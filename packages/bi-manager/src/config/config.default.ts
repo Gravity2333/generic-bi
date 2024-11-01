@@ -1,10 +1,8 @@
 import { EggAppInfo } from "egg";
 import * as path from "path";
 import { IMyAppConfig } from "./../interface/config";
-import { EBIVERSION } from "@bi/common";
 
-const NPM_CMS_HOST = "127.0.0.1";
-const isCms = process.env.BI_VERSION === EBIVERSION.CMS;
+// const HOST = "127.0.0.1";
 
 export default (appInfo: EggAppInfo) => {
   const config = {} as IMyAppConfig;
@@ -39,11 +37,11 @@ export default (appInfo: EggAppInfo) => {
   config.sequelize = {
     options: {
       dialect: "postgres",
-      host: "bi-postgres",
-      port: 5432,
+      host: "127.0.0.1",
+      port: 5433,
       database: "bi",
-      username: "machloop",
-      password: "Machloop@123",
+      username: "postgres",
+      password: "bi@123",
       timezone: "+08:00",
       modules: ["../model/*"],
       logging: false,
@@ -68,7 +66,7 @@ export default (appInfo: EggAppInfo) => {
     client: {
       host: "bi-redis", // default value
       port: 6379, // default value
-      password: "Machloop@123",
+      // password: "Machloop@123",
       db: 0,
     },
   };
@@ -123,71 +121,33 @@ export default (appInfo: EggAppInfo) => {
     expiresIn: "2h", // https://github.com/vercel/ms
   };
 
-  // 外部系统配置
-  // ===========
-  config.orm = {
-    "npmd-cms": {
-      type: "postgres",
-      host: NPM_CMS_HOST,
-      port: 5432,
-      username: "machloop",
-      password: "Machloop@123",
-      timezone: "+08:00",
-      database: isCms ? "fpc-cms" : "fpc",
-    },
-  };
+  // config.clickhouse = {
+  //   protocol: "http:",
+  //   host: HOST,
+  //   path: "/",
+  //   port: 8123,
+  //   user: "clickhouse",
+  //   password: "Machloop@123",
+  //   database: "fpc",
+  //   // ca_path: join(__dirname, "./ch_config/certs/server.crt"),
+  // };
 
-  config.clickhouse = {
-    protocol: "http:",
-    host: NPM_CMS_HOST,
-    path: "/",
-    port: 8123,
-    user: "clickhouse",
-    password: "Machloop@123",
-    database: "fpc",
-    // ca_path: join(__dirname, "./ch_config/certs/server.crt"),
-  };
+  // config.clickhouse = {
+  //   protocol: "http:",
+  //   host: HOST,
+  //   path: "/",
+  //   port: 8123,
+  //   user: "clickhouse",
+  //   password: "Machloop@123",
+  //   database: "fpc",
+  //   // ca_path: join(__dirname, "./ch_config/certs/server.crt"),
+  // };
 
-  if (isCms) {
-    config.clickhouse = {
-      protocol: "http:",
-      host: NPM_CMS_HOST,
-      path: "/",
-      port: 8123,
-      user: "clickhouse",
-      password: "Machloop@123",
-      database: "fpc",
-      // ca_path: join(__dirname, "./ch_config/certs/server.crt"),
-    };
-  } else {
-    config.clickhouse = {
-      protocol: "http:",
-      host: NPM_CMS_HOST,
-      path: "/",
-      port: 8123,
-      user: "clickhouse",
-      password: "Machloop@123",
-      database: "fpc",
-      // ca_path: join(__dirname, "./ch_config/certs/server.crt"),
-    };
-
-    config.chStatus = {
-      protocol: "http:",
-      host: NPM_CMS_HOST,
-      path: "/",
-      port: 8124,
-      user: "clickhouse",
-      password: "Machloop@123",
-      database: "fpc",
-      // ca_path: join(__dirname, "./ch_config/certs/server.crt"),
-    };
-  }
-
-  config.restapi = {
-    url_origin: `https://${NPM_CMS_HOST}:${isCms ? 41120 : 41110}`,
-    app_key: "td-XPsGtzCZQnkmhNNGn_jsec7cb8e_R",
-    app_token: "yRKcxHQYeMJFdyHHB@pCJtDPjXjsys-D",
-  };
+  // config.restapi = {
+  //   url_origin: `https://${NPM_CMS_HOST}:${isCms ? 41120 : 41110}`,
+  //   app_key: "td-XPsGtzCZQnkmhNNGn_jsec7cb8e_R",
+  //   app_token: "yRKcxHQYeMJFdyHHB@pCJtDPjXjsys-D",
+  // };
 
   /** 配置日志清理 */
   config.midwayLogger = {

@@ -2,8 +2,6 @@ import { ILifeCycle, IMidwayContainer } from "@midwayjs/core";
 import { App, Configuration, Inject, Logger } from "@midwayjs/decorator";
 import { IMidwayLogger } from "@midwayjs/logger";
 import { Application } from "@midwayjs/web";
-import * as ClickHouse from "@posthog/clickhouse";
-import { readFileSync } from "fs";
 import { join } from "path";
 import { ApiController } from "./controller/api";
 import { DashboardService } from "./service/dashboard";
@@ -12,11 +10,9 @@ import { ReportService } from "./service/report";
 import { ReportScheduleService } from "./service/reportSchedule";
 import { Utils } from "./utils";
 import { WidgetService } from "./service/widget";
-import { EBIVERSION } from "@bi/common";
 import { NpmdDictService } from "./service/npmdDict";
 import { NetworkService } from "./service/network";
 
-const isCms = process.env.BI_VERSION === EBIVERSION.CMS;
 
 @Configuration({
   imports: [
@@ -70,50 +66,27 @@ export class ContainerConfiguration implements ILifeCycle {
   async onConfigLoad(container: IMidwayContainer) {
     // 初始化 clickhouse 客户端
     // =======================
-    this.app.clickhouseClient = new ClickHouse({
-      protocol: this.app.config.clickhouse.protocol,
-      host: this.app.config.clickhouse.host,
-      port: this.app.config.clickhouse.port,
-      path: this.app.config.clickhouse.path,
-      format: "JSON",
-      user: this.app.config.clickhouse.user,
-      password: this.app.config.clickhouse.password,
-      queryOptions: {
-        database: this.app.config.clickhouse.database,
-      },
-      ...(this.app.config.clickhouse.ca_path
-        ? {
-            // This object merge with request params (see request lib docs)
-            ca: readFileSync(this.app.config.clickhouse.ca_path),
-            requestCert: true,
-            rejectUnauthorized: false,
-          }
-        : {}),
-    });
+    // this.app.clickhouseClient = new ClickHouse({
+    //   protocol: this.app.config.clickhouse.protocol,
+    //   host: this.app.config.clickhouse.host,
+    //   port: this.app.config.clickhouse.port,
+    //   path: this.app.config.clickhouse.path,
+    //   format: "JSON",
+    //   user: this.app.config.clickhouse.user,
+    //   password: this.app.config.clickhouse.password,
+    //   queryOptions: {
+    //     database: this.app.config.clickhouse.database,
+    //   },
+    //   ...(this.app.config.clickhouse.ca_path
+    //     ? {
+    //         // This object merge with request params (see request lib docs)
+    //         ca: readFileSync(this.app.config.clickhouse.ca_path),
+    //         requestCert: true,
+    //         rejectUnauthorized: false,
+    //       }
+    //     : {}),
+    // });
 
-    if (!isCms) {
-      // 初始化 chStatus 客户端
-      this.app.chStatusClient = new ClickHouse({
-        protocol: this.app.config.chStatus.protocol,
-        host: this.app.config.chStatus.host,
-        port: this.app.config.chStatus.port,
-        path: this.app.config.chStatus.path,
-        format: "JSON",
-        user: this.app.config.chStatus.user,
-        password: this.app.config.chStatus.password,
-        queryOptions: {
-          database: this.app.config.chStatus.database,
-        },
-        ...(this.app.config.chStatus.ca_path
-          ? {
-              // This object merge with request params (see request lib docs)
-              ca: readFileSync(this.app.config.chStatus.ca_path),
-              requestCert: true,
-              rejectUnauthorized: false,
-            }
-          : {}),
-      });
-    }
     (global as any).app = {
       clickhouseClient: this.app.clickhouseClient,
       chStatusClient: this.app.chStatusClient,
