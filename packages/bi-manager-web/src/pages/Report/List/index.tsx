@@ -14,7 +14,6 @@ import { history } from 'umi';
 import cronstrue from 'cronstrue/i18n';
 import { proTableSerchConfig } from '@/common';
 import { PlusOutlined } from '@ant-design/icons';
-import { SensorOfflineAlert } from '@/components/SensorOfflineAlert';
 import styles from './index.less';
 import { getTablePaginationDefaultSettings } from '@/utils/pagination';
 import MailConfigAlert from '../components/MailConfigAlert';
@@ -59,7 +58,6 @@ type ReportListVariableTypes = {
   frozeRows: Record<string, boolean>;
   currentReport: IReportFormData;
   showLogs: boolean;
-  hasOnlineSensor: boolean;
 };
 
 export default function List() {
@@ -96,17 +94,7 @@ export default function List() {
           return (
             <Tag
               style={{ cursor: 'default' }}
-              // style={{ cursor: hasOnlineSensor ? 'pointer' : 'not-allowed' }}
-              // onClick={() => {
-              //   if (hasOnlineSensor) {
-              //     if (embed) {
-              //       jumpToParent('/analysis/dashboard/custom', { dashboardTabId: id }, false);
-              //     } else {
-              //       history.push(`/dashboard/${id}/preview`);
-              //     }
-              //   }
-              // }}
-              color={variables.hasOnlineSensor ? 'blue' : 'rgba(0, 0, 0, 0.2)'}
+              color={'blue'}
             >
               {name}
             </Tag>
@@ -193,7 +181,6 @@ export default function List() {
                   payload: record.id,
                 });
               }}
-              disabled={!variables.hasOnlineSensor}
             >
               执行
             </Button>
@@ -204,7 +191,6 @@ export default function List() {
                 variables.currentReport = record;
                 variables.showLogs = true;
               }}
-              disabled={!variables.hasOnlineSensor}
             >
               结果
             </Button>
@@ -218,7 +204,6 @@ export default function List() {
                   history.push(`/embed/report/${record.id}/update`);
                 }
               }}
-              disabled={!variables.hasOnlineSensor}
             >
               修改
             </Button>
@@ -245,11 +230,6 @@ export default function List() {
 
   return (
     <div className={styles['pro-table-auto-height']}>
-      {/** 无可用探针提醒 */}
-      <SensorOfflineAlert
-        hasOnlineSensor={variables.hasOnlineSensor}
-        setHasOnlinenSensor={(hasSensor) => (variables.hasOnlineSensor = hasSensor)}
-      />
       {/* 邮箱配置提醒 */}
       <MailConfigAlert />
       <ProTable
@@ -296,7 +276,6 @@ export default function List() {
               }}
               key="created"
               type="primary"
-              disabled={!variables.hasOnlineSensor}
             >
               新建
             </Button>,

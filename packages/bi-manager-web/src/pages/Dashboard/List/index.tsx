@@ -11,7 +11,6 @@ import { IDashboardFormData } from '@bi/common';
 import { Badge, Button, Checkbox, message, Popconfirm, Popover, Upload } from 'antd';
 import { useRef, useState } from 'react';
 import { history } from 'umi';
-import { SensorOfflineAlert } from '@/components/SensorOfflineAlert';
 import styles from './index.less';
 import { getTablePaginationDefaultSettings } from '@/utils/pagination';
 import useEmbed from '@/hooks/useEmbed';
@@ -55,8 +54,7 @@ const ExportDashboard = ({ keys }: { keys: React.Key[] }) => {
 
 export default function DashboardList() {
   const actionRef = useRef<ActionType>();
-  /** 是否有可用的探针 */
-  const [hasOnlineSensor, setHasOnlinenSensor] = useState<boolean>(true);
+
   const [embed] = useEmbed();
 
   /** 勾选的仪表盘 */
@@ -127,14 +125,13 @@ export default function DashboardList() {
                   history.push(`/dashboard/${record.id}/preview`);
                 }
               }}
-              disabled={!hasOnlineSensor}
             >
               预览
             </Button>
             <Button
               type="link"
               size="small"
-              disabled={!hasOnlineSensor || (!isDev && record?.readonly === '1')}
+              disabled={ (!isDev && record?.readonly === '1')}
               onClick={() => {
                 if (embed) {
                   history.push(`/embed/dashboard/${record.id}/update`);
@@ -213,10 +210,6 @@ export default function DashboardList() {
 
   return (
     <div className={styles['pro-table-auto-height']}>
-      <SensorOfflineAlert
-        hasOnlineSensor={hasOnlineSensor}
-        setHasOnlinenSensor={setHasOnlinenSensor}
-      />
       <ProTable
         rowKey="id"
         bordered
@@ -270,7 +263,6 @@ export default function DashboardList() {
                 }}
                 key="created"
                 type="primary"
-                disabled={!hasOnlineSensor}
               >
                 新建
               </Button>

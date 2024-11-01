@@ -1,17 +1,15 @@
 import { DARK_COLOR, LIGHT_COLOR, updateTheme } from '@/utils/theme';
 import { Avatar, Space, Switch, Tag } from 'antd';
 import { useModel } from 'umi';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { isIframeEmbed } from '@/utils';
 import { TTheme } from '@/interface';
-import { EBIVERSION } from '@bi/common';
-import useBiVersion from '@/hooks/useBiVersion';
 import styles from './index.less';
 import { UserOutlined } from '@ant-design/icons';
 
 const RightContent = () => {
   const { initialState, setInitialState } = useModel('@@initialState');
-  const biVersion = useBiVersion();
+
   const handeChangeTheme = (checked: boolean) => {
     setInitialState({
       ...(initialState || {}),
@@ -55,10 +53,10 @@ const RightContent = () => {
   if (isIframeEmbed) {
     return null;
   }
-console.log(initialState)
+
   return (
     <Space>
-      <Tag>{biVersion === EBIVERSION.CMS ? 'CMS版本' : '探针版本'}</Tag>
+      <Tag>{'测试版本'}</Tag>
       <Switch
         checked={initialState?.theme === 'dark'}
         checkedChildren={'🌙'}
@@ -68,7 +66,7 @@ console.log(initialState)
       <span className={`${styles.action} ${styles.account}`}>
         <Avatar size="small" icon={<UserOutlined />} />
         <div className={`${styles.name} anticon`}>
-          <span style={{marginLeft:'8px'}}>
+          <span style={{ marginLeft: '8px' }}>
             {(initialState as any)?.currentUserInfo?.username || '未知用户'}
           </span>
         </div>

@@ -13,7 +13,6 @@ import { history, useLocation } from 'umi';
 import DraggableTabs from '../components/DraggableTabs';
 import { sendMsgToParent } from '@/utils/sendMsgToParent';
 import React from 'react';
-import { SensorOfflineAlert } from '@/components/SensorOfflineAlert';
 import useVariable from '@/hooks/useVariable';
 import { UseVariableParams } from '@/hooks/useVariable/typings';
 
@@ -37,15 +36,17 @@ const variableConfig: UseVariableParams = {
       }
       const { success, data } = call(queryAllDashboards, {});
       const list = success ? data : [];
-      const rankedList = [...list]
-      const defaultIndex = rankedList.findIndex(d=>d.id === SYSTEM_DASHBOARD_ID)
-      if(defaultIndex>=0){
-        const [defaultDashboard] = rankedList.splice(defaultIndex,1)
-        rankedList.unshift(defaultDashboard)
+      const rankedList = [...list];
+      const defaultIndex = rankedList.findIndex((d) => d.id === SYSTEM_DASHBOARD_ID);
+      if (defaultIndex >= 0) {
+        const [defaultDashboard] = rankedList.splice(defaultIndex, 1);
+        rankedList.unshift(defaultDashboard);
       }
       store.dashboardList = rankedList;
       if (rankedList.length > 0) {
-        store.selectedDashboardId = payload?.dashboardTabId ? payload?.dashboardTabId :rankedList[0].id;
+        store.selectedDashboardId = payload?.dashboardTabId
+          ? payload?.dashboardTabId
+          : rankedList[0].id;
       }
       setLoading(false);
     },
@@ -71,7 +72,7 @@ export default () => {
   const [variables, dispatch, loading] = useVariable<DashboardTabDataType>(variableConfig);
 
   const { dashboardList, selectedDashboardId, dashboardDetail } = variables;
- 
+
   const queryDashboardListLoading = loading('fetchDashboardList');
 
   const queryDashboardDetailLoading = loading('fetchDashboardDetail');
@@ -117,7 +118,7 @@ export default () => {
       return <Result status="warning" title="没有找到相关的仪表盘" />;
     }
     return <DashboardEditor dashboard={dashboardDetail} preview tab />;
-  }, [dashboardDetail?.id, dashboardDetail,queryDashboardDetailLoading]);
+  }, [dashboardDetail?.id, dashboardDetail, queryDashboardDetailLoading]);
 
   const handleEdit: TabsProps['onEdit'] = async (targetKey, action) => {
     if (action === 'add') {
@@ -187,38 +188,29 @@ export default () => {
         fetchDashboardDetail,
       }}
     >
-      <SensorOfflineAlert
-        hasOnlineSensor={hasOnlineSensor}
-        setHasOnlinenSensor={setHasOnlinenSensor}
-        hide
-      />
-      {!hasOnlineSensor ? (
-        <Result status="warning" title="无在线探针，无法查看仪表盘！" />
-      ) : (
-        <div style={{display:'flex',flexFlow:'column nowrap',height:'100%',overflow:'hidden'}}>
-          <div>
-            <DraggableTabs
-              type="editable-card"
-              destroyInactiveTabPane
-              activeKey={selectedDashboardId}
-              onEdit={handleEdit}
-              onChange={handleChange}
-              dragEnd={handleDragEnd}
-            >
-              {dashboardList.map((row) => (
-                <Tabs.TabPane
-                  tab={row.name}
-                  key={row.id}
-                  closable={row?.readonly === '0'}
-                ></Tabs.TabPane>
-              ))}
-            </DraggableTabs>
-          </div>
-          <div style={{flex: '1 0',overflow:'auto'}}>
-          {hasOnlineSensor && renderdDashboard}
-          </div>
+      <div
+        style={{ display: 'flex', flexFlow: 'column nowrap', height: '100%', overflow: 'hidden' }}
+      >
+        <div>
+          <DraggableTabs
+            type="editable-card"
+            destroyInactiveTabPane
+            activeKey={selectedDashboardId}
+            onEdit={handleEdit}
+            onChange={handleChange}
+            dragEnd={handleDragEnd}
+          >
+            {dashboardList.map((row) => (
+              <Tabs.TabPane
+                tab={row.name}
+                key={row.id}
+                closable={row?.readonly === '0'}
+              ></Tabs.TabPane>
+            ))}
+          </DraggableTabs>
         </div>
-      )}
+        <div style={{ flex: '1 0', overflow: 'auto' }}>{renderdDashboard}</div>
+      </div>
     </EmbedTabContext.Provider>
   );
 };

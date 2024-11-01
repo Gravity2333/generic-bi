@@ -20,7 +20,6 @@ import React, { useRef, useState } from 'react';
 import { history } from 'umi';
 import AddToDashboard from '../components/Renderer/components/AddToDashboard';
 import WidgetPreview from '../Preview';
-import { SensorOfflineAlert } from '@/components/SensorOfflineAlert';
 import FullScreenCard from '@/components/FullScreenCard';
 import SQLPreview from '@/pages/SqlLab/components/Preview';
 import { downloadSqlJsonCSV, downloadSqlJsonExcel } from '@/services/sqllab';
@@ -34,15 +33,13 @@ const biToken = window.sessionStorage.getItem(BI_AUTH_TOKEN_KEY);
 
 export default function WidgetList() {
   const actionRef = useRef<ActionType>();
-  /** 是否有可用的探针 */
-  const [hasOnlineSensor, setHasOnlinenSensor] = useState<boolean>(true);
   /** 预览的widget */
   const [previewWidget, setPreviewWidget] = useState<IWidgetFormData>();
 
   /** 勾选的widget */
   const [selectedWidget, setSelectedWidget] = useState<IWidgetFormData[]>([]);
 
-  const [embed]= useEmbed()
+  const [embed] = useEmbed();
 
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
 
@@ -234,7 +231,6 @@ export default function WidgetList() {
               onClick={() => {
                 setPreviewWidget(record);
               }}
-              disabled={!hasOnlineSensor}
             >
               预览
             </Button>
@@ -248,7 +244,6 @@ export default function WidgetList() {
                   history.push(`/widget/${record.id}/copy`);
                 }
               }}
-              disabled={!hasOnlineSensor}
             >
               复制
             </Button>
@@ -270,7 +265,6 @@ export default function WidgetList() {
                   }
                 }
               }}
-              disabled={!hasOnlineSensor}
             >
               {record?.readonly === '1' ? '查看' : '修改'}
             </Button>
@@ -300,10 +294,6 @@ export default function WidgetList() {
 
   return (
     <div className={styles['pro-table-auto-height']}>
-      <SensorOfflineAlert
-        hasOnlineSensor={hasOnlineSensor}
-        setHasOnlinenSensor={setHasOnlinenSensor}
-      />
       <ProTable
         rowKey="id"
         bordered

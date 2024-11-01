@@ -91,10 +91,10 @@ export const layout: RunTimeLayoutConfig = ({ initialState }) => {
     navTheme: initialState?.theme === 'dark' ? 'realDark' : 'light',
     layout: 'top',
     primaryColor: initialState?.theme === 'dark' ? DARK_COLOR : LIGHT_COLOR,
-    title: isIframeEmbed ? false : 'BI可视化',
+    title: isIframeEmbed ? false : 'Generic-BI',
     className: isIframeEmbed ? 'embed-bi-layout' : undefined,
     isChildrenLayout: true,
-    rightContentRender: () => <RightContent />,
+    rightContentRender: () => <RightContent />, 
     links: [],
     childrenRender: LayoutContent,
   };
