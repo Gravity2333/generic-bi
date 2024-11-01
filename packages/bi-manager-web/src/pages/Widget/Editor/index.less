@@ -1,0 +1,50 @@
+:root{
+  --top: 48px;
+}
+.widget-editor {
+  position: fixed;
+  top: var(--top);
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  overflow: hidden;
+  background: white;
+  &__config {
+    width: 450px;
+    min-width: 450px;
+    height: calc(100%-48px);
+    overflow-x: hidden;
+    overflow-y: auto;
+    background: #fff;
+    border-right: 1px solid rgba(0, 0, 0, 0.06);
+    :global {
+      .ant-divider-horizontal.ant-divider-with-text {
+        margin: 10px 0;
+      }
+      .ant-divider-inner-text {
+        color: rgba(0, 0, 0, 0.5);
+        font-size: 14px;
+      }
+    }
+  }
+  &__container {
+    position: relative;
+    width: 100%;
+    height: calc(100%-48px);
+    transform: translate(0, 0);
+  }
+  &__content {
+    position: fixed;
+    top: 0px;
+    right: 0px;
+    bottom: 0px;
+    left: 0px;
+    display: flex;
+    flex: 1;
+    align-items: center;
+    justify-content: center;
+    margin: auto;
+    margin-left: 10px;
+  }
+}

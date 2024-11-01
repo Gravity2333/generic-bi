@@ -1,0 +1,22 @@
+.container {
+  position: absolute;
+  z-index: 9999999;
+  box-sizing: border-box;
+  padding: 8px 16px;
+  overflow: hidden;
+  color: var(--font-color);
+  background-color: var(--bg-color);
+  border-radius: 4px;
+  box-shadow: 0 2px 8px 0 #cacaca;
+
+  :global {
+    .ant-menu-item {
+      display: flex;
+      align-items: center;
+      height: 2em;
+    }
+    .ant-menu-title-content {
+      line-height: 2em;
+    }
+  }
+}

@@ -1,0 +1,62 @@
+.pro-table-auto-height {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  right: 0px;
+  display: flex;
+  flex-flow: column nowrap;
+  overflow: hidden;
+  :global {
+    .ant-pro-table {
+      height: 100%;
+      display: flex;
+      flex: 1 1;
+      flex-flow: column nowrap;
+      overflow: hidden;
+      .ant-pro-card:last-child {
+        flex: 1 1 100%;
+        overflow: hidden;
+        .ant-pro-card-body {
+          display: flex;
+          flex-flow: column nowrap;
+          height: 100%;
+          overflow: hidden;
+          .ant-pro-table-alert {
+            flex: 0 0;
+          }
+          .ant-table-wrapper {
+            flex: 1 1 100%;
+            overflow: hidden;
+            .ant-spin-nested-loading {
+              height: 100%;
+              overflow: hidden;
+              .ant-spin-container {
+                height: 100%;
+                overflow: hidden;
+                .ant-table {
+                  height: 100%;
+                  .ant-table-container {
+                    height: 100%;
+                    overflow: hidden !important;
+                    .ant-table-content {
+                      height: 100%;
+                      overflow: auto !important;
+                      table {
+                        .ant-table-thead {
+                          position: sticky;
+                          top: 0px;
+                          z-index: 3;
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "description": "某个网络的总流量",
+
+  "viz_type": "time_histogram",
+  "datasource": "fpc.d_fpc_metric_network_data_record",
+
+  "metrics": [
+    {
+      "expression_type": "simple",
+      "aggregate": "SUM",
+      "field": "total_bytes"
+    }
+  ],
+  "filters": [
+    {
+      "expression_type": "simple",
+      "field": "network_id",
+      "field_type": "String",
+      "operator": "EQUALS",
+      "value": "906VC3wBDck3rne__v0_"
+    }
+  ],
+  "time_field": "timestamp",
+  "time_range": {
+    "type": "custom",
+    "custom": ["2021-12-08T17:34:00+08:00", "2021-12-08T18:04:00+08:00"],
+    "range": 10,
+    "unit": "m",
+    "include_lower": true,
+    "include_upper": true
+  },
+  "groupby": [{ "field": "network_id" }],
+  "havings": [],
+  "limit": null,
+  "sorts": []
+}

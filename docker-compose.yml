@@ -1,0 +1,44 @@
+version: '2.4'
+services:
+  bi-server:
+    container_name: machloop-bi-server
+    image: machloop/bi-server:latest
+    environment:
+      USER: root
+      TZ: "Asia/Shanghai"
+    ports:
+      - "127.0.0.1:41130:41130"
+    restart: always
+    volumes:
+      # bi-manager config
+      #- /opt/components/bi-apps/config/config.default.js:/usr/src/app/dist/config/config.default.js
+      # 日志
+      - /opt/machloop/log/bi-manager:/root/logs/@bi/manager
+      # 生成的 pdf 文件
+      - /opt/components/bi-apps/app/dist/resources/pdf:/usr/src/app/dist/resources/pdf/
+      # 默认仪表盘
+      - /opt/components/bi-apps/init/dashboard:/usr/src/app/dist/init/dashboard/
+  bi-postgres:
+    container_name: machloop-bi-postgres # 生成的容器名称 
+    restart: always
+    image: postgres:11 # postgres 镜像
+    # ports:
+      # - 5432:5432 # 映射端口号
+    privileged: true # 解决权限
+    environment:
+      POSTGRES_USER: machloop
+      POSTGRES_PASSWORD: Machloop@123 # 密码
+      POSTGRES_DB: bi
+      PGDATA: /var/lib/postgresql/data/pgdata # 数据存储文件夹
+    volumes:
+      - /opt/machloop/data/postgres-bi:/var/lib/postgresql/data/pgdata
+      # sql 初始化语句
+      - ./packages/bi-manager/init/sql/init_table.sql:/docker-entrypoint-initdb.d/init_table.sql
+  bi-redis:
+    container_name: machloop-bi-redis
+    image: redis:latest
+    # ports:
+      # - 6379:6379
+    command: redis-server --requirepass Machloop@123
+    volumes:
+      - /opt/machloop/data/redis-bi:/data

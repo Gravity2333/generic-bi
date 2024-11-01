@@ -1,0 +1,18 @@
+{
+  "name": "root",
+  "private": true,
+  "npmClient": "yarn",
+  "workspaces": {
+    "packages": [
+      "packages/*"
+    ],
+    "nohoist": [
+      "**/egg",
+      "**/egg/**",
+      "**/midway",
+      "**/midway/**",
+      "**/@midwayjs",
+      "**/@midwayjs/**"
+    ]
+  }
+}

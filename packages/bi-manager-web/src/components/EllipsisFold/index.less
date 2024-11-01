@@ -1,0 +1,67 @@
+.ellipsis-scroll {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding-right: 0px;
+  position: relative;
+  height: 100%;
+  &__expand {
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    bottom: 0px;
+    width: 20px;
+    // cursor: pointer;
+    opacity: 1;
+    svg {
+      margin-top: 5px;
+      margin-left: 0px;
+    }
+  }
+
+  &__expand:hover {
+    color: rgb(24, 144, 255);
+  }
+
+  &__left {
+    vertical-align: middle;
+    cursor: pointer;
+  }
+
+  &__left:hover {
+    color: rgb(24, 144, 255);
+  }
+
+  &__center {
+    display: inline-block;
+    flex: 1 1;
+    // height: 24px;
+    overflow: hidden;
+    vertical-align: top;
+  }
+
+  &__center-expand {
+    display: inline-block;
+    overflow: hidden;
+    white-space: pre-wrap;
+    vertical-align: middle;
+    vertical-align: top;
+  }
+
+  &__right {
+    vertical-align: middle;
+    cursor: pointer;
+  }
+
+  &__right:hover {
+    color: rgb(24, 144, 255);
+  }
+
+  &__placeholder {
+    // width: 14px;
+    // height: 14px;
+    // margin-left: 14px;
+  }
+}

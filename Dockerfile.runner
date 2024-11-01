@@ -1,0 +1,46 @@
+FROM machloop/bi-builder as npmd-hj-x86
+
+COPY packages/bi-manager/package.json /build/packages/bi-manager-prod/
+
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
+
+RUN cd /build/packages/bi-manager-prod/ && sed -i '/\@bi\/common/d' package.json && npm install numeral sqlstring uuid && npm install --production && node-prune
+
+FROM alpine:latest
+ENV TZ Asia/Shanghai
+ENV NODE_ENV production
+ENV PLATFORM X86
+ENV BI_VERSION NPMD
+
+RUN \
+mkdir -p /usr/src/app \
+&& mkdir -p /node_modules.d \
+&& install -d /usr/src/app/view \
+&& install -d /usr/src/app/dist \
+&& install -d /usr/src/app/node_modules \
+&& install -d -m 777 /usr/src/app/dist/resources/pdf \
+&& install -d -m 777 /usr/src/app/dist/init/dashboard \
+&& install -d -m 777 /usr/src/app/dist/init/sql \
+&& sed -i 's/dl-cdn.alpinelinux.org/mirrors.tuna.tsinghua.edu.cn/g' /etc/apk/repositories \
+&& echo "https://mirrors.aliyun.com/alpine/edge/community/" >> /etc/apk/repositories \
+&& apk -U --no-cache update && apk add --no-cache --allow-untrusted nodejs yarn tzdata bash chromium nss ca-certificates font-wqy-zenhei \
+&& rm -rf /var/cache/*
+
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
+  PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
+
+WORKDIR /usr/src/app
+COPY --from=npmd-hj-x86 /build/packages/bi-manager/package.json /build/packages/bi-manager/tsconfig.json /usr/src/app/
+COPY --from=npmd-hj-x86 /build/packages/bi-manager-prod/node_modules/ /usr/src/app/node_modules/
+COPY docker-entrypoint.sh /
+
+RUN chmod +x /docker-entrypoint.sh
+
+ENV NODE_PATH /usr/local/lib/node_modules:/usr/src/app/node_modules
+
+EXPOSE 41130
+
+ENTRYPOINT ["/docker-entrypoint.sh"]
+
+CMD yarn run start:docker
+

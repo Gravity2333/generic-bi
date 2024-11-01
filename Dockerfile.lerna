@@ -1,0 +1,64 @@
+FROM node:16.8.0-alpine3.11 as build-temp
+RUN yarn config set registry https://registry.npmmirror.com/ && yarn global add lerna cnpm node-prune && yarn cache clean 
+# 替换国内镜像源
+# RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.ustc.edu.cn/g' /etc/apk/repositories
+RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.tuna.tsinghua.edu.cn/g' /etc/apk/repositories
+RUN \
+  mkdir /build \
+  mkdir -p /build/packages/bi-common/ \
+  mkdir -p /build/packages/bi-manager/ \
+  mkdir -p /build/packages/bi-manager-web/ \
+  && yarn global add node-gyp \
+  # node-canvas
+  # @see: https://github.com/Automattic/node-canvas/issues/1886#issuecomment-925928476
+  && apk add --no-cache build-base g++ cairo-dev jpeg-dev pango-dev giflib-dev python2 bash \
+  && apk add --update libmount ttf-dejavu ttf-droid ttf-freefont ttf-liberation ttf-ubuntu-font-family fontconfig
+
+WORKDIR /build
+
+# Copy your packages
+COPY packages/bi-common/ ./packages/bi-common/
+COPY packages/bi-manager/package.json ./packages/bi-manager/
+COPY packages/bi-manager-web/package.json ./packages/bi-manager-web/
+
+# Copies package.json and package-lock.json to Docker environment
+COPY package.json lerna.json .
+# Installs all node packages across packages
+RUN lerna bootstrap && yarn cache clean 
+
+COPY packages/bi-manager ./packages/bi-manager/
+COPY packages/bi-manager-web ./packages/bi-manager-web/
+
+# build
+RUN cd ./packages/bi-manager && npm run build
+RUN cd ./packages/bi-manager-web && npm run build
+
+RUN cd ./packages/bi-manager && yarn prune --production && node-prune
+
+# ===================
+FROM alpine:latest
+ENV TIME_ZONE=Asia/Shanghai
+ENV NODE_ENV production
+# 替换国内镜像源
+# RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.ustc.edu.cn/g' /etc/apk/repositories
+RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.tuna.tsinghua.edu.cn/g' /etc/apk/repositories
+
+RUN \
+  mkdir -p /usr/src/app \
+  mkdir -p /usr/src/app/view \
+  mkdir -p /usr/src/app/dist \
+  mkdir -p /usr/src/app/node_modules \
+  && apk add --no-cache nodejs yarn tzdata bash \
+  && echo "${TIME_ZONE}" > /etc/timezone \ 
+  && ln -sf /usr/share/zoneinfo/${TIME_ZONE} /etc/localtime 
+
+WORKDIR /usr/src/app
+# 拷贝 nodejs 服务
+COPY --from=build-temp /build/packages/bi-manager/package.json /build/packages/bi-manager/tsconfig.json /usr/src/app/
+COPY --from=build-temp /build/packages/bi-manager/dist/ /usr/src/app/dist/
+COPY --from=build-temp /build/packages/bi-manager/node_modules/ /usr/src/app/node_modules/
+# Copy Web production
+COPY --from=build-temp /build/packages/bi-manager-web/dist/ /usr/src/app/view/
+
+EXPOSE 7001
+CMD yarn run start:docker

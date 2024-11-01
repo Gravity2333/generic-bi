@@ -1,0 +1,42 @@
+{
+  "description": "所有网络的总带宽统计(5m统计表)- 时间折线图",
+
+  "viz_type": "time_histogram",
+  "datasource": "fpc.d_fpc_metric_network_data_record",
+
+  "metrics": [
+    {
+      "expression_type": "simple",
+      "aggregate": "",
+      "field": "timestamp"
+    },
+    {
+      "expression_type": "simple",
+      "aggregate": "SUM",
+      "field": "total_bytes"
+    }
+  ],
+  "filters": [],
+  "time_field": "timestamp",
+  "time_range": {
+    "type": "range",
+    "range": 10,
+    "unit": "m",
+    "include_lower": true,
+    "include_upper": true
+  },
+  "groupby": [{ "field": "timestamp" }],
+  "havings": [],
+  "limit": null,
+  "time_grain": "5m",
+  "sorts": [
+    [
+      {
+        "expression_type": "simple",
+        "aggregate": "",
+        "field": "timestamp"
+      },
+      "desc"
+    ]
+  ]
+}

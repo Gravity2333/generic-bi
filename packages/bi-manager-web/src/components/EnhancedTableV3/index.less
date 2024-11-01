@@ -1,0 +1,62 @@
+:global {
+  .ag-theme-alpine {
+    --ag-borders: solid 1px;
+    --ag-border-color: #f0f0f0;
+    --ag-secondary-border-color: #f0f0f0;
+    --ag-borders-critical-color: #f0f0f0;
+    --ag-cell-horizontal-border: solid #f0f0f0;
+    --ag-header-column-resize-handle-height: 100%;
+    --ag-header-column-resize-handle-color: #f0f0f0;
+  }
+
+  .ag-theme-alpine-dark {
+    --ag-borders: solid 1px;
+    --ag-border-color: #303030;
+    --ag-secondary-border-color: #303030;
+    --ag-borders-critical-color: #303030;
+    --ag-cell-horizontal-border: solid #303030;
+    --ag-header-column-resize-handle-height: 100%;
+    --ag-header-column-resize-handle-color: #303030;
+  }
+
+  .ag-header-cell-text {
+    font-weight: 500;
+    font-size: 14px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial,
+      'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol',
+      'Noto Color Emoji';
+  }
+  // ag-table所有内容可选中
+  .ag-unselectable {
+    user-select: text;
+  }
+}
+
+.tableContainer {
+  display: flex;
+  flex-direction: column;
+
+  .header {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 10px;
+
+    .extra {
+      flex-grow: 1;
+      padding-right: 10px;
+    }
+  }
+
+  .body {
+    flex-grow: 1;
+    width: 100%;
+  }
+
+  .footer {
+    flex-shrink: 0;
+    height: 40px;
+  }
+}

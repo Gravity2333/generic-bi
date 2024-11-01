@@ -1,0 +1,56 @@
+{
+  "description": "最近10分钟所有网络的会话统计 - 时间折线图",
+
+  "viz_type": "time_histogram",
+  "datasource": "fpc.d_fpc_metric_network_data_record",
+
+  "metrics": [
+    {
+      "expression_type": "simple",
+      "aggregate": "",
+      "field": "timestamp"
+    },
+    {
+      "expression_type": "simple",
+      "aggregate": "SUM",
+      "field": "active_sessions"
+    },
+    {
+      "expression_type": "simple",
+      "aggregate": "SUM",
+      "field": "established_sessions"
+    },
+    {
+      "expression_type": "simple",
+      "aggregate": "SUM",
+      "field": "destroyed_sessions"
+    },
+    {
+      "expression_type": "simple",
+      "aggregate": "SUM",
+      "field": "concurrent_sessions"
+    }
+  ],
+  "filters": [],
+  "time_field": "timestamp",
+  "time_range": {
+    "type": "range",
+    "range": 10,
+    "unit": "m",
+    "include_lower": true,
+    "include_upper": true
+  },
+  "groupby": [{ "field": "timestamp" }],
+  "havings": [],
+  "limit": null,
+  "sorts": [
+    [
+      {
+        "expression_type": "simple",
+        "aggregate": "",
+        "field": "timestamp"
+      },
+      "desc"
+    ]
+  ]
+}

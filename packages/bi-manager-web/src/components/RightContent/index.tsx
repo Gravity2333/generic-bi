@@ -1,0 +1,80 @@
+import { DARK_COLOR, LIGHT_COLOR, updateTheme } from '@/utils/theme';
+import { Avatar, Space, Switch, Tag } from 'antd';
+import { useModel } from 'umi';
+import { useEffect, useState } from 'react';
+import { isIframeEmbed } from '@/utils';
+import { TTheme } from '@/interface';
+import { EBIVERSION } from '@bi/common';
+import useBiVersion from '@/hooks/useBiVersion';
+import styles from './index.less';
+import { UserOutlined } from '@ant-design/icons';
+
+const RightContent = () => {
+  const { initialState, setInitialState } = useModel('@@initialState');
+  const biVersion = useBiVersion();
+  const handeChangeTheme = (checked: boolean) => {
+    setInitialState({
+      ...(initialState || {}),
+      theme: !!checked ? 'dark' : 'light',
+    });
+  };
+
+  useEffect(() => {
+    window.addEventListener('message', (ev: MessageEvent<{ param: any }>) => {}, false);
+  }, []);
+
+  // 监听外层的容器的
+  useEffect(() => {
+    function watchStorage() {
+      const parentTheme = (localStorage.getItem('theme') || 'light') as TTheme;
+      if (parentTheme !== initialState?.theme) {
+        setInitialState({
+          ...(initialState || {}),
+          theme: parentTheme,
+        });
+      }
+    }
+
+    // if (!isIframeEmbed) {
+    //   return;
+    // }
+
+    window.addEventListener('storage', watchStorage);
+    return () => {
+      window.removeEventListener('storage', watchStorage);
+    };
+  }, [initialState?.theme]);
+
+  // 先初始化一遍
+  useEffect(() => {
+    const isDark = initialState?.theme === 'dark';
+    updateTheme(isDark, isDark ? DARK_COLOR : LIGHT_COLOR);
+  }, [initialState?.theme]);
+
+  // 微前端部署时，不显示主题配置
+  if (isIframeEmbed) {
+    return null;
+  }
+console.log(initialState)
+  return (
+    <Space>
+      <Tag>{biVersion === EBIVERSION.CMS ? 'CMS版本' : '探针版本'}</Tag>
+      <Switch
+        checked={initialState?.theme === 'dark'}
+        checkedChildren={'🌙'}
+        unCheckedChildren={'🌝'}
+        onChange={handeChangeTheme}
+      />
+      <span className={`${styles.action} ${styles.account}`}>
+        <Avatar size="small" icon={<UserOutlined />} />
+        <div className={`${styles.name} anticon`}>
+          <span style={{marginLeft:'8px'}}>
+            {(initialState as any)?.currentUserInfo?.username || '未知用户'}
+          </span>
+        </div>
+      </span>
+    </Space>
+  );
+};
+
+export default RightContent;

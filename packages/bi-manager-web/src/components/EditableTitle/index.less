@@ -1,0 +1,42 @@
+@import (reference) '~antd/es/style/themes/index';
+
+.editable-title input {
+  padding: 0;
+  background: transparent;
+  border: none;
+  outline: none;
+  box-shadow: none;
+  cursor: initial;
+}
+
+.editable-title textarea {
+  background: transparent;
+  border: 1px solid @border-color-base;
+  border-radius: @border-radius-base;
+  outline: none;
+  box-shadow: none;
+  cursor: initial;
+}
+
+.editable-title input[type='text'] {
+  padding: 2px;
+  border: 1px solid @border-color-base;
+  border-radius: @border-radius-base;
+}
+
+.editable-title input[type='button'] {
+  font-size: inherit;
+  white-space: normal;
+  text-align: left;
+  background: transparent;
+  border-color: transparent;
+  cursor: initial;
+}
+
+.editable-title.editable-title--editable input[type='button'] {
+  cursor: pointer;
+}
+
+.editable-title.editable-title--editing input[type='button'] {
+  cursor: text;
+}

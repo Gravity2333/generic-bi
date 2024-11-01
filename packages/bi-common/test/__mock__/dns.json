@@ -1,0 +1,49 @@
+{
+  "title": "DNS_APPLE",
+  "description": "apple网站",
+  "datasource": "d_fpc_protocol_dns_log_record",
+  "viz_type": "big_number_total",
+  "metrics": [
+    {
+      "expression_type": "simple",
+      "aggregate": "COUNT",
+      "field": "domain",
+      "comment": "",
+      "display_name": "域名1",
+      "column_format": "",
+      "id": "268473c0-c5e5-11ec-ad4e-a1cabed33b29"
+    }
+  ],
+  "sorts": [],
+  "limit": 100,
+  "filters": [
+    {
+      "expression_type": "simple",
+      "field": "domain",
+      "field_type": "String",
+      "operator": "LIKE",
+      "value": "apple",
+      "sql_expression": null,
+      "filter_select_type": null,
+      "filter_type": null,
+      "operator_label": null,
+      "id": "934c1fa1-7e62-43c3-930c-30ca5001d9bd"
+    }
+  ],
+  "groupby": [
+    { "field": "domain", "display_name": "", "column_format": "raw" }
+  ],
+  "time_field": "start_time",
+  "time_range": {
+    "include_lower": true,
+    "include_upper": true,
+    "type": "range",
+    "custom": ["2022-04-27T11:49:11+08:00", "2022-04-27T12:49:11+08:00"],
+    "range": -1,
+    "unit": "H",
+    "label": "最近1小时"
+  },
+  "refresh_time": 300000,
+  "havings": [],
+  "y_axis_format": "raw"
+}
