@@ -73,12 +73,7 @@ export class exploreAPIController {
         time_range,
         exist_rollup,
       } = formData;
-
-      // 判断数据源类型
-      const isChStatus =
-        datasource?.indexOf("_metric_") > -1 ||
-        datasource?.indexOf("d_fpc_http_analysis_result") > -1;
-
+      
       const references = [];
       if (reference?.length > 0) {
         for (let r of reference) {
@@ -103,8 +98,7 @@ export class exploreAPIController {
           );
 
           const sqlData = await this.clickhouseService.executeSql(
-            refSql + securityQueryId,
-            isChStatus
+            refSql + securityQueryId
           );
           if (denominator) {
             const timeDiff = getTimeDiff(time_range);
@@ -129,8 +123,7 @@ export class exploreAPIController {
       // 可能携带查询 ID 的完整 sql 语句
       const fullSql = sql + securityQueryId;
       const sqlData = await this.clickhouseService.executeSql(
-        fullSql,
-        isChStatus
+        fullSql
       );
 
       return {
@@ -158,8 +151,8 @@ export class exploreAPIController {
   async cancelAllQuery() {
     try {
       const killSql = `KILL QUERY WHERE query_id IN (SELECT query_id FROM system.processes where query LIKE '%*/%')`;
-      this.clickhouseService.executeSql(killSql, true);
-      this.clickhouseService.executeSql(killSql, false);
+      this.clickhouseService.executeSql(killSql);
+      this.clickhouseService.executeSql(killSql);
     } catch (e) {}
   }
 }

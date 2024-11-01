@@ -272,32 +272,6 @@ export class WidgetAPIController {
     return generateSql(widgetSpec, false, networkInfo);
   }
 
-  @Get("/widgets/:id/sql-explain")
-  async getWidgetSqlExplain(@Param() id: string) {
-    const widgetSpec = await this.widgetService.getWidgetSpecification(id);
-    const networkInfo = await this.networkService.getNetworkInfo();
-    if (widgetSpec.custom_times) {
-      widgetSpec.custom_times =
-        ((await this.npmdDictService.getCustomTimesFromRestApi()) || {})[
-          widgetSpec.custom_times
-        ];
-    }
-    // 转成 sql 语句
-    const { sql, colNames, colIdList } = generateSql(
-      widgetSpec,
-      false,
-      networkInfo
-    );
-    // 查看 sql 的执行计划
-    const explainPlan = await this.clickhouseService.querySqlExplain(sql);
-    return {
-      sql,
-      colNames,
-      colIdList,
-      explain: explainPlan,
-    };
-  }
-
   @Get("/widgets/:id/data")
   async getWidgetSqlData(
     @Param() id: string,
@@ -359,10 +333,6 @@ export class WidgetAPIController {
         time_range: timeRange,
         exist_rollup,
       } = widgetSpec;
-      // 判断数据源类型
-      const isChStatus =
-        datasource?.indexOf("_metric_") > -1 ||
-        datasource?.indexOf("d_fpc_http_analysis_result") > -1;
 
       // 标识查询 ID，用于取消查询
       const securityQueryId = queryId ? `/*${base64Encode(queryId)}*/ ` : "";
@@ -398,8 +368,7 @@ export class WidgetAPIController {
             networkInfo
           );
           const sqlData = await this.clickhouseService.executeSql(
-            refSql + securityQueryId,
-            isChStatus
+            refSql + securityQueryId
           );
           if (denominator) {
             references.push({
@@ -422,8 +391,7 @@ export class WidgetAPIController {
 
       const fullSql = sql + securityQueryId;
       const sqlData = await this.clickhouseService.executeSql(
-        fullSql,
-        isChStatus
+        fullSql
       );
       return {
         sql,

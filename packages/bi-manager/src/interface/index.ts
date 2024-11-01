@@ -1,4 +1,4 @@
-import * as ClickHouse from "@posthog/clickhouse";
+import { ExternalSystem } from "@bi/common";
 import * as jwt from "jsonwebtoken";
 
 export * from "./config";
@@ -26,8 +26,7 @@ export interface IReportJobFile {
 declare module "egg" {
   // 扩展 Application
   interface Application {
-    clickhouseClient: ClickHouse;
-    chStatusClient: ClickHouse;
+    externalSystemClient: ExternalSystem;
   }
 
   // 扩展 Context

@@ -1,7 +1,7 @@
 import { LIGHT_COLOR, updateTheme } from '@/utils/theme';
 import { Settings as LayoutSettings } from '@ant-design/pro-layout';
 import { IUserInfo, SHARE_PAGE_PREFIX } from '@bi/common';
-import { Button, notification, Result, Skeleton, Spin } from 'antd';
+import { Button, ConfigProvider, notification, Result, Skeleton, Spin } from 'antd';
 import { RequestConfig, RunTimeLayoutConfig, useModel } from 'umi';
 import { BI_AUTH_TOKEN_KEY, isDev } from './common';
 import RightContent from './components/RightContent';

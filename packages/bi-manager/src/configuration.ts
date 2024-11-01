@@ -12,8 +12,10 @@ import { Utils } from "./utils";
 import { WidgetService } from "./service/widget";
 import { NpmdDictService } from "./service/npmdDict";
 import { NetworkService } from "./service/network";
-
-
+import * as ClickHouse from "@posthog/clickhouse";
+import { readFileSync } from "fs";
+import { DataSetTypes, ExternalSystem } from "@bi/common";
+import { Pool } from "pg";
 @Configuration({
   imports: [
     "@midwayjs/sequelize",
@@ -64,32 +66,61 @@ export class ContainerConfiguration implements ILifeCycle {
    * 在应用配置加载后执行
    */
   async onConfigLoad(container: IMidwayContainer) {
-    // 初始化 clickhouse 客户端
+    // 初始化 外部系统 客户端
     // =======================
-    // this.app.clickhouseClient = new ClickHouse({
-    //   protocol: this.app.config.clickhouse.protocol,
-    //   host: this.app.config.clickhouse.host,
-    //   port: this.app.config.clickhouse.port,
-    //   path: this.app.config.clickhouse.path,
-    //   format: "JSON",
-    //   user: this.app.config.clickhouse.user,
-    //   password: this.app.config.clickhouse.password,
-    //   queryOptions: {
-    //     database: this.app.config.clickhouse.database,
-    //   },
-    //   ...(this.app.config.clickhouse.ca_path
-    //     ? {
-    //         // This object merge with request params (see request lib docs)
-    //         ca: readFileSync(this.app.config.clickhouse.ca_path),
-    //         requestCert: true,
-    //         rejectUnauthorized: false,
-    //       }
-    //     : {}),
-    // });
+    switch (this.app.config.externalSystem?.type) {
+      case DataSetTypes.POSTGRE:
+        // 处理postgre
+        const pool = new Pool({
+          user: this.app.config.externalSystem.options?.user,
+          password: this.app.config.externalSystem.options?.password,
+          host: this.app.config.externalSystem.options?.host,
+          port: this.app.config.externalSystem.options?.port,
+          database: this.app.config.externalSystem.options?.database,
+        });
+        pool.connect((err, client, done) => {
+          if (err) throw err;
+          this.app.externalSystemClient = {
+            querying: function <T>(sql: string) {
+              return new Promise<{ data: T }>((resolve, reject) => {
+                // 执行查询
+                client.query(sql, (err, res) => {
+                  if (err) reject(err);
+                  resolve({ data: res.rows });
+                });
+              });
+            },
+            unlink: done,
+          };
+        });
+        break;
+      case DataSetTypes.CLICKHOUSE:
+        // 处理postgre
+        this.app.externalSystemClient = new ClickHouse({
+          protocol: this.app.config.options?.protocol,
+          host: this.app.config.externalSystem.options?.host,
+          port: this.app.config.externalSystem.options?.port,
+          path: this.app.config.externalSystem.options?.path,
+          format: "JSON",
+          user: this.app.config.externalSystem.options?.user,
+          password: this.app.config.externalSystem.options?.password,
+          queryOptions: {
+            database: this.app.config.externalSystem.options?.database,
+          },
+          ...(this.app.config.externalSystem.options?.ca_path
+            ? {
+                // This object merge with request params (see request lib docs)
+                ca: readFileSync(this.app.config.externalSystem.options?.ca_path),
+                requestCert: true,
+                rejectUnauthorized: false,
+              }
+            : {}),
+        });
+        break;
+    }
 
     (global as any).app = {
-      clickhouseClient: this.app.clickhouseClient,
-      chStatusClient: this.app.chStatusClient,
+      externalSystemClient: this.app.externalSystemClient as ExternalSystem,
     };
   }
 

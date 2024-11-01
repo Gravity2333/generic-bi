@@ -1,8 +1,9 @@
 import { EggAppInfo } from "egg";
 import * as path from "path";
 import { IMyAppConfig } from "./../interface/config";
+import { DataSetTypes } from "@bi/common";
 
-// const HOST = "127.0.0.1";
+const HOST = "127.0.0.1";
 
 export default (appInfo: EggAppInfo) => {
   const config = {} as IMyAppConfig;
@@ -31,7 +32,7 @@ export default (appInfo: EggAppInfo) => {
     "errorHandlerMiddleware",
     "jwtAuthMiddleware",
     "responseMiddleware",
-    "sysLoggerMiddleware"
+    "sysLoggerMiddleware",
   ];
 
   config.sequelize = {
@@ -121,27 +122,18 @@ export default (appInfo: EggAppInfo) => {
     expiresIn: "2h", // https://github.com/vercel/ms
   };
 
-  // config.clickhouse = {
-  //   protocol: "http:",
-  //   host: HOST,
-  //   path: "/",
-  //   port: 8123,
-  //   user: "clickhouse",
-  //   password: "Machloop@123",
-  //   database: "fpc",
-  //   // ca_path: join(__dirname, "./ch_config/certs/server.crt"),
-  // };
-
-  // config.clickhouse = {
-  //   protocol: "http:",
-  //   host: HOST,
-  //   path: "/",
-  //   port: 8123,
-  //   user: "clickhouse",
-  //   password: "Machloop@123",
-  //   database: "fpc",
-  //   // ca_path: join(__dirname, "./ch_config/certs/server.crt"),
-  // };
+  config.externalSystem = {
+    type: DataSetTypes.POSTGRE,
+    options: {
+      protocol: "http:",
+      host: HOST,
+      path: "/",
+      port: 5433,
+      user: "postgres",
+      password: "bi@123",
+      database: "bi",
+    },
+  };
 
   // config.restapi = {
   //   url_origin: `https://${NPM_CMS_HOST}:${isCms ? 41120 : 41110}`,

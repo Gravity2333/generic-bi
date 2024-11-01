@@ -7,7 +7,7 @@ export interface IClickhouseResponseFactory<T> {
   [key: string]: any;
 }
 
-export interface IClickhouseTable {
+export interface IDatasetTable {
   /** 表名 */
   name: string;
   /** 类型 */

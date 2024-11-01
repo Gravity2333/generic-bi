@@ -342,14 +342,12 @@ export class WidgetService {
       false,
       networkInfo
     );
-    const { datasource } = widgetSpec;
-    // 判断数据源类型
-    const isChStatus = datasource?.indexOf("_metric_") > -1;
+  
     // 标识查询 ID，用于取消查询
     let securityQueryId = id ? `/*${base64Encode(id)}*/ ` : "";
     let fullSql = sql + securityQueryId;
 
-    let sqlData = await this.clickhouseService.executeSql(fullSql, isChStatus);
+    let sqlData = await this.clickhouseService.executeSql(fullSql);
     // 匹配标题名称
     const titleNameList = colIdList?.map((id) => {
       const c = colInfoMap[id];

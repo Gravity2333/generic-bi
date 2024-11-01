@@ -54,10 +54,10 @@ export class SqlLabController {
         securityQueryId;
       let sqlData: any = null;
       try {
-        sqlData = await this.clickhouseService.executeSql(fullSql, true);
+        sqlData = await this.clickhouseService.executeSql(fullSql);
       } catch (e) {
         try {
-          sqlData = await this.clickhouseService.executeSql(fullSql, false);
+          sqlData = await this.clickhouseService.executeSql(fullSql);
         } catch (error) {
           throw new Error(error);
         }
@@ -131,10 +131,10 @@ export class SqlLabController {
     try {
       let dataList: Record<string, any>[] = null;
       try {
-        dataList = await this.clickhouseService.executeSql(sql, true);
+        dataList = await this.clickhouseService.executeSql(sql);
       } catch (e) {
         try {
-          dataList = await this.clickhouseService.executeSql(sql, false);
+          dataList = await this.clickhouseService.executeSql(sql);
         } catch (error) {
           this.ctx?.throw(500, error);
         }
