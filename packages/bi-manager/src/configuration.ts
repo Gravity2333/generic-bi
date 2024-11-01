@@ -78,21 +78,21 @@ export class ContainerConfiguration implements ILifeCycle {
           port: this.app.config.externalSystem.options?.port,
           database: this.app.config.externalSystem.options?.database,
         });
-        pool.connect((err, client, done) => {
-          if (err) throw err;
-          this.app.externalSystemClient = {
-            querying: function <T>(sql: string) {
-              return new Promise<{ data: T }>((resolve, reject) => {
+        this.app.externalSystemClient = {
+          querying: function <T>(sql: string) {
+            return new Promise<{ data: T }>((resolve, reject) => {
+              pool.connect((err, client, done) => {
+                if (err) throw err;
                 // 执行查询
                 client.query(sql, (err, res) => {
+                  done();
                   if (err) reject(err);
                   resolve(res.rows);
                 });
               });
-            },
-            unlink: done,
-          };
-        });
+            });
+          },
+        };
         break;
       case DataSetTypes.CLICKHOUSE:
         // 处理postgre
@@ -110,7 +110,9 @@ export class ContainerConfiguration implements ILifeCycle {
           ...(this.app.config.externalSystem.options?.ca_path
             ? {
                 // This object merge with request params (see request lib docs)
-                ca: readFileSync(this.app.config.externalSystem.options?.ca_path),
+                ca: readFileSync(
+                  this.app.config.externalSystem.options?.ca_path
+                ),
                 requestCert: true,
                 rejectUnauthorized: false,
               }
