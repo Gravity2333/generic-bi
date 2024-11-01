@@ -1,4 +1,4 @@
-import useVariable, { UseVariableParams } from '@/hooks/useVariable';
+import useVariable, { UseVariableParams } from 'use-variable-hook'
 import { createDictMapping, updateDictMapping } from '@/services/dicts';
 import { BookOutlined } from '@ant-design/icons';
 import { INpmdDict } from '@bi/common';

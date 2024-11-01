@@ -13,8 +13,8 @@ import { history, useLocation } from 'umi';
 import DraggableTabs from '../components/DraggableTabs';
 import { sendMsgToParent } from '@/utils/sendMsgToParent';
 import React from 'react';
-import useVariable from '@/hooks/useVariable';
-import { UseVariableParams } from '@/hooks/useVariable/typings';
+import useVariable from 'use-variable-hook';
+import { UseVariableParams } from 'use-variable-hook';
 
 interface IEmbedTabContextType {
   queryList: (showLoading: boolean) => void;

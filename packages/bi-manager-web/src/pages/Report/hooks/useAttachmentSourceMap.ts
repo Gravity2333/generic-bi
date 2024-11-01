@@ -1,5 +1,4 @@
-import useVariable from '@/hooks/useVariable';
-import { UseVariableParams } from '@/hooks/useVariable/typings';
+import useVariable, { UseVariableParams } from 'use-variable-hook'
 import { queryAllDashboards } from '@/services/dashboard';
 import { queryAllWidgets } from '@/services/widget';
 import { useEffect } from 'react';

@@ -4,7 +4,7 @@ import { Result, Skeleton } from 'antd';
 import { useEffect } from 'react';
 import { useParams } from 'umi';
 import DashboardEditor from '../Editor';
-import useVariable from '@/hooks/useVariable';
+import useVariable from 'use-variable-hook';
 
 export default function DashboardUpdate() {
   const { dashboardId } = useParams<any>();

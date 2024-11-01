@@ -10,7 +10,7 @@ import { useContext, useEffect, useRef, useState } from 'react';
 import { history } from 'umi';
 import styles from './index.less';
 import useEmbed from '@/hooks/useEmbed';
-import useVariable from '@/hooks/useVariable';
+import useVariable from 'use-variable-hook';
 import TagEditDrawer, { dictMapColumns, TagEditDrawerRef } from './components/TagEditDrawer';
 
 type DatasourceVariables = {

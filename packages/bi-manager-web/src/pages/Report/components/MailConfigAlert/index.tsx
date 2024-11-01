@@ -1,5 +1,4 @@
-import useVariable from '@/hooks/useVariable';
-import { UseVariableParams } from '@/hooks/useVariable/typings';
+import useVariable, { UseVariableParams } from 'use-variable-hook'
 import { queryMailConfig } from '@/services/global';
 import { IMailConfig } from '@bi/common';
 import { Alert } from 'antd';

@@ -20,8 +20,7 @@ import MailConfigAlert from '../components/MailConfigAlert';
 import useAttachmentSourceMap from '../hooks/useAttachmentSourceMap';
 import ReportLogModal from '../components/ReportLogModal';
 import useEmbed from '@/hooks/useEmbed';
-import useVariable from '@/hooks/useVariable';
-import { UseVariableParams } from '@/hooks/useVariable/typings';
+import useVariable, { UseVariableParams } from 'use-variable-hook'
 
 const DEFAULT_PAGE_SIZE = 10;
 const DEFAULT_PAGE = 1;

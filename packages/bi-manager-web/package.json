@@ -49,6 +49,7 @@
     "sql-formatter": "^2.3.4",
     "styled-components": "^5.3.1",
     "umi": "^3.5.19",
+    "use-variable-hook": "^3.0.13",
     "uuid": "^8.3.2",
     "wangeditor": "^4.7.11"
   },
