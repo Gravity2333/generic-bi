@@ -141,8 +141,8 @@ export function getWhereExpr({
   filters: IFilterCondition;
   timeRange: ITimeRange;
   timeField: string;
-  startTime: string;
-  endTime: string;
+  startTime?: string;
+  endTime?: string;
   networkInfo: INetworkInfoType;
   filterOperator: string;
   customTimes?: ICustomTime;
@@ -154,18 +154,20 @@ export function getWhereExpr({
     whereExpr += ')';
   }
 
-  const startTimeOperator = timeRange!.include_lower ? '>=' : '>';
-  const endTimeOperator = timeRange!.include_upper ? '<=' : '<';
-
-  const timeWhereExpr = `(${timeField} ${startTimeOperator} toDateTime64('${startTime}', 3, 'UTC') AND ${timeField} ${endTimeOperator} toDateTime64('${endTime}', 3, 'UTC'))`;
-
-  if (whereExpr) {
-    whereExpr += ' AND ';
-    whereExpr += '(';
-    whereExpr += timeWhereExpr;
-    whereExpr += ')';
-  } else {
-    whereExpr += timeWhereExpr;
+  if(startTime&&endTime){
+    const startTimeOperator = timeRange!.include_lower ? '>=' : '>';
+    const endTimeOperator = timeRange!.include_upper ? '<=' : '<';
+  
+    const timeWhereExpr = `(${timeField} ${startTimeOperator} toDateTime64('${startTime}', 3, 'UTC') AND ${timeField} ${endTimeOperator} toDateTime64('${endTime}', 3, 'UTC'))`;
+  
+    if (whereExpr) {
+      whereExpr += ' AND ';
+      whereExpr += '(';
+      whereExpr += timeWhereExpr;
+      whereExpr += ')';
+    } else {
+      whereExpr += timeWhereExpr;
+    }
   }
 
   if (customTimes) {

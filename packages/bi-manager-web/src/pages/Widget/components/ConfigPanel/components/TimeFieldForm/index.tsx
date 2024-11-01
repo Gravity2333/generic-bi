@@ -5,9 +5,11 @@ import { Form, Input, Select } from 'antd';
 export function TimeFieldForm({
   timeColumns,
   disabled,
+  required = false
 }: {
   disabled: boolean;
   timeColumns: IClickhouseColumn[];
+  required?: boolean
 }) {
   return (
     <>
@@ -20,13 +22,13 @@ export function TimeFieldForm({
             const time_field_custom = getFieldValue('time_field_custom');
             if (time_field_custom === 'custom') {
               return (
-                <Form.Item name="time_field" label="时间字段" rules={[{ required: true }]}>
+                <Form.Item name="time_field" label="时间字段" rules={[{ required: required }]}>
                   <Input placeholder="请输入时间字段" />
                 </Form.Item>
               );
             } else {
               return (
-                <Form.Item name="time_field" label="时间字段" rules={[{ required: true }]}>
+                <Form.Item name="time_field" label="时间字段" rules={[{ required: required }]}>
                   <Select
                     style={{ width: '100%' }}
                     placeholder="请选择时间字段"

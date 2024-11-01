@@ -5,8 +5,6 @@ export enum DataSetTypes {
 
 
 export interface ExternalSystem{
-    querying: <T>(sql: string) => Promise<{
-        data: T
-    }>,
+    querying: <T>(sql: string) => Promise<T>,
     unLink: ()=> void
 }

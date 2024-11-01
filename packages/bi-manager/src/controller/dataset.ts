@@ -23,7 +23,7 @@ export class DatasetAPIController {
   async listAllDatasets() {
     /** 由于探针的详单和统计数据存在两个数据库中，所以要查询两个并且拼接 */
     /** 探针和cms都默认采用d_fpc开头的表,不再采用t_fpc开头的表,需要在此过滤掉 */
-    const { data: recordData = [] } = await (async () => {
+    const recordData = await (async () => {
       if (this.ctx.app.config?.externalSystem?.type === DataSetTypes.POSTGRE) {
         return await this.ctx.app.externalSystemClient.querying<
           IDatasetTable[]
@@ -44,7 +44,7 @@ export class DatasetAPIController {
   @Get("/datasets/:tableName/columns")
   async listDatasetColumns(@Param() tableName: string) {
     // 判断查询两个表
-    const { data: recordData = [] } = await (async () => {
+    const recordData = await (async () => {
       if (this.ctx.app.config?.externalSystem?.type === DataSetTypes.POSTGRE) {
         return await this.ctx.app.externalSystemClient.querying<
           IDatasetTable[]

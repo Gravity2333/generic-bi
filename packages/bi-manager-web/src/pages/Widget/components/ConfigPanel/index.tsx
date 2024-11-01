@@ -762,6 +762,10 @@ function ConfigPanel(props: Props, ref: any) {
                     timeColumns={currentColums?.filter(({ type }: { type: string }) =>
                       type.includes('DateTime'),
                     )}
+                    required={[
+                      EVisualizationType.TimeHistogram,
+                      EVisualizationType.Time_Column,
+                    ].includes(vizType)}
                   />
                   {/* 时间范围 */}
                   <FormItem
@@ -770,7 +774,7 @@ function ConfigPanel(props: Props, ref: any) {
                     rules={[
                       {
                         validator: async () => {
-                          if (!form.getFieldValue('time_range')) {
+                          if (form.getFieldValue('time_field') && !form.getFieldValue('time_range')) {
                             throw new Error('请选择时间范围!');
                           }
                         },
@@ -793,7 +797,7 @@ function ConfigPanel(props: Props, ref: any) {
                         </FormItem>
                       );
                     } else {
-                      return <FormItem name="time_grain"  noStyle/>;
+                      return <FormItem name="time_grain" noStyle />;
                     }
                   })()}
                   {vizType !== EVisualizationType.TimeHistogram &&

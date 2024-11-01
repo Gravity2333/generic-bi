@@ -86,7 +86,7 @@ export class ContainerConfiguration implements ILifeCycle {
                 // 执行查询
                 client.query(sql, (err, res) => {
                   if (err) reject(err);
-                  resolve({ data: res.rows });
+                  resolve(res.rows);
                 });
               });
             },

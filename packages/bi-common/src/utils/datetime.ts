@@ -159,6 +159,9 @@ export function getTimeRange(timeRange: ITimeRange) {
 
 /** 获取utc时间范围 */
 export function getUtcTimeRange(timeRange: ITimeRange) {
+  if(!timeRange){
+    return []
+  }
   let startTime = '';
   let endTime = '';
   // 先转换时间

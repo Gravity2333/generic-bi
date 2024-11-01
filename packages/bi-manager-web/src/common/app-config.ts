@@ -1,7 +1,5 @@
 export const isDev = process.env.NODE_ENV === 'development';
 
-export const isArm = process.env.PLATFORM === 'ARM';
-
 export const ENV_PREFIX = isDev ? '/api' : '';
 
 export const API_PREFIX = `${ENV_PREFIX}/bi/web-api/v1`;

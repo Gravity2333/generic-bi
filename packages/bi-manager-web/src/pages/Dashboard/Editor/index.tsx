@@ -44,7 +44,6 @@ import { isDev } from '@/common';
 import { COMPONENT_TYPE_LIST } from '../components/HorizontalComponentAdder/typing';
 import { cancelAllQuery } from '@/services';
 import { DashboardContext, IDashboardContext } from '@/layouts/DashboardLayout';
-import usePlatform from '@/hooks/usePlatform';
 
 const { Option } = Select;
 const { RangePicker } = DatePicker;
@@ -117,7 +116,6 @@ export default function DashboardEditor({
   tab = false,
 }: IDashboardEditorProps) {
   const { id, name, specification } = dashboard || {};
-  const {isArm} = usePlatform()
   const [dashboardName, setDashboardName] = useState<string>(name || '[ 未命名仪表盘 ]');
   /** 全屏 */
   const [fullScreen, setFullScreen] = useState<boolean>();
@@ -437,9 +435,7 @@ export default function DashboardEditor({
           <Menu onClick={handleMenuClick}>
             {preview && !readonly && <Menu.Item key={DashboardOperationKey.Update}>编辑</Menu.Item>}
             <Menu.Item key={DashboardOperationKey.DowloadAsImage}>保存为图片</Menu.Item>
-            {!isArm ? (
-              <Menu.Item key={DashboardOperationKey.DownloadAsPdf}>保存为PDF</Menu.Item>
-            ) : null}
+            <Menu.Item key={DashboardOperationKey.DownloadAsPdf}>保存为PDF</Menu.Item>
             {preview ? <Menu.Item key={DashboardOperationKey.Fullscreen}>全屏</Menu.Item> : ''}
           </Menu>
         }

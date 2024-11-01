@@ -3,7 +3,6 @@ import { IAjaxResponseFactory } from '@/interface';
 import { ICustomTime, IMailConfig, IUserInfo } from '@bi/common';
 import { request } from 'umi';
 import { stringify } from 'qs';
-import { EPlatform } from '@/hooks/usePlatform';
 
 /**
  * 查询邮箱配置
@@ -77,15 +76,6 @@ export async function queryBiVersion() {
  */
 export async function queryCustomTimes() {
   return request<IAjaxResponseFactory<Record<string, ICustomTime>>>(`${API_PREFIX}/custom-times`, {
-    method: 'GET',
-  });
-}
-
-/**
- * 查询平台
- */
-export async function queryPlatform() {
-  return request<IAjaxResponseFactory<EPlatform>>(`${API_PREFIX}/platform`, {
     method: 'GET',
   });
 }

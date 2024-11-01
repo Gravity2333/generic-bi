@@ -39,7 +39,6 @@ import { v4 as uuidv4 } from 'uuid';
 import { CHINESE_LOCALE, MAIL_SUFFIX_LIST } from './dict';
 import { queryAllWidgets } from '@/services';
 import Privacy from '@/components/Privacy';
-import usePlatform from '@/hooks/usePlatform';
 import useEmbed from '@/hooks/useEmbed';
 
 const FormItem = Form.Item;
@@ -53,7 +52,6 @@ const formItemLayout = {
 const { RangePicker } = DatePicker;
 
 export default function ReportForm({ type }: { type: 'create' | 'update' }) {
-  const { isArm } = usePlatform();
   /** 编辑模式下id */
   const { id } = useParams<{ id: string }>();
   /** 表单 */
@@ -463,7 +461,7 @@ export default function ReportForm({ type }: { type: 'create' | 'update' }) {
             }
           }}
         >
-          {!isArm ? <Radio value={EAttachmentSource.DASHBOARD}>仪表盘</Radio> : null}
+          <Radio value={EAttachmentSource.DASHBOARD}>仪表盘</Radio>
 
           <Radio value={EAttachmentSource.WIDGET}>图表</Radio>
         </Radio.Group>
@@ -530,7 +528,7 @@ export default function ReportForm({ type }: { type: 'create' | 'update' }) {
                 <Radio disabled={type !== EAttachmentSource.WIDGET} value={EAttachmentType.CSV}>
                   CSV
                 </Radio>
-                {!isArm ? <Radio value={EAttachmentType.PDF}>PDF</Radio> : null}
+                <Radio value={EAttachmentType.PDF}>PDF</Radio>
               </Radio.Group>
             </FormItem>
           );
