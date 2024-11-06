@@ -3,6 +3,7 @@ import { DisconnectOutlined, SmileOutlined } from '@ant-design/icons';
 import { Alert, Button, Card, Result } from 'antd';
 import { useEffect, useState } from 'react';
 import { history } from 'umi';
+import styles from './index.less'
 
 export default function Welcome() {
   const [connect, setConnect] = useState<boolean>(true);
@@ -34,25 +35,48 @@ export default function Welcome() {
         />
       ) : null}
       <Result icon={<SmileOutlined />} title={`欢迎使用Generic-BI`} />
-      <div
-        style={{
-          display: 'flex',
-          flexFlow: 'row wrap',
-          justifyContent: 'start',
-          margin: 'auto',
-          width: '70%',
-        }}
+      <div className={styles['show-bar']}
       >
-        <Card
-          size="small"
-          style={{ width: '25%', height: '200px', borderRadius: '10px', margin: '10px' }}
+        <div
+          className={`${styles['show-bar__card']} ${styles['show-bar__card__db-cover']}`}
           title={undefined}
+          onClick={() => {
+            history.push('/configuration/database');
+          }}
         >
-          ss
-        </Card>
-        <Card  style={{ width: '25%', height: '200px', borderRadius: '10px', margin: '10px' }}size="small" title={undefined}>
-          ss
-        </Card>
+          <h3>还没配置数据库？</h3>
+          <span>去配置</span>
+        </div>
+        <div
+          className={`${styles['show-bar__card']} ${styles['show-bar__card__widget-cover']}`}
+          title={undefined}
+          onClick={() => {
+            history.push('/widget/create');
+          }}
+        >
+          <h3>开始第一个图表！</h3>
+          <span>去创建</span>
+        </div>
+        <div
+          className={`${styles['show-bar__card']} ${styles['show-bar__card__dashboard-cover']}`}
+          title={undefined}
+          onClick={() => {
+            history.push('/dashboard/create');
+          }}
+        >
+          <h3>批量展示！</h3>
+          <span>去拖拽</span>
+        </div>
+        <div
+          className={`${styles['show-bar__card']} ${styles['show-bar__card__mail-cover']}`}
+          title={undefined}
+          onClick={() => {
+            history.push('/report/create');
+          }}
+        >
+          <h3>立刻通知！</h3>
+          <span>去发送</span>
+        </div>
       </div>
     </>
   );
