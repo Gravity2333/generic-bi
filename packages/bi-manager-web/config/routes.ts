@@ -333,14 +333,29 @@ const routes: IRouteProps[] = [
     path: '/configuration',
     name: '配置',
     icon: 'setting',
+    component: '../layouts/PageLayout',
     routes: [
       {
         path: '/configuration',
+        hideInMenu: true,
         redirect: '/configuration/dashboard',
       },
       {
+        path: '/configuration/database',
+        name: '数据库',
+        hideInMenu: true,
+        component: './Configuration/Database',
+      },
+      {
         path: '/configuration/dashboard',
-        name: '仪表盘',
+        name: '默认仪表盘',
+        hideInMenu: true,
+        component: './Configuration/Dashboard',
+      },
+      {
+        path: '/configuration/dict',
+        name: '字典',
+        hideInMenu: true,
         component: './Configuration/Dashboard',
       },
     ],

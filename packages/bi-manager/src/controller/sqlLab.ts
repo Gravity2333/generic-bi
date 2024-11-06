@@ -12,7 +12,6 @@ import {
   Query,
   Validate,
 } from "@midwayjs/decorator";
-import { ClickHouseService } from "../service/clickhouse";
 import {
   Utils,
   base64Encode,
@@ -26,13 +25,14 @@ import { KEEP_RESPONSE_RAW } from "../middleware/responseHandler";
 import { CreateWidgetInput } from "../dto/widget.dto";
 import { SqlLabService } from "../service/sqlLab";
 import { ValidationError } from "sequelize";
+import { DatabaseService } from "../service/database";
 
 @Provide()
 @Controller("/web-api/v1")
 export class SqlLabController {
   @Inject()
-  clickhouseService: ClickHouseService;
-
+  databaseService: DatabaseService;
+  
   @Inject()
   ctx: Context;
 
@@ -54,10 +54,10 @@ export class SqlLabController {
         securityQueryId;
       let sqlData: any = null;
       try {
-        sqlData = await this.clickhouseService.executeSql(fullSql);
+        sqlData = await this.databaseService.executeSql(fullSql);
       } catch (e) {
         try {
-          sqlData = await this.clickhouseService.executeSql(fullSql);
+          sqlData = await this.databaseService.executeSql(fullSql);
         } catch (error) {
           throw new Error(error);
         }
@@ -131,10 +131,10 @@ export class SqlLabController {
     try {
       let dataList: Record<string, any>[] = null;
       try {
-        dataList = await this.clickhouseService.executeSql(sql);
+        dataList = await this.databaseService.executeSql(sql);
       } catch (e) {
         try {
-          dataList = await this.clickhouseService.executeSql(sql);
+          dataList = await this.databaseService.executeSql(sql);
         } catch (error) {
           this.ctx?.throw(500, error);
         }

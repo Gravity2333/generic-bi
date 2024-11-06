@@ -6,8 +6,6 @@ import {
   IFilter,
   IFilterCondition,
   IFilterGroup,
-  INetworkGroup,
-  INetworkInfoType,
   TCHFieldType,
   TFieldOperator,
 } from '../typings';
@@ -70,7 +68,7 @@ export function getOperatorByFieldType(
  * 将单个过滤字段转换为 sql 语句
  * @param filter 单个过滤字段
  */
-function filter2Sql(filter: IFilter, networkInfo: INetworkInfoType): string {
+function filter2Sql(filter: IFilter): string {
   // 自定义 sql 语句
   if (filter.expression_type === 'sql') {
     return filter.sql_expression || '';
@@ -119,43 +117,6 @@ function filter2Sql(filter: IFilter, networkInfo: INetworkInfoType): string {
   // 如果值可以切分成多个，就转成数组进行 in 操作
   const splitValueList =
     typeof value === 'string' ? value.split(',').filter((item) => item) : [];
-  const { networkGroups, networks } = networkInfo;
-  const networkGroupMap = [...networkGroups].reduce((prev, curr) => {
-    return {
-      ...prev,
-      [curr.id]: curr,
-    };
-  }, {});
-
-  // 特殊处理 network_id
-  if (field === 'network_id' && !isArray) {
-    let netList: string[] = [];
-    splitValueList.forEach((id) => {
-      if (id === 'ALL') {
-        netList.push(...networks.map((n) => n.id));
-      } else if (networkGroupMap[id]) {
-        netList.push(
-          ...((networkGroupMap[id] as INetworkGroup)?.network_ids?.split(',') ||
-            []),
-        );
-      } else {
-        netList.push(id);
-      }
-    });
-    netList = Array.from(new Set(netList));
-    if (netList?.length > 0) {
-      if (opText === '=') {
-        return `${SqlString.escapeId(field)} IN (${netList.map(
-          (el) => `'${el}'`,
-        )})`;
-      } else if (opText === '!=') {
-        return `${SqlString.escapeId(field)} NOT IN (${netList.map(
-          (el) => `'${el}'`,
-        )})`;
-      }
-    }
-    return '1=2';
-  }
 
   // 是否是基本的比较操作符
   if (comparisonOperatorList.includes(operator)) {
@@ -164,30 +125,9 @@ function filter2Sql(filter: IFilter, networkInfo: INetworkInfoType): string {
     // Array(LowCardinality(String)) or Array(String)
     if (isArray && fieldType.includes('string')) {
       if (splitValueList.length > 0) {
-        if (field === 'network_id') {
-          let netList: string[] = [];
-          splitValueList.forEach((id) => {
-            if (id === 'ALL') {
-              netList.push(...networks.map((n) => n.id));
-            } else if (networkGroupMap[id]) {
-              netList.push(
-                ...((networkGroupMap[id] as INetworkGroup)?.network_ids?.split(
-                  ',',
-                ) || []),
-              );
-            } else {
-              netList.push(id);
-            }
-          });
-          netList = Array.from(new Set(netList));
-          return `hasAny(${SqlString.escapeId(field)}, [${SqlString.escape(
-            netList,
-          )}])=1`;
-        } else {
-          return `hasAll(${SqlString.escapeId(field)}, [${SqlString.escape(
-            splitValueList,
-          )}])=1`;
-        }
+        return `hasAll(${SqlString.escapeId(field)}, [${SqlString.escape(
+          splitValueList,
+        )}])=1`;
       } else {
         return `has(${SqlString.escapeId(field)}, ${SqlString.escape(
           value,
@@ -349,7 +289,6 @@ function filter2Sql(filter: IFilter, networkInfo: INetworkInfoType): string {
  */
 function filterGroup2Sql(
   { operator, group }: IFilterGroup,
-  networkInfo: INetworkInfoType,
 ): string {
   const operatorUpperCase = (
     operator || EFilterGroupOperatorTypes.AND
@@ -370,9 +309,9 @@ function filterGroup2Sql(
 
   group?.forEach((row, index) => {
     if (row.hasOwnProperty('group')) {
-      groupExpr += ` ( ${filterGroup2Sql(row as IFilterGroup, networkInfo)} ) `;
+      groupExpr += ` ( ${filterGroup2Sql(row as IFilterGroup)} ) `;
     } else {
-      groupExpr += ` ${filter2Sql(row as IFilter, networkInfo)} `;
+      groupExpr += ` ${filter2Sql(row as IFilter)} `;
     }
 
     // 拼接逻辑关系
@@ -395,20 +334,19 @@ function filterGroup2Sql(
  */
 export function filterCondition2Sql(
   condition: IFilterCondition,
-  networkInfo: INetworkInfoType,
   filterOperator = 'AND',
 ): string {
   let whereExpr = '';
   condition.forEach((row, index) => {
     // 如果是组合
     if (row.hasOwnProperty('group')) {
-      const r = filterGroup2Sql(row as IFilterGroup, networkInfo);
+      const r = filterGroup2Sql(row as IFilterGroup);
       if (r) {
         whereExpr += `(${r})`;
       }
     } else {
       // 单个的字段条件
-      const r = filter2Sql(row as IFilter, networkInfo);
+      const r = filter2Sql(row as IFilter);
       if (r) {
         whereExpr += `(${r})`;
       }

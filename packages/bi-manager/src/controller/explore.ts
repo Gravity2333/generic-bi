@@ -14,10 +14,9 @@ import {
   Provide,
 } from "@midwayjs/decorator";
 import { Context } from "egg";
-import { ClickHouseService } from "../service/clickhouse";
 import { base64Encode } from "../utils";
-import { NetworkService } from "../service/network";
-import { NpmdDictService } from "../service/npmdDict";
+import { NpmdDictService } from "../service/dicts";
+import { DatabaseService } from "../service/database";
 
 @Provide()
 @Controller("/web-api/v1")
@@ -26,11 +25,8 @@ export class exploreAPIController {
   ctx: Context;
 
   @Inject()
-  networkService: NetworkService;
-
-  @Inject()
-  clickhouseService: ClickHouseService;
-
+  databaseService: DatabaseService;
+  
   @Inject()
   npmdDictService: NpmdDictService;
 
@@ -48,21 +44,12 @@ export class exploreAPIController {
     }
   ) {
     try {
-      const networkInfo = await this.networkService.getNetworkInfo();
-
-      if (formData.custom_times) {
-        formData.custom_times =
-          ((await this.npmdDictService.getCustomTimesFromRestApi()) || {})[
-            formData.custom_times
-          ];
-      }
       // 标识查询 ID，用于取消查询
       const securityQueryId = queryId ? `/*${base64Encode(queryId)}*/ ` : "";
       // 组装成 sql 语句
       const { sql, colNames, colIdList } = generateSql(
         formData,
-        false,
-        networkInfo
+        false
       );
       // console.log(sql);
       const {
@@ -94,12 +81,12 @@ export class exploreAPIController {
           const { sql: refSql } = generateSql(
             refSpecification as any,
             false,
-            networkInfo
           );
 
-          const sqlData = await this.clickhouseService.executeSql(
+          const sqlData = await this.databaseService.executeSql(
             refSql + securityQueryId
           );
+
           if (denominator) {
             const timeDiff = getTimeDiff(time_range);
             references.push({
@@ -122,7 +109,7 @@ export class exploreAPIController {
 
       // 可能携带查询 ID 的完整 sql 语句
       const fullSql = sql + securityQueryId;
-      const sqlData = await this.clickhouseService.executeSql(
+      const sqlData = await this.databaseService.executeSql(
         fullSql
       );
 
@@ -143,7 +130,7 @@ export class exploreAPIController {
   async cancelSlowQuery(@Body(ALL) { queryIds }: { queryIds: string }) {
     try {
       const idList = queryIds ? queryIds.split(",") : [];
-      await this.clickhouseService.cancelQueries(idList);
+      await this.databaseService.cancelQueries(idList);
     } catch (e) {}
   }
 
@@ -151,8 +138,8 @@ export class exploreAPIController {
   async cancelAllQuery() {
     try {
       const killSql = `KILL QUERY WHERE query_id IN (SELECT query_id FROM system.processes where query LIKE '%*/%')`;
-      this.clickhouseService.executeSql(killSql);
-      this.clickhouseService.executeSql(killSql);
+      this.databaseService.executeSql(killSql);
+      this.databaseService.executeSql(killSql);
     } catch (e) {}
   }
 }

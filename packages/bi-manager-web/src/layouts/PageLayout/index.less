@@ -1,0 +1,25 @@
+.pageMenuWrap {
+  :global {
+    .ant-tabs {
+      background: #fff;
+    }
+    .ant-tabs-nav {
+      margin-bottom: 10px !important;
+    }
+  }
+}
+
+:global(.dark) {
+  .pageMenuWrap {
+    :global {
+      .ant-tabs {
+        background: #000;
+      }
+    }
+  }
+}
+
+.pageBody {
+  margin-top: 6px;
+  height: calc(100% - 68px);
+}

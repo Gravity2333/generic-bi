@@ -10,12 +10,8 @@ import { ReportService } from "./service/report";
 import { ReportScheduleService } from "./service/reportSchedule";
 import { Utils } from "./utils";
 import { WidgetService } from "./service/widget";
-import { NpmdDictService } from "./service/npmdDict";
-import { NetworkService } from "./service/network";
-import * as ClickHouse from "@posthog/clickhouse";
-import { readFileSync } from "fs";
-import { DataSetTypes, ExternalSystem } from "@bi/common";
-import { Pool } from "pg";
+import { NpmdDictService } from "./service/dicts";
+import { DatabaseService } from "./service/database";
 @Configuration({
   imports: [
     "@midwayjs/sequelize",
@@ -45,9 +41,6 @@ export class ContainerConfiguration implements ILifeCycle {
   npmdDictMappingService: NpmdDictMappingService;
 
   @Inject()
-  networkService: NetworkService;
-
-  @Inject()
   npmdDictService: NpmdDictService;
 
   @Inject()
@@ -62,69 +55,12 @@ export class ContainerConfiguration implements ILifeCycle {
   @Inject()
   reportScheduleService: ReportScheduleService;
 
+  @Inject()
+  databaseService: DatabaseService;
   /**
    * 在应用配置加载后执行
    */
-  async onConfigLoad(container: IMidwayContainer) {
-    // 初始化 外部系统 客户端
-    // =======================
-    switch (this.app.config.externalSystem?.type) {
-      case DataSetTypes.POSTGRE:
-        // 处理postgre
-        const pool = new Pool({
-          user: this.app.config.externalSystem.options?.user,
-          password: this.app.config.externalSystem.options?.password,
-          host: this.app.config.externalSystem.options?.host,
-          port: this.app.config.externalSystem.options?.port,
-          database: this.app.config.externalSystem.options?.database,
-        });
-        this.app.externalSystemClient = {
-          querying: function <T>(sql: string) {
-            return new Promise<{ data: T }>((resolve, reject) => {
-              pool.connect((err, client, done) => {
-                if (err) throw err;
-                // 执行查询
-                client.query(sql, (err, res) => {
-                  done();
-                  if (err) reject(err);
-                  resolve(res.rows);
-                });
-              });
-            });
-          },
-        };
-        break;
-      case DataSetTypes.CLICKHOUSE:
-        // 处理postgre
-        this.app.externalSystemClient = new ClickHouse({
-          protocol: this.app.config.options?.protocol,
-          host: this.app.config.externalSystem.options?.host,
-          port: this.app.config.externalSystem.options?.port,
-          path: this.app.config.externalSystem.options?.path,
-          format: "JSON",
-          user: this.app.config.externalSystem.options?.user,
-          password: this.app.config.externalSystem.options?.password,
-          queryOptions: {
-            database: this.app.config.externalSystem.options?.database,
-          },
-          ...(this.app.config.externalSystem.options?.ca_path
-            ? {
-                // This object merge with request params (see request lib docs)
-                ca: readFileSync(
-                  this.app.config.externalSystem.options?.ca_path
-                ),
-                requestCert: true,
-                rejectUnauthorized: false,
-              }
-            : {}),
-        });
-        break;
-    }
-
-    (global as any).app = {
-      externalSystemClient: this.app.externalSystemClient as ExternalSystem,
-    };
-  }
+  async onConfigLoad(container: IMidwayContainer) {}
 
   /**
    * 在应用 ready 的时候执行
@@ -136,6 +72,7 @@ export class ContainerConfiguration implements ILifeCycle {
     // =======================
     this.logger.info("[report-schedule] init jobs start...");
     /** bi自检,纠错 */
+    this.databaseService.initDatabase();
     /** 检查图表数据源 */
     this.widgetService.checkWidgetSource();
     /** 初始化默认仪表盘 */
@@ -156,6 +93,13 @@ export class ContainerConfiguration implements ILifeCycle {
         `[report-schedule] init jobs finished, jobs number: ${reportList.length}...`
       );
     }, 2000);
+
+    process.on("uncaughtException", function (err) {
+      //打印出错误
+      console.log(err);
+      //打印出错误的调用栈方便调试
+      console.log(err.stack);
+    });
   }
 
   /**

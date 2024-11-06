@@ -1,5 +1,5 @@
 import { addArrayJoin } from '../..';
-import { ICustomTime, INetworkInfoType, IWidgetSpecification } from '../../../typings';
+import { ICustomTime,  IWidgetSpecification } from '../../../typings';
 import { getUtcTimeRange } from '../../datetime';
 import {
   checkAggregateType,
@@ -10,7 +10,7 @@ import {
 } from '../utils';
 import * as SqlString from 'sqlstring';
 
-export function generatePie(widgetSpecification: IWidgetSpecification,networkInfo: INetworkInfoType) {
+export function generatePie(widgetSpecification: IWidgetSpecification) {
   let sql = '';
   const {
     datasource,
@@ -71,7 +71,6 @@ export function generatePie(widgetSpecification: IWidgetSpecification,networkInf
     timeField: timeAggType ? timeAlias : time_field!,
     startTime,
     endTime,
-    networkInfo,
     filterOperator,
     customTimes: custom_times as unknown as ICustomTime,
   });

@@ -22,13 +22,12 @@ import {
   getPagination,
 } from "../utils";
 import { DashboardService } from "./dashboard";
-import { NpmdDictService } from "./npmdDict";
-import { NetworkService } from "./network";
-import { ClickHouseService } from "./clickhouse";
+import { NpmdDictService } from "./dicts";
 import { EBooleanString, IMyAppConfig } from "../interface";
 import * as fs from "fs";
 import path = require("path");
 import { ELogOperareTarget, ELogOperareType } from "./systemLog";
+import { DatabaseService } from "./database";
 
 @Provide()
 export class WidgetService {
@@ -41,14 +40,12 @@ export class WidgetService {
   @Logger()
   readonly logger: IMidwayLogger;
 
-  @Inject()
-  networkService: NetworkService;
-
   @Config(ALL)
   config: IMyAppConfig;
 
+
   @Inject()
-  clickhouseService: ClickHouseService;
+  databaseService: DatabaseService;
 
   @Inject()
   npmdDictService: NpmdDictService;
@@ -303,17 +300,6 @@ export class WidgetService {
         }
         return {};
       })(),
-      ...(await (async () => {
-        if (widgetSpec.custom_times) {
-          return {
-            custom_times:
-              ((await this.npmdDictService.getCustomTimesFromRestApi()) || {})[
-                widgetSpec.custom_times
-              ],
-          };
-        }
-        return {};
-      })()),
     };
 
     const { metrics, groupby } = widgetSpec;
@@ -335,19 +321,17 @@ export class WidgetService {
       },
       {}
     );
-    const networkInfo = await this.networkService.getNetworkInfo();
     // 转成 sql 语句
     const { sql, colNames, colIdList } = generateSql(
       widgetSpec,
       false,
-      networkInfo
     );
   
     // 标识查询 ID，用于取消查询
     let securityQueryId = id ? `/*${base64Encode(id)}*/ ` : "";
     let fullSql = sql + securityQueryId;
 
-    let sqlData = await this.clickhouseService.executeSql(fullSql);
+    let sqlData = await this.databaseService.executeSql(fullSql);
     // 匹配标题名称
     const titleNameList = colIdList?.map((id) => {
       const c = colInfoMap[id];

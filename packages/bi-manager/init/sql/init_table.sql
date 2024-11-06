@@ -1,6 +1,27 @@
 -- CREATE DATABASE bi OWNER machloop;
 -- GRANT ALL PRIVILEGES ON DATABASE bi TO machloop;
 -- REVOKE CONNECT ON DATABASE bi FROM public;
+-- ----------------------------
+-- Table structure for bi_database
+-- ----------------------------
+CREATE TABLE IF NOT EXISTS "public"."bi_database" (
+  "id" varchar(64) COLLATE "pg_catalog"."default" NOT NULL,
+  "type" varchar(32) COLLATE "pg_catalog"."default" NOT NULL DEFAULT '',
+  "option" text COLLATE "pg_catalog"."default" NOT NULL DEFAULT '',
+  "created_at" timestamptz(6),
+  "updated_at" timestamptz(6),
+  "deleted_at" timestamptz(6),
+  "owner" varchar(64) COLLATE "pg_catalog"."default" NOT NULL DEFAULT '',
+  CONSTRAINT "bi_database_pkey" PRIMARY KEY ("id")
+);
+COMMENT ON COLUMN "public"."bi_database"."id" IS '主键';
+COMMENT ON COLUMN "public"."bi_database"."type" IS '数据库类型';
+COMMENT ON COLUMN "public"."bi_database"."option" IS '数据库连接配置';
+COMMENT ON COLUMN "public"."bi_database"."created_at" IS '创建时间';
+COMMENT ON COLUMN "public"."bi_database"."updated_at" IS '更新时间';
+COMMENT ON COLUMN "public"."bi_database"."deleted_at" IS '删除时间';
+COMMENT ON COLUMN "public"."bi_database"."owner" IS 'owner的id,可对Dashbase进行增删改';
+
 
 -- ----------------------------
 -- Table structure for bi_dashboard

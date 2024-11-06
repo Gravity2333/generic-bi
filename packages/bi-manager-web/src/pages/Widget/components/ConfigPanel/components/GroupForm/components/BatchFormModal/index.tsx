@@ -33,7 +33,7 @@ function BatchFormModal(
   const [modalForm] = Form.useForm();
   const groupNameMap = useMemo(() => {
     const map = new Map();
-    columns.forEach((column) => {
+    columns?.forEach((column) => {
       map.set(column.name, column.comment || column.name);
     });
     return map;

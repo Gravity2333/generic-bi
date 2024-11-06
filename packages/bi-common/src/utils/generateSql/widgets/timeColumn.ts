@@ -1,5 +1,5 @@
 import { addArrayJoin } from '../..';
-import { INetworkInfoType, IWidgetSpecification } from '../../../typings';
+import { IWidgetSpecification } from '../../../typings';
 import { getUtcTimeRange } from '../../datetime';
 import {
   checkAggregateType,
@@ -12,7 +12,6 @@ import * as SqlString from 'sqlstring';
 
 export function generateTimeColumn(
   widgetSpecification: IWidgetSpecification,
-  networkInfo: INetworkInfoType,
 ) {
   let sql = '';
   const {
@@ -87,7 +86,6 @@ export function generateTimeColumn(
     timeField: time_field!,
     startTime,
     endTime,
-    networkInfo,
     filterOperator
   });
 

@@ -7,8 +7,7 @@ import {
   Query,
 } from "@midwayjs/decorator";
 import { Context } from "egg";
-import { ClickHouseService } from "../service/clickhouse";
-import { NpmdDictService } from "../service/npmdDict";
+import { NpmdDictService } from "../service/dicts";
 import { GlobalService } from "./../service/global";
 
 @Provide()
@@ -20,8 +19,6 @@ export class ApiController {
   @Inject()
   globalService: GlobalService;
 
-  @Inject()
-  clickhouseService: ClickHouseService;
 
   @Inject()
   npmdDictService: NpmdDictService;

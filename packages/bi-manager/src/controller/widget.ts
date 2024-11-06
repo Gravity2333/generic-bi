@@ -26,14 +26,13 @@ import { ValidationError } from "joi";
 import { Readable } from "nodemailer/lib/xoauth2";
 import { CreateWidgetInput, QueryWidgetInput } from "../dto/widget.dto";
 import { KEEP_RESPONSE_RAW } from "../middleware/responseHandler";
-import { ClickHouseService } from "../service/clickhouse";
 import { IMidwayLogger } from "@midwayjs/logger";
 import { WidgetService } from "../service/widget";
 import * as fs from "fs";
 import { base64Encode } from "../utils";
-import { NpmdDictService } from "../service/npmdDict";
-import { NetworkService } from "../service/network";
+import { NpmdDictService } from "../service/dicts";
 import { ELogOperareTarget, ELogOperareType } from "../service/systemLog";
+import { DatabaseService } from "../service/database";
 const formidable = require("formidable");
 
 @Provide()
@@ -46,13 +45,10 @@ export class WidgetAPIController {
   widgetService: WidgetService;
 
   @Inject()
-  clickhouseService: ClickHouseService;
+  databaseService: DatabaseService;
 
   @Logger()
   readonly logger: IMidwayLogger;
-
-  @Inject()
-  networkService: NetworkService;
 
   @Inject()
   npmdDictService: NpmdDictService;
@@ -256,22 +252,6 @@ export class WidgetAPIController {
     }
   }
 
-  // Widget SQL 数据相关
-  // =================
-  @Get("/widgets/:id/sql-debug")
-  async getWidgetSqlDebug(@Param() id: string) {
-    const widgetSpec = await this.widgetService.getWidgetSpecification(id);
-    const networkInfo = await this.networkService.getNetworkInfo();
-    if (widgetSpec.custom_times) {
-      widgetSpec.custom_times =
-        ((await this.npmdDictService.getCustomTimesFromRestApi()) || {})[
-          widgetSpec.custom_times
-        ];
-    }
-    // 转成 sql 语句
-    return generateSql(widgetSpec, false, networkInfo);
-  }
-
   @Get("/widgets/:id/data")
   async getWidgetSqlData(
     @Param() id: string,
@@ -307,24 +287,12 @@ export class WidgetAPIController {
           }
           return {};
         })(),
-        ...(await (async () => {
-          if (widgetSpec.custom_times) {
-            return {
-              custom_times:
-                ((await this.npmdDictService.getCustomTimesFromRestApi()) ||
-                  {})[widgetSpec.custom_times],
-            };
-          }
-          return {};
-        })()),
       };
 
-      const networkInfo = await this.networkService.getNetworkInfo();
       // 转成 sql 语句
       const { sql, colNames, colIdList } = generateSql(
         widgetSpec,
         false,
-        networkInfo
       );
       const {
         reference = [],
@@ -360,14 +328,13 @@ export class WidgetAPIController {
               : timeRange,
             exist_rollup,
           });
-          const networkInfo = await this.networkService.getNetworkInfo();
+
           // 生成sql
           const { sql: refSql } = generateSql(
             refSpecification as any,
             false,
-            networkInfo
           );
-          const sqlData = await this.clickhouseService.executeSql(
+          const sqlData = await this.databaseService.executeSql(
             refSql + securityQueryId
           );
           if (denominator) {
@@ -390,7 +357,7 @@ export class WidgetAPIController {
       }
 
       const fullSql = sql + securityQueryId;
-      const sqlData = await this.clickhouseService.executeSql(
+      const sqlData = await this.databaseService.executeSql(
         fullSql
       );
       return {

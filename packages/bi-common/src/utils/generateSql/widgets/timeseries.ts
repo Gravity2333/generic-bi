@@ -1,5 +1,5 @@
 import { addArrayJoin, getUtcTimeRange } from '../..';
-import { INetworkInfoType, IWidgetSpecification } from '../../../typings';
+import { IWidgetSpecification } from '../../../typings';
 import {
   checkAggregateType,
   convertAggregateType,
@@ -17,7 +17,6 @@ import * as SqlString from 'sqlstring';
 
 export function generateTimeHistgram(
   widgetSpecification: IWidgetSpecification,
-  networkInfo: INetworkInfoType,
 ) {
   let sql = '';
   const {
@@ -60,7 +59,6 @@ export function generateTimeHistgram(
     timeField: time_field!,
     startTime,
     endTime,
-    networkInfo,
     filterOperator,
   });
 
@@ -145,7 +143,7 @@ export function generateTimeHistgram(
         timeField: time_field!,
         startTime,
         endTime,
-        networkInfo,
+
         filterOperator,
       });
       sql += ` AND ${(() => {

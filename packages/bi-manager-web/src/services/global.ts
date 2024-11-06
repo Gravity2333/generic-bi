@@ -63,22 +63,13 @@ export async function queryAlarms({ from, to }: { from: string; to: string }) {
 }
 
 /**
- * 查询BI版本
- */
-export async function queryBiVersion() {
-  return request<IAjaxResponseFactory<any>>(`${API_PREFIX}/bi-version`, {
-    method: 'GET',
-  });
-}
-
-/**
  * 查询自定义时间
  */
-export async function queryCustomTimes() {
-  return request<IAjaxResponseFactory<Record<string, ICustomTime>>>(`${API_PREFIX}/custom-times`, {
-    method: 'GET',
-  });
-}
+// export async function queryCustomTimes() {
+//   return request<IAjaxResponseFactory<Record<string, ICustomTime>>>(`${API_PREFIX}/custom-times`, {
+//     method: 'GET',
+//   });
+// }
 
 /**
  * 查询用户信息

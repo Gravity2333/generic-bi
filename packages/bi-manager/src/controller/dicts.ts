@@ -17,9 +17,8 @@ import {
   QueryNpmdDictInput,
   QueryNpmdDictMappingInput,
 } from "../dto/npmDict.dto";
-import { NpmdDictService } from "../service/npmdDict";
-import { NpmdDictMappingService } from "./../service/npmdDictMapping";
-import { NetworkService } from "../service/network";
+import { NpmdDictService } from "../service/dicts";
+import { NpmdDictMappingService } from "../service/npmdDictMapping";
 
 @Provide()
 @Controller("/web-api/v1")
@@ -27,8 +26,6 @@ export class NpmdAPIController {
   @Inject()
   npmdDictService: NpmdDictService;
 
-  @Inject()
-  networkService: NetworkService;
 
   @Inject()
   npmdDictMappingService: NpmdDictMappingService;
@@ -38,11 +35,6 @@ export class NpmdAPIController {
   @Validate()
   async listNpmdDicts(@Query(ALL) { forceFlush }: QueryNpmdDictInput) {
     return this.npmdDictService.queryDicts(forceFlush);
-  }
-
-  @Get("/npmd/dicts/network-groups")
-  async listNpmdNetworkGroupsDicts() {
-    return this.networkService.listAllNetworkGroups();
   }
 
   @Get("/npmd/dict-mappings")

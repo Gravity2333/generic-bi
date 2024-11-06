@@ -260,7 +260,7 @@ function FormModal(
                                     style={{ width: '40%' }}
                                     onChange={(e) => {
                                       const column: any =
-                                        columns.find((item) => item.name === e) || {};
+                                        columns?.find((item) => item.name === e) || {};
                                       updateFilter(id, {
                                         field: e,
                                         field_type: column?.type || '',

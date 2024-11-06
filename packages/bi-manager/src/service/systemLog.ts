@@ -56,6 +56,7 @@ export enum ELogOperareTarget {
   "WIDGET",
   "DATASOURCE",
   "REPORT",
+  "DATABASE"
 }
 
 /** 操作对象label */
@@ -65,6 +66,7 @@ const LogOperatetargetLabel: Record<`${ELogOperareTarget}`, string> = {
   [ELogOperareTarget.WIDGET]: "图表",
   [ELogOperareTarget.DATASOURCE]: "数据源",
   [ELogOperareTarget.REPORT]: "报表",
+  [ELogOperareTarget.DATABASE]: "数据库",
 };
 
 export interface ISystemLogWriteParams {

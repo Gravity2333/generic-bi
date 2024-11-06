@@ -2,9 +2,9 @@ import { EBIVERSION, IMailConfig, IUserInfo } from "@bi/common";
 import { Config, Inject, Provide } from "@midwayjs/decorator";
 import { InjectEntityModel } from "@midwayjs/orm";
 import { Repository } from "typeorm";
-import { NpmdCmsSmtp } from "../entity/npmd-cms/smtp";
+import { NpmdCmsSmtp } from "../entity/npmd/smtp";
 import { EBooleanString, IMyAppConfig } from "../interface";
-import { NPMD_CMS_TABLE } from "./npmdDict";
+import { NPMD_CMS_TABLE } from "./dicts";
 import { RestApiService } from "./restApi";
 import { TimerCache } from "../utils/timerCache";
 

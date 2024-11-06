@@ -3,10 +3,6 @@ import cx from 'classnames';
 import { v4 as uuidv4 } from 'uuid';
 import styles from './index.less';
 import { ECOMPONENTTYPE } from './typing';
-import { ACTIVE_ASSETS_NAME } from './components/ActiveAssets';
-import { NEW_FOUNDED_ASSETS_NAME } from './components/NewFoundedAssets';
-import BUILTIN_NEW_FOUNDED_ASSETS from './assets/BUILTIN_NEW_FOUNDED_ASSETS.svg';
-import BUILTIN_ACTIVEASSETS from './assets/BUILTIN_ACTIVEASSETS.svg';
 import MULTISOURCECARD from './assets/MULTISOURCECARD.svg';
 import TIME from './assets/TIME.svg';
 import TABS from './assets/TABS.svg';
@@ -16,11 +12,7 @@ import TEXTDIVIDER from './assets/TEXTDIVIDER.svg';
 import TEXT from './assets/TEXT.svg';
 import AutoWidthContainer from '@/components/AutoWidthContainer';
 import AutoWidthContainerCard from '@/components/AutoWidthContainer/components/AutoWidthContainerCard';
-import ALARM from './assets/ALARM.svg';
 import { useState } from 'react';
-import { ALARM_NAME } from './components/Alarms';
-import { EBIVERSION } from '@bi/common';
-import useBiVersion from '@/hooks/useBiVersion';
 
 export const CARD_HEIGHT = 260;
 export const CARD_WIDTH = 300;
@@ -68,7 +60,6 @@ const ComponentCard = ({ name, title, icon }: { name: string; title: string; ico
 
 const HorizontalComponentAdder = () => {
   const [searchName, setSearchName] = useState<string>('');
-  const biVersion = useBiVersion();
   const componentInfoList = [
     {
       svg: TEXT,
@@ -104,29 +95,7 @@ const HorizontalComponentAdder = () => {
       svg: MULTISOURCECARD,
       title: '多数据源卡片',
       name: ECOMPONENTTYPE.MULTISOURCECARD,
-    },
-    ...(() => {
-      if (biVersion === EBIVERSION.NPMD) {
-        return [
-          {
-            svg: BUILTIN_ACTIVEASSETS,
-            title: ACTIVE_ASSETS_NAME,
-            name: ECOMPONENTTYPE.BUILTIN_ACTIVEASSETS,
-          },
-          {
-            svg: BUILTIN_NEW_FOUNDED_ASSETS,
-            title: `${NEW_FOUNDED_ASSETS_NAME}[默认最近半小时]`,
-            name: ECOMPONENTTYPE.BUILTIN_NEW_FOUNDED_ASSETS,
-          },
-          {
-            svg: ALARM,
-            title: `${ALARM_NAME}[默认最近半小时]`,
-            name: ECOMPONENTTYPE.ALARM,
-          },
-        ];
-      }
-      return [];
-    })(),
+    }
   ];
   return (
     <div style={{ margin: '10px 0px' }}>

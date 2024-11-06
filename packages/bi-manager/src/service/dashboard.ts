@@ -15,7 +15,6 @@ import {
 import { IMyAppConfig } from "../interface";
 import DashboardModel from "../model/dashboard";
 import { getPagination, Utils } from "../utils";
-import { ClickHouseService } from "./clickhouse";
 import { ReportService } from "./report";
 import { WidgetService } from "./widget";
 import * as fs from "fs";
@@ -32,9 +31,6 @@ export class DashboardService {
 
   @Inject()
   reportService: ReportService;
-
-  @Inject()
-  clickhouseService: ClickHouseService;
 
   @Config(ALL)
   config: IMyAppConfig;

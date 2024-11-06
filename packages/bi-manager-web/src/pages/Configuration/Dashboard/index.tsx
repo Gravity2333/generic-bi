@@ -1,5 +1,4 @@
-import { API_PREFIX, BI_AUTH_TOKEN_KEY } from '@/common';
-import useBiVersion from '@/hooks/useBiVersion';
+import { API_PREFIX } from '@/common';
 import { deleteDeafultDashboard, queryAllDefaultDashboards } from '@/services/dashboard';
 import { UploadOutlined } from '@ant-design/icons';
 import { EBIVERSION, IDashboardFormData, SYSTEM_DASHBOARD_ID } from '@bi/common';
@@ -13,7 +12,6 @@ export default function DashboardConfig() {
   const handleSubmit = () => {};
   const [defaultDashboard, setDefaltDashboard] = useState<IDashboardFormData[]>([]);
   const [defaultDashboardLoading, setDefaltDashboardLoading] = useState<boolean>(true);
-  const biVersion = useBiVersion();
 
   const fetchDefaultDashboard = async () => {
     setDefaltDashboardLoading(true);
@@ -60,9 +58,8 @@ export default function DashboardConfig() {
               },
               accept: '.bi',
             }}
-            disabled={biVersion === EBIVERSION.CMS}
           >
-            <Button icon={<UploadOutlined />} disabled={biVersion === EBIVERSION.CMS}>
+            <Button icon={<UploadOutlined />}>
               导入
             </Button>
           </Upload>
@@ -108,11 +105,7 @@ export default function DashboardConfig() {
               </Upload>
             }
             bordered
-            dataSource={
-              biVersion === EBIVERSION.CMS
-                ? defaultDashboard.filter((d) => d.id !== SYSTEM_DASHBOARD_ID)
-                : defaultDashboard
-            }
+            dataSource={defaultDashboard}
             renderItem={(item: IDashboardFormData) => (
               <List.Item
                 key={item.id}

@@ -6,7 +6,6 @@ import {
   IFilterCondition,
   IGroupBy,
   IMetric,
-  INetworkInfoType,
   ITimeRange,
   weekValue,
 } from '../../../typings';
@@ -134,7 +133,6 @@ export function getWhereExpr({
   timeField = '',
   startTime,
   endTime,
-  networkInfo,
   filterOperator = 'AND',
   customTimes,
 }: {
@@ -143,14 +141,13 @@ export function getWhereExpr({
   timeField: string;
   startTime?: string;
   endTime?: string;
-  networkInfo: INetworkInfoType;
   filterOperator: string;
   customTimes?: ICustomTime;
 }) {
   let whereExpr = '';
   if (filters.length > 0) {
     whereExpr += '(';
-    whereExpr += filterCondition2Sql(filters, networkInfo, filterOperator);
+    whereExpr += filterCondition2Sql(filters, filterOperator);
     whereExpr += ')';
   }
 

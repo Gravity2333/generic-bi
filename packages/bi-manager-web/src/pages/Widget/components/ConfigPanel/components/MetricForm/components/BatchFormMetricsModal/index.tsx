@@ -27,7 +27,7 @@ function BatchFormMetricsModal(
 
   const fieldNameMap = useMemo(() => {
     const map = new Map();
-    columns.forEach((column) => {
+    columns?.forEach((column) => {
       map.set(column.name, {
         display_name: column.comment || column.name,
         type: column.type,

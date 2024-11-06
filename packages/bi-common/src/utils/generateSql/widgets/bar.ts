@@ -1,5 +1,5 @@
 import { addArrayJoin } from '../..';
-import { ICustomTime, INetworkInfoType, IWidgetSpecification } from '../../../typings';
+import { ICustomTime, IWidgetSpecification } from '../../../typings';
 import { getUtcTimeRange } from '../../datetime';
 import {
   checkAggregateType,
@@ -12,7 +12,6 @@ import * as SqlString from 'sqlstring';
 
 export function generateBar(
   widgetSpecification: IWidgetSpecification,
-  networkInfo: INetworkInfoType,
 ) {
   let sql = '';
   const {
@@ -74,7 +73,6 @@ export function generateBar(
     timeField: timeAggType ? timeAlias : time_field!,
     startTime,
     endTime,
-    networkInfo,
     filterOperator,
     customTimes: custom_times as unknown as ICustomTime,
   });

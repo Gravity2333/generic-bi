@@ -5,10 +5,10 @@ export * from './report';
 export * from './widget';
 export * from './npmdDict';
 export * from './mail';
-export * from './network';
 export * from './customTimes';
 export * from './user';
 export * from './datasets'
+export * from './database'
 
 export interface IPageFactory<T> {
   rows: T[];

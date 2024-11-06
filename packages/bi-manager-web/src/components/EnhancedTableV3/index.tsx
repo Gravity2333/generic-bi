@@ -163,7 +163,7 @@ function InnerTable<RecordType extends Record<string, any>>(props: Props<RecordT
         });
         onColumnChange?.(columns.filter((item) => !item.hide).map((item) => item.field));
         if (showSequence) {
-          columns.unshift(seqCol);
+          columns?.unshift(seqCol);
         }
         return columns;
       }

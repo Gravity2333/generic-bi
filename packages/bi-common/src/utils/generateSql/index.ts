@@ -1,6 +1,5 @@
 import {
   EVisualizationType,
-  INetworkInfoType,
   IWidgetSpecification,
 } from '../../typings';
 import { generateTimeHistgram } from './widgets/timeseries';
@@ -22,24 +21,23 @@ import { generateTimeColumn } from './widgets/timeColumn';
 export function generateSql(
   widgetSpecification: IWidgetSpecification,
   pretty = true,
-  networkInfo: INetworkInfoType,
 ): { sql: string; colNames: string[]; colIdList: string[] } {
   const { viz_type } = widgetSpecification;
   if (viz_type === EVisualizationType.BigNumberTotal) {
-    return generateBigNumber(widgetSpecification, networkInfo);
+    return generateBigNumber(widgetSpecification);
   } else if (viz_type === EVisualizationType.Pie) {
-    return generatePie(widgetSpecification, networkInfo);
+    return generatePie(widgetSpecification);
   } else if (
     viz_type === EVisualizationType.Bar ||
     viz_type === EVisualizationType.Column
   ) {
-    return generateBar(widgetSpecification, networkInfo);
+    return generateBar(widgetSpecification);
   } else if (viz_type === EVisualizationType.Table) {
-    return generateTable(widgetSpecification, networkInfo);
+    return generateTable(widgetSpecification);
   } else if (viz_type === EVisualizationType.TimeHistogram) {
-    return generateTimeHistgram(widgetSpecification, networkInfo);
+    return generateTimeHistgram(widgetSpecification);
   } else if (viz_type === EVisualizationType.Time_Column) {
-    return generateTimeColumn(widgetSpecification, networkInfo);
+    return generateTimeColumn(widgetSpecification);
   } else {
     return {
       sql: '',

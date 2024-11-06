@@ -1,8 +1,8 @@
-import { DataSetTypes, IDatasetTable } from "@bi/common";
+import { EDatabaseType } from "@bi/common";
 import { Controller, Get, Inject, Param, Provide } from "@midwayjs/decorator";
 import { Context } from "egg";
 import { NpmdDictMappingService } from "../service/npmdDictMapping";
-import { ClickHouseService } from "../service/clickhouse";
+import { DatabaseService } from "../service/database";
 
 /** 元元数据详单表 */
 // const PROTOCOL_RECORD_REG = /d_fpc_protocol_([a-zA-Z0-9]+)_log_record/g;
@@ -17,25 +17,21 @@ export class DatasetAPIController {
   npmdDictMappingService: NpmdDictMappingService;
 
   @Inject()
-  clickHouseService: ClickHouseService;
+  databaseService: DatabaseService;
 
   @Get("/datasets")
   async listAllDatasets() {
     /** 由于探针的详单和统计数据存在两个数据库中，所以要查询两个并且拼接 */
     /** 探针和cms都默认采用d_fpc开头的表,不再采用t_fpc开头的表,需要在此过滤掉 */
     const recordData = await (async () => {
-      if (this.ctx.app.config?.externalSystem?.type === DataSetTypes.POSTGRE) {
-        return await this.ctx.app.externalSystemClient.querying<
-          IDatasetTable[]
-        >(
+      if (this.databaseService?.type === EDatabaseType.POSTGRE) {
+        return await await this.databaseService.executeSql(
           `SELECT tablename as name FROM pg_catalog.pg_tables WHERE schemaname != 'pg_catalog' AND schemaname != 'information_schema'`
         );
-      } else if (
-        this.ctx.app.config?.externalSystem?.type === DataSetTypes.CLICKHOUSE
-      ) {
-        return await this.ctx.app.externalSystemClient.querying<
-          IDatasetTable[]
-        >("SELECT name, comment FROM system.tables WHERE name LIKE '%d_fpc_%'");
+      } else if (this.databaseService?.type === EDatabaseType.CLICKHOUSE) {
+        return await await this.databaseService.executeSql(
+          "SELECT name, comment FROM system.tables WHERE name LIKE '%d_fpc_%'"
+        );
       }
     })();
     return recordData;
@@ -45,11 +41,8 @@ export class DatasetAPIController {
   async listDatasetColumns(@Param() tableName: string) {
     // 判断查询两个表
     const recordData = await (async () => {
-      if (this.ctx.app.config?.externalSystem?.type === DataSetTypes.POSTGRE) {
-        return await this.ctx.app.externalSystemClient.querying<
-          IDatasetTable[]
-        >(
-          `select
+      if (this.databaseService?.type === EDatabaseType.POSTGRE) {
+        return await await this.databaseService.executeSql(`select
               a.attname name,
               d.description comment,
               concat_ws('',t.typname,SUBSTRING(format_type(a.atttypid,a.atttypmod) from '(.*)')) as type
@@ -80,14 +73,9 @@ export class DatasetAPIController {
               position('_2' in tablename)=0
               )
               and c.relname = '${tableName}'
-              order by c.relname,a.attnum;`
-        );
-      } else if (
-        this.ctx.app.config?.externalSystem?.type === DataSetTypes.CLICKHOUSE
-      ) {
-        return await this.ctx.app.externalSystemClient.querying<
-          IDatasetTable[]
-        >(`desc ${tableName}`);
+              order by c.relname,a.attnum;`);
+      } else if (this.databaseService?.type === EDatabaseType.CLICKHOUSE) {
+        return await await this.databaseService.executeSql(`desc ${tableName}`);
       }
     })();
     // // 获取字段管理关系

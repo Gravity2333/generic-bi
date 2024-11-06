@@ -54,7 +54,7 @@ import FilterForm from './components/FilterForm';
 import GroupForm from './components/GroupForm';
 import TimeRangeForm from './components/TimeRangeForm';
 import VizTypeForm from './components/VizTypeForm';
-import { queryCustomTimes } from '@/services/global';
+// import { queryCustomTimes } from '@/services/global';
 import TimeGrainSelect from './components/TimeGrainSelect';
 import { TimeFieldForm } from './components/TimeFieldForm';
 import TextArea from 'antd/lib/input/TextArea';
@@ -255,12 +255,12 @@ function ConfigPanel(props: Props, ref: any) {
     resetWidget();
   };
 
-  const fetchCustomTimes = async () => {
-    const { success, data } = await queryCustomTimes();
-    if (success) {
-      setCustomTimes(Object.values(data));
-    }
-  };
+  // const fetchCustomTimes = async () => {
+  //   const { success, data } = await queryCustomTimes();
+  //   if (success) {
+  //     setCustomTimes(Object.values(data));
+  //   }
+  // };
 
   /** 提交表单 */
   const submitForm = async (val: any) => {
@@ -451,7 +451,7 @@ function ConfigPanel(props: Props, ref: any) {
 
   useEffect(() => {
     /** 请求自定义时间 */
-    fetchCustomTimes();
+    // fetchCustomTimes();
     /** 将提交函数传递出去 */
     setSubmitFunc(function () {
       return () => {

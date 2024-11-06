@@ -36,3 +36,13 @@ export function throttle(func: any,delay: number,onTimeout?: any){
     }
   }
 }
+
+export function getPagePath() {
+  return window.location.href.split('?')[0];
+}
+
+/** 根据 URL 判断页面是否处理内嵌状态 */
+export const pageIsEmbed = () => {
+  const pagePath = getPagePath();
+  return pagePath.indexOf('/embed/') > -1;
+};
