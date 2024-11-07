@@ -1,4 +1,4 @@
-import { API_PREFIX } from '@/common';
+import { API_PREFIX, BI_AUTH_TOKEN_KEY } from '@/common';
 import { deleteDeafultDashboard, queryAllDefaultDashboards } from '@/services/dashboard';
 import { UploadOutlined } from '@ant-design/icons';
 import { EBIVERSION, IDashboardFormData, SYSTEM_DASHBOARD_ID } from '@bi/common';
@@ -6,6 +6,7 @@ import { Button, Form, List, Modal, Tag, Upload, message } from 'antd';
 import { useForm } from 'antd/lib/form/Form';
 import { useState } from 'react';
 
+const biToken = window.localStorage.getItem(BI_AUTH_TOKEN_KEY);
 
 export default function DashboardConfig() {
   const [form] = useForm<any>();
@@ -77,7 +78,7 @@ export default function DashboardConfig() {
                 {...{
                   name: 'file',
                   headers: {
-                    authorization: 'authorization-text',
+                    ...(biToken ? { Authorization: `Bearer ${biToken}` } : {}),
                   },
                   method: 'post',
                   action: `${API_PREFIX}/dashboards/default/as-import`,
