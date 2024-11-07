@@ -3,7 +3,7 @@ import { DisconnectOutlined, SmileOutlined } from '@ant-design/icons';
 import { Alert, Button, Card, Result } from 'antd';
 import { useEffect, useState } from 'react';
 import { history } from 'umi';
-import styles from './index.less'
+import styles from './index.less';
 
 export default function Welcome() {
   const [connect, setConnect] = useState<boolean>(true);
@@ -34,9 +34,8 @@ export default function Welcome() {
           }
         />
       ) : null}
-      <Result icon={<SmileOutlined />} title={`欢迎使用Generic-BI`} />
-      <div className={styles['show-bar']}
-      >
+      <Result icon={<SmileOutlined style={{ color: 'rgba(84,154,220,0.9)' }} />} title={`欢迎使用Generic-BI`} />
+      <div className={styles['show-bar']}>
         <div
           className={`${styles['show-bar__card']} ${styles['show-bar__card__db-cover']}`}
           title={undefined}
