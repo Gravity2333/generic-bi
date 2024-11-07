@@ -46,3 +46,10 @@ export const pageIsEmbed = () => {
   const pagePath = getPagePath();
   return pagePath.indexOf('/embed/') > -1;
 };
+
+export function removeObjectNullValue(obj: Record<string, any>) {
+  const keys = Object.keys(obj).filter((k) => obj[k] !== undefined || obj[k] !== null);
+  return keys.reduce((currentRes, key) => {
+    return { ...currentRes, [key]: obj[key] };
+  }, {});
+}

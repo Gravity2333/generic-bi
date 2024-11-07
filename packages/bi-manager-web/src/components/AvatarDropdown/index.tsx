@@ -52,7 +52,7 @@ function AvatarDropdown() {
   return true ? (
     <HeaderDropdown overlay={menuHeaderDropdown} placement="bottomRight">
       <span className={`${styles.action} ${styles.account}`}>
-        <Avatar size="small" icon={<UserOutlined />} />
+        <Avatar size="small" icon={<UserOutlined />} style={{marginRight:'10px'}}/>
         <div className={`${styles.name} anticon`}>
           <span className="header-text">
             {(initialState as any)?.currentUserInfo?.fullname ||

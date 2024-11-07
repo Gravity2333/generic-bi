@@ -1,19 +1,22 @@
+import { PAGE_DEFAULT_SIZE } from '@/components/CustomPagination';
 import { downloadLog, queryReportLogs } from '@/services/report';
-import ProTable, { ProColumns } from '@ant-design/pro-table';
+import { removeObjectNullValue } from '@/utils';
+import { getTablePaginationDefaultSettings } from '@/utils/pagination';
 import {
   EReportJobExecutionResult,
   EReportJobStatus,
   EReportJobTriggerType,
   IReportJobLog,
 } from '@bi/common';
-import { Button, Modal } from 'antd';
+import { Button, Modal, Table } from 'antd';
+import { ColumnType } from 'antd/lib/table';
 import moment from 'moment';
-
-const DEFAULT_PAGE_SIZE = 10;
-const DEFAULT_PAGE = 1;
+import { useCallback } from 'react';
+import usePolling from 'use-polling-hook';
+import useVariable, { UseVariableParams } from 'use-variable-hook';
 
 /** 日志列定义 */
-const logColumns: ProColumns<IReportJobLog>[] = [
+const logColumns: ColumnType<IReportJobLog>[] = [
   {
     title: '创建时间',
     dataIndex: 'created_at',
@@ -44,9 +47,8 @@ const logColumns: ProColumns<IReportJobLog>[] = [
     dataIndex: 'status',
     ellipsis: true,
     align: 'center',
-    valueEnum: {
-      '0': { text: '执行中', status: 'Processing' },
-      '1': { text: '执行完成', status: 'Success' },
+    render: (_, record) => {
+      return record['status'] === '0' ? '执行中' : '执行完成';
     },
   },
   {
@@ -54,9 +56,8 @@ const logColumns: ProColumns<IReportJobLog>[] = [
     dataIndex: 'execution_result',
     ellipsis: true,
     align: 'center',
-    valueEnum: {
-      '0': { text: '成功', status: 'Success' },
-      '1': { text: '失败', status: 'Error' },
+    render: (_, record) => {
+      return record['execution_result'] === '0' ? '成功' : '失败';
     },
   },
   {
@@ -93,12 +94,95 @@ const logColumns: ProColumns<IReportJobLog>[] = [
     },
   },
 ];
+
+type Pagination = { page: number; pageSize: number };
+const defaultTablePaginationDefaultSettings = getTablePaginationDefaultSettings();
+
+type ReportLogModalVariablesType = {
+  pagination: Pagination;
+  totalElements: number;
+  tableData: IReportJobLog[];
+  searchParams: Record<string, any>;
+};
+const ReportLogModalVariables: UseVariableParams = {
+  variables: {
+    pagination: {
+      page: 1,
+      pageSize: defaultTablePaginationDefaultSettings.pageSize! || PAGE_DEFAULT_SIZE,
+    },
+    searchParams: {},
+    totalElements: 0,
+    tableData: [],
+  },
+  reducers: {
+    updatePagination(store, { payload }) {
+      store.pagination = payload;
+    },
+  },
+  effects: {
+    fetchReportLogs({ call, Control }, { store }, queryParams) {
+      const { success, data } = call(queryReportLogs, queryParams);
+      if (success) {
+        store.tableData = data.rows;
+        store.totalElements = data.total;
+      }
+      Control.return({});
+    },
+  },
+};
+
+function PollingTable({ reportId }: { reportId: string }) {
+  const [variables, dispatch] = useVariable<ReportLogModalVariablesType>(ReportLogModalVariables);
+  const { pagination, tableData, totalElements, searchParams } = variables;
+  /** 轮巡函数 */
+  const pollingFn = useCallback((queryParams) => {
+    return dispatch({
+      type: 'fetchReportLogs',
+      payload: queryParams,
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const [loading] = usePolling({
+    interval: 1000,
+    pollingFn,
+    params: removeObjectNullValue({
+      pageNumber: pagination.page - 1,
+      pageSize: pagination.pageSize,
+      ...searchParams,
+      reportId,
+    }),
+  });
+
+  return (
+    <Table<IReportJobLog>
+      rowKey="id"
+      bordered
+      size="small"
+      columns={logColumns}
+      loading={loading}
+      dataSource={tableData}
+      pagination={{
+        ...getTablePaginationDefaultSettings({
+          onChangePage: (page, pageSize) => {
+            dispatch({
+              type: 'updatePagination',
+              payload: { page, pageSize },
+            });
+          },
+        }),
+        total: totalElements,
+      }}
+    />
+  );
+}
+
 export default function ReportLogModal({
   setShowLogs,
   showLogs,
   reportId,
 }: {
-  setShowLogs: (arg: boolean)=>void;
+  setShowLogs: (arg: boolean) => void;
   showLogs: boolean;
   reportId: string;
 }) {
@@ -113,40 +197,7 @@ export default function ReportLogModal({
       destroyOnClose
       footer={false}
     >
-      <ProTable
-        rowKey="id"
-        bordered
-        size="small"
-        columns={logColumns}
-        request={async (params) => {
-          const { current, pageSize } = params;
-          const { success, data } = await queryReportLogs({
-            reportId: reportId || '',
-            pageSize: pageSize || DEFAULT_PAGE_SIZE,
-            pageNumber: (current || DEFAULT_PAGE) - 1,
-          });
-          if (!success) {
-            return {
-              data: [],
-              success,
-            };
-          }
-          const { rows, total, pageNumber } = data as any;
-          return {
-            data: rows,
-            success: success,
-            page: pageNumber,
-            total,
-          };
-        }}
-        pagination={{
-          defaultPageSize: DEFAULT_PAGE_SIZE,
-          defaultCurrent: DEFAULT_PAGE,
-          showSizeChanger: true,
-        }}
-        search={false}
-        toolBarRender={false}
-      />
+      <PollingTable reportId={reportId} />
     </Modal>
   );
 }
