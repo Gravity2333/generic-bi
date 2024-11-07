@@ -3,6 +3,24 @@
 
 ## Getting Started
 
+## 安装postgre
+下载地址 https://postgresapp.com/downloads.html
+
+客户端推荐: https://eggerapps.at/postico/v1.php
+
+## 创建数据库
+CREATE DATABASE bi;
+
+## 创建用户
+超级管理员 postgre下：
+CREATE USER genericbiserver WITH PASSWORD 'genericbiserver@123';
+
+给权限
+grant all on schema public to genericbiserver;
+
+## 安装redis
+下载地址  https://redis.io/docs/latest/operate/oss_and_stack/install/install-redis
+
 ```bash
 $ npm install lerna -g
 # Or
