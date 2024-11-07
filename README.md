@@ -1,5 +1,5 @@
-# bi-server
-一个通用的bi系统
+# Generic-bi-server
+一个通用的bi系统,目前支持Clickhouse Postgre Mysql的数据可视化
 
 ## Getting Started
 
@@ -144,5 +144,3 @@ https://wbt5.com/jsdom-canvas.html
 docker-compose -f docker-compose.dev.yml stop
 docker-compose -f docker-compose.dev.yml up -d
 ```
-
-# generic-bi
