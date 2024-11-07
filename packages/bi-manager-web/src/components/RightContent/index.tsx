@@ -6,6 +6,7 @@ import { isIframeEmbed } from '@/utils';
 import { TTheme } from '@/interface';
 import styles from './index.less';
 import { UserOutlined } from '@ant-design/icons';
+import AvatarDropdown from '../AvatarDropdown';
 
 const RightContent = () => {
   const { initialState, setInitialState } = useModel('@@initialState');
@@ -63,14 +64,7 @@ const RightContent = () => {
         unCheckedChildren={'🌝'}
         onChange={handeChangeTheme}
       />
-      <span className={`${styles.action} ${styles.account}`}>
-        <Avatar size="small" icon={<UserOutlined />} />
-        <div className={`${styles.name} anticon`}>
-          <span style={{ marginLeft: '8px' }}>
-            {(initialState as any)?.currentUserInfo?.username || '未知用户'}
-          </span>
-        </div>
-      </span>
+      <AvatarDropdown/>
     </Space>
   );
 };

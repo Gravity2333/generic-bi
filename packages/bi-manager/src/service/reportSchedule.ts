@@ -425,7 +425,7 @@ export class ReportScheduleService {
       dashboard_ids: oldDashboardIds,
     } = report || {};
     // 生成 jwt token
-    const jwtToken = await this.jwtService.generateFixedToken();
+    const jwtToken = ''
     const timeRange = parseObjJson<ITimeRange>(global_time_range);
 
     const { attachment, timeout } = decrypt(sender_options || "{}") as

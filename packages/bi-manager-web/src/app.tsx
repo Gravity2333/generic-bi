@@ -13,8 +13,6 @@ import { useEffect, useState } from 'react';
 import { queryCurrentUserInfo } from './services/global';
 import { sendMsgToParent } from './utils/sendMsgToParent';
 
-const biToken = window.sessionStorage.getItem(BI_AUTH_TOKEN_KEY);
-
 export function getInitialState(): { theme: TTheme; settings?: Partial<LayoutSettings> } {
   const theme = (window.localStorage.getItem(THEME_KEY) as TTheme) || 'light';
   const isDark = theme === 'dark';
@@ -32,20 +30,21 @@ function LayoutContent(children: JSX.Element) {
   const { initialState, setInitialState } = useModel('@@initialState');
   useEffect(() => {
     (async () => {
-      setLoading(true);
-      if (!biToken) {
-        setLoading(false);
-        return;
-      }
-      const { success, data } = await queryCurrentUserInfo(biToken);
-      if (success) {
-        setCurrentUserInfo(data);
-        setInitialState({
-          ...(initialState || {}),
-          currentUserInfo: data,
-        } as any);
-      }
-      setLoading(false);
+      // const biToken = window.sessionStorage.getItem(BI_AUTH_TOKEN_KEY);
+      // setLoading(true);
+      // if (!biToken) {
+      //   setLoading(false);
+      //   return;
+      // }
+      // const { success, data } = await queryCurrentUserInfo(biToken);
+      // if (success) {
+      //   setCurrentUserInfo(data);
+      //   setInitialState({
+      //     ...(initialState || {}),
+      //     currentUserInfo: data,
+      //   } as any);
+      // }
+      // setLoading(false);
     })();
   }, []);
 
@@ -81,6 +80,8 @@ const unAuthorizedNotification = throttle(() => {
     message: '没有权限访问',
     description: '抱歉，您无权访问该页面',
   });
+  window.sessionStorage.setItem(BI_AUTH_TOKEN_KEY, '');
+  location.href='/login'
   sendMsgToParent({ unAuthorize: true });
 }, 10000);
 
@@ -94,7 +95,7 @@ export const layout: RunTimeLayoutConfig = ({ initialState }) => {
     title: isIframeEmbed ? false : 'Generic-BI',
     className: isIframeEmbed ? 'embed-bi-layout' : undefined,
     isChildrenLayout: true,
-    rightContentRender: () => <RightContent />, 
+    rightContentRender: () => <RightContent />,
     links: [],
     childrenRender: LayoutContent,
   };
@@ -105,8 +106,11 @@ const REQUEST_TIME_OUT = 600000;
 
 export const request: RequestConfig = {
   headers: {
-    ...(biToken ? { Authorization: `Bearer ${biToken}` } : {}),
-  },
+    ...(() => {
+      const biToken = window.sessionStorage.getItem(BI_AUTH_TOKEN_KEY);
+      return biToken ? { Authorization: `Bearer ${biToken}` } : {};
+    })(),
+  } as any,
   timeout: REQUEST_TIME_OUT,
   errorHandler: (error: any) => {
     const { data } = error;
@@ -139,5 +143,5 @@ export const request: RequestConfig = {
       description: errorMsg,
     });
     return data;
-  },
+  }
 };

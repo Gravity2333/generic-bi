@@ -330,6 +330,13 @@ const routes: IRouteProps[] = [
     ],
   },
   {
+    path: '/login',
+    name: '登录',
+    hideInMenu: true,
+    layout: false,
+    component: './Login',
+  },
+  {
     path: '/configuration',
     name: '配置',
     icon: 'setting',

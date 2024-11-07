@@ -198,3 +198,31 @@ COMMENT ON COLUMN "public"."bi_smtp"."created_at" IS '创建时间';
 COMMENT ON COLUMN "public"."bi_smtp"."updated_at" IS '更新时间';
 COMMENT ON COLUMN "public"."bi_smtp"."deleted_at" IS '删除时间';
 COMMENT ON COLUMN "public"."bi_smtp"."owner" IS 'owner的id,可对SMTP进行增删改';
+
+
+-- ----------------------------
+-- Table structure for bi_users
+-- ----------------------------
+CREATE TABLE IF NOT EXISTS "public"."bi_users" (
+  "id" varchar(64) COLLATE "pg_catalog"."default" NOT NULL,
+  "username" varchar(32) COLLATE "pg_catalog"."default" NOT NULL DEFAULT '',
+  "password" varchar(32) COLLATE "pg_catalog"."default" NOT NULL DEFAULT '',
+  "role" varchar(6) COLLATE "pg_catalog"."default" NOT NULL DEFAULT '111111',
+  "nickname" varchar(32) COLLATE "pg_catalog"."default" NOT NULL DEFAULT '',
+  "avator" text COLLATE "pg_catalog"."default" NOT NULL DEFAULT '',
+  "created_at" timestamptz(6),
+  "updated_at" timestamptz(6),
+  "deleted_at" timestamptz(6),
+  "owner" varchar(64) COLLATE "pg_catalog"."default" NOT NULL DEFAULT '',
+  CONSTRAINT "bi_users_pkey" PRIMARY KEY ("id")
+);
+COMMENT ON COLUMN "public"."bi_users"."id" IS '主键';
+COMMENT ON COLUMN "public"."bi_users"."username" IS '用户名';
+COMMENT ON COLUMN "public"."bi_users"."password" IS '密码';
+COMMENT ON COLUMN "public"."bi_users"."role" IS '角色 (默认 root为 111111)';
+COMMENT ON COLUMN "public"."bi_users"."nickname" IS '昵称';
+COMMENT ON COLUMN "public"."bi_users"."avator" IS '头像';
+COMMENT ON COLUMN "public"."bi_users"."created_at" IS '创建时间';
+COMMENT ON COLUMN "public"."bi_users"."updated_at" IS '更新时间';
+COMMENT ON COLUMN "public"."bi_users"."deleted_at" IS '删除时间';
+COMMENT ON COLUMN "public"."bi_users"."owner" IS 'owner的id,可对Dashbase进行增删改';

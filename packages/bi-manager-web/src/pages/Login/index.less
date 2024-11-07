@@ -1,0 +1,91 @@
+.outer-card {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: 30.875rem;
+  border-radius: 6px;
+  box-shadow: rgba(0, 0, 0, 0.08) 0px 1px 15px;
+  transform: translate(-50%, -50%);
+
+  &__title {
+    width: 100%;
+    margin-bottom: 2.5rem;
+    color: rgb(76, 87, 115);
+    font-weight: 700;
+    font-size: 1.15rem;
+    font-family: 'Lato', sans-serif;
+    line-height: 1.5rem;
+    text-align: center;
+  }
+
+  &__input {
+    width: 100%;
+    padding: 0.75rem;
+    color: rgb(76, 87, 115);
+    font-weight: 700;
+    font-size: 1rem;
+    font-family: inherit;
+    text-align: inherit;
+    background-color: rgb(255, 255, 255);
+    border: 1px solid rgb(237, 110, 110);
+    border-radius: 4px;
+    outline: none;
+  }
+
+  &__btn {
+    margin-top: 20px;
+    width: 100%;
+    color: #ffffff;
+    background-color: rgba(80, 158, 227, 0.88);
+    border-color: #509ee3;
+    flex-shrink: 0;
+    border: 1px solid #509ee3;
+
+    cursor: pointer;
+    text-decoration: none;
+    font-weight: bold;
+    font-family: "Lato", sans-serif;
+    border-radius: 6px;
+    display: inline-block;
+    box-sizing: border-box;
+
+    height: 2.5rem;
+  }
+
+  &__btn:hover{
+    background: #f9fbfc;
+    transition: all 200ms linear;
+    transition-property: color, border-color, background-color;
+  }
+
+  &__bottom-tip{
+    width: 100%;
+    margin-bottom: 10px;
+    color: rgb(76, 87, 115);
+    font-weight: 300;
+    font-size: 0.8rem;
+    font-family: 'Lato', sans-serif;
+    line-height: 1.5rem;
+    text-align: center;
+    cursor: pointer;
+  }
+
+  &__bottom-tip:hover{
+    color: rgba(80, 158, 227, 0.88);
+    font-weight: 350;
+    transition-duration: 200ms;
+  }
+
+
+}
+
+:global{
+    #bi-web-root{
+        background: #fff !important;
+        background-color: rgb(249, 251, 252)! important;
+        background-image: url(../../assets/bridge.svg) !important;
+        background-repeat: no-repeat !important;
+        background-position: center bottom !important;
+        background-size: 100% auto !important;
+    }
+}

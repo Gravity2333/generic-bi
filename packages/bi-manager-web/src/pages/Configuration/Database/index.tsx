@@ -30,8 +30,7 @@ export default function DatabaseConfig() {
   const [modalForm] = Form.useForm();
   const datasourceType = Form.useWatch('datasource_type', modalForm);
   const [, isDark] = useDaynamicTheme();
-  console.log(datasourceType);
-
+  
   const handleSubmit = async (vals: any) => {
     const params = {
       id: vals.id,

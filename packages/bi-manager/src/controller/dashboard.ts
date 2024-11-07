@@ -333,7 +333,6 @@ export class DashboardAPIController {
   @Get("/dashboards/:id/export")
   async exportDashboardPdf(@Param() id: string) {
     const dashboard = await this.dashboardService.getDashboardById(id);
-    const jwtToken = await this.jwtService.generateFixedToken();
     let pdfs: IReportJobFile[] = [];
     try {
       const result = await this.httpService.get<{
@@ -348,7 +347,7 @@ export class DashboardAPIController {
             shotList: [
               {
                 name: dashboard.id,
-                path: `/bi${SHARE_PAGE_PREFIX}/dashboard/${id}/preview?token=${jwtToken}`,
+                path: `/bi${SHARE_PAGE_PREFIX}/dashboard/${id}/preview`,
               },
             ],
           }),

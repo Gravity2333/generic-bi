@@ -23,14 +23,6 @@ export class ApiController {
   @Inject()
   npmdDictService: NpmdDictService;
 
-  @Get("/current-user")
-  async querCurrentUserInfo(
-    @Query(ALL)
-    { token }: { token: string }
-  ) {
-    return await this.globalService.parseToken(token);
-  }
-
   @Get("/*")
   async Error404() {
     return this.ctx?.throw(404, `[API Not Found] ${this.ctx.request.URL}`);
