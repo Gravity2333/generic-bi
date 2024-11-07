@@ -17,7 +17,7 @@ const SecurityLayout = ({ children }: SecurityLayoutProps) => {
   useDynamicTheme()
   useEffect(() => {
     // 检查 token 值
-    const token = sessionStorage.getItem(BI_AUTH_TOKEN_KEY);
+    const token = localStorage.getItem(BI_AUTH_TOKEN_KEY);
     if (token) {
       setHasAuth(true);
     }

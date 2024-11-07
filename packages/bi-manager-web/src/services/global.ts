@@ -102,3 +102,13 @@ export async function queryCurrentUserInfo() {
     method: 'GET',
   });
 }
+
+
+/**
+ * 查询os信息
+ */
+export async function queryOsInfo() {
+  return request<IAjaxResponseFactory<any>>(`${API_PREFIX}/os-info`, {
+    method: 'GET',
+  });
+}

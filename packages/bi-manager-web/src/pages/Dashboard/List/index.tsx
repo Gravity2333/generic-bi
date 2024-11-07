@@ -15,7 +15,7 @@ import styles from './index.less';
 import { getTablePaginationDefaultSettings } from '@/utils/pagination';
 import useEmbed from '@/hooks/useEmbed';
 
-const biToken = window.sessionStorage.getItem(BI_AUTH_TOKEN_KEY);
+const biToken = window.localStorage.getItem(BI_AUTH_TOKEN_KEY);
 
 const ExportDashboard = ({ keys }: { keys: React.Key[] }) => {
   const [exportWidgets, setExportWidgets] = useState<boolean>(false);
