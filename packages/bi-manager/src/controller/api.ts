@@ -23,15 +23,6 @@ export class ApiController {
   @Inject()
   npmdDictService: NpmdDictService;
 
-
-  @Get("/mail-configs")
-  async queryMailConfig() {
-    const mapping = await this.globalService.getMailConfig();
-    // 删除密码
-    delete mapping?.login_password;
-    return mapping ?? {};
-  }
-
   @Get("/current-user")
   async querCurrentUserInfo(
     @Query(ALL)

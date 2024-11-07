@@ -1,15 +1,38 @@
 import { API_PREFIX } from '@/common';
 import { IAjaxResponseFactory } from '@/interface';
-import { ICustomTime, IMailConfig, IUserInfo } from '@bi/common';
+import { IMailConfig, IUserInfo } from '@bi/common';
 import { request } from 'umi';
 import { stringify } from 'qs';
+import { ITransmitSmtp } from '@/pages/Configuration/Mail';
 
 /**
  * 查询邮箱配置
  */
 export async function queryMailConfig() {
-  return request<IAjaxResponseFactory<IMailConfig>>(`${API_PREFIX}/mail-configs`, {
+  return request<IAjaxResponseFactory<IMailConfig>>(`${API_PREFIX}/smtp-configuration`, {
     method: 'GET',
+  });
+}
+
+/** 配置邮箱 */
+export async function configMail(params: ITransmitSmtp) {
+  return request<IAjaxResponseFactory<any>>(`${API_PREFIX}/smtp-configuration`, {
+    method: 'POST',
+    data:params,
+  });
+}
+
+/** 检查smtp合法 */
+export async function checkMailvalidate() {
+  return request<IAjaxResponseFactory<IMailConfig>>(`${API_PREFIX}/smtp-configuration/check`, {
+    method: 'GET',
+  });
+}
+
+export async function checkMailByParams(params: ITransmitSmtp) {
+  return request<IAjaxResponseFactory<any>>(`${API_PREFIX}/smtp-configuration/check-by-params`, {
+    method: 'POST',
+    data:params,
   });
 }
 

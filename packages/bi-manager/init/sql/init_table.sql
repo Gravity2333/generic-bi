@@ -167,3 +167,34 @@ COMMENT ON COLUMN "public"."bi_npmd_dict_mapping"."dict_field" IS '映射到字�
 COMMENT ON COLUMN "public"."bi_npmd_dict_mapping"."created_at" IS '创建时间';
 COMMENT ON COLUMN "public"."bi_npmd_dict_mapping"."updated_at" IS '更新时间';
 COMMENT ON COLUMN "public"."bi_npmd_dict_mapping"."deleted_at" IS '删除时间';
+
+-- ----------------------------
+-- Table structure for bi_smtp
+-- ----------------------------
+CREATE TABLE IF NOT EXISTS "public"."bi_smtp" (
+  "id" varchar(64) COLLATE "pg_catalog"."default" NOT NULL,
+  "encrypt" varchar(6) COLLATE "pg_catalog"."default" NOT NULL DEFAULT '0',
+  "login_password" varchar(32) COLLATE "pg_catalog"."default" NOT NULL DEFAULT '',
+  "login_user" varchar(32) COLLATE "pg_catalog"."default" NOT NULL DEFAULT '',
+  "mail_address" varchar(64) COLLATE "pg_catalog"."default" NOT NULL DEFAULT '',
+  "mail_username" varchar(32) COLLATE "pg_catalog"."default" NOT NULL DEFAULT '',
+  "server_port" varchar(32) COLLATE "pg_catalog"."default" NOT NULL DEFAULT '',
+  "smtp_server" varchar(64) COLLATE "pg_catalog"."default" NOT NULL DEFAULT '',
+  "created_at" timestamptz(6),
+  "updated_at" timestamptz(6),
+  "deleted_at" timestamptz(6),
+  "owner" varchar(64) COLLATE "pg_catalog"."default" NOT NULL DEFAULT '',
+  CONSTRAINT "bi_smtp_pkey" PRIMARY KEY ("id")
+);
+COMMENT ON COLUMN "public"."bi_smtp"."id" IS '主键';
+COMMENT ON COLUMN "public"."bi_smtp"."encrypt" IS '是否加密';
+COMMENT ON COLUMN "public"."bi_smtp"."login_password" IS '登录密码';
+COMMENT ON COLUMN "public"."bi_smtp"."login_user" IS '登录用户名';
+COMMENT ON COLUMN "public"."bi_smtp"."mail_address" IS '邮件地址';
+COMMENT ON COLUMN "public"."bi_smtp"."mail_username" IS '邮件名称';
+COMMENT ON COLUMN "public"."bi_smtp"."server_port" IS '服务端口';
+COMMENT ON COLUMN "public"."bi_smtp"."smtp_server" IS '邮件服务器';
+COMMENT ON COLUMN "public"."bi_smtp"."created_at" IS '创建时间';
+COMMENT ON COLUMN "public"."bi_smtp"."updated_at" IS '更新时间';
+COMMENT ON COLUMN "public"."bi_smtp"."deleted_at" IS '删除时间';
+COMMENT ON COLUMN "public"."bi_smtp"."owner" IS 'owner的id,可对SMTP进行增删改';

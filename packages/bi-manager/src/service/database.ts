@@ -1,7 +1,6 @@
 import { ALL, App, Config, Inject, Logger, Provide } from "@midwayjs/decorator";
 import { Context } from "egg";
 import { IMidwayLogger } from "@midwayjs/logger";
-import { NpmdDictService } from "./dicts";
 import { IMyAppConfig } from "../interface";
 import DatabaseModel from "../model/database";
 import { UpdateDatabseInput } from "../dto/database.dto";
@@ -22,9 +21,6 @@ export class DatabaseService {
 
   @Config(ALL)
   config: IMyAppConfig;
-
-  @Inject()
-  npmdDictService: NpmdDictService;
 
   @App()
   app: Application;

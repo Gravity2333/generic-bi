@@ -1,33 +1,28 @@
-import useVariable, { UseVariableParams } from 'use-variable-hook'
-import { queryMailConfig } from '@/services/global';
-import { IMailConfig } from '@bi/common';
+import useVariable, { UseVariableParams } from 'use-variable-hook';
+import { checkMailvalidate } from '@/services/global';
 import { Alert } from 'antd';
 import { useEffect } from 'react';
 
 const MailConfigAlertVariable: UseVariableParams = {
   variables: {
-    mailConfig: {},
+    mailValidate: {},
   },
   effects: {
     fetchMailConfig: ({ call, setLoading }, { store }) => {
       setLoading(true);
-      const { success, data } = call(queryMailConfig);
-      store.mailConfig = success ? data : ({} as IMailConfig);
+      const { success, data } = call(checkMailvalidate);
+      store.mailValidate = success ? data : false;
       setLoading(false);
     },
   },
 };
 
 type MailConfigAlertVariableType = {
-  mailConfig: IMailConfig;
+  mailValidate: boolean;
 };
 
-export default function MailConfigAlert({
-  setMailConfig,
-}: {
-  setMailConfig?: React.Dispatch<React.SetStateAction<IMailConfig>>;
-}) {
-  const [{ mailConfig }, dispatch, loading] =
+export default function MailConfigAlert() {
+  const [{ mailValidate }, dispatch, loading] =
     useVariable<MailConfigAlertVariableType>(MailConfigAlertVariable);
 
   useEffect(() => {
@@ -36,13 +31,7 @@ export default function MailConfigAlert({
     });
   }, []);
 
-  useEffect(() => {
-    if (setMailConfig) {
-      setMailConfig(mailConfig);
-    }
-  }, [mailConfig]);
-
-  return !loading('fetchMailConfig') && !mailConfig?.effective ? (
+  return !loading('fetchMailConfig') && !mailValidate ? (
     <Alert
       type="warning"
       message="没有查询到有效的邮箱配置，可能会影响邮箱外发功能的正常使用，请先完善邮箱配置"

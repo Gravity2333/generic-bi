@@ -29,7 +29,6 @@ import { Utils } from "../utils";
 import { toZip } from "./../utils/zip";
 import { DashboardService } from "./dashboard";
 import { JwtService } from "./jwt";
-import { MailService } from "./mail";
 import { ReportService } from "./report";
 import { ReportJobLogService } from "./reportJobLog";
 import { WidgetService } from "./widget";
@@ -41,6 +40,7 @@ import {
   ELogOperareType,
   SystemLogService,
 } from "./systemLog";
+import { SMTPService } from "./smtp";
 
 export const PDF_OUT_DIR = "/opt/components/bi-apps/app/dist/resources/pdf";
 // 执行任务的前缀
@@ -64,7 +64,7 @@ export class ReportScheduleService {
   widgetService: WidgetService;
 
   @Inject()
-  mailService: MailService;
+  smtpService: SMTPService;
 
   @Inject()
   jwtService: JwtService;
@@ -514,7 +514,7 @@ export class ReportScheduleService {
         }
       })();
       // 发送邮件
-      await this.mailService.sendMail(
+      await this.smtpService.sendMail(
         receiver_emails,
         subject || report.name,
         content,

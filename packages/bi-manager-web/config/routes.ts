@@ -180,21 +180,21 @@ const routes: IRouteProps[] = [
       },
     ],
   },
-  // {
-  //   path: '/embed/sql-lab',
-  //   name: 'SQL Lab',
-  //   icon: 'ConsoleSqlOutlined',
-  //   hideInMenu: true,
-  //   layout: false,
-  //   component: '../layouts/GlobalLayout',
-  //   routes: [
-  //     {
-  //       path: '/embed/sql-lab',
-  //       layout: false,
-  //       component: './SqlLab',
-  //     },
-  //   ],
-  // },
+  {
+    path: '/embed/sql-lab',
+    name: 'SQL Lab',
+    icon: 'ConsoleSqlOutlined',
+    hideInMenu: true,
+    layout: false,
+    component: '../layouts/GlobalLayout',
+    routes: [
+      {
+        path: '/embed/sql-lab',
+        layout: false,
+        component: './SqlLab',
+      },
+    ],
+  },
   {
     path: '/embed/datasource',
     name: '数据源',
@@ -246,33 +246,6 @@ const routes: IRouteProps[] = [
     ],
   },
   {
-    path: '/report',
-    name: '报表',
-    icon: 'FieldTimeOutlined',
-    component: '../layouts/GlobalLayout',
-    routes: [
-      {
-        path: '/report',
-        component: './Report/List',
-      },
-      {
-        path: '/report/create',
-        name: '创建报表',
-        hideInMenu: true,
-        component: './Report/Create',
-      },
-      {
-        path: '/report/:id/update',
-        name: '编辑报表',
-        hideInMenu: true,
-        component: './Report/Update',
-      },
-      {
-        component: './404',
-      },
-    ],
-  },
-  {
     path: '/widget',
     name: '图表',
     icon: 'bar-chart',
@@ -317,18 +290,45 @@ const routes: IRouteProps[] = [
       },
     ],
   },
-  // {
-  //   path: '/sql-lab',
-  //   name: 'SQL Lab',
-  //   icon: 'ConsoleSqlOutlined',
-  //   component: '../layouts/GlobalLayout',
-  //   routes: [
-  //     {
-  //       path: '/sql-lab',
-  //       component: './SqlLab',
-  //     },
-  //   ],
-  // },
+  {
+    path: '/sql-lab',
+    name: 'SQL Lab',
+    icon: 'ConsoleSqlOutlined',
+    component: '../layouts/GlobalLayout',
+    routes: [
+      {
+        path: '/sql-lab',
+        component: './SqlLab',
+      },
+    ],
+  },
+  {
+    path: '/report',
+    name: '报表',
+    icon: 'FieldTimeOutlined',
+    component: '../layouts/GlobalLayout',
+    routes: [
+      {
+        path: '/report',
+        component: './Report/List',
+      },
+      {
+        path: '/report/create',
+        name: '创建报表',
+        hideInMenu: true,
+        component: './Report/Create',
+      },
+      {
+        path: '/report/:id/update',
+        name: '编辑报表',
+        hideInMenu: true,
+        component: './Report/Update',
+      },
+      {
+        component: './404',
+      },
+    ],
+  },
   {
     path: '/configuration',
     name: '配置',
@@ -338,7 +338,7 @@ const routes: IRouteProps[] = [
       {
         path: '/configuration',
         hideInMenu: true,
-        redirect: '/configuration/dashboard',
+        redirect: '/configuration/database',
       },
       {
         path: '/configuration/database',
@@ -356,7 +356,13 @@ const routes: IRouteProps[] = [
         path: '/configuration/dict',
         name: '字典',
         hideInMenu: true,
-        component: './Configuration/Dashboard',
+        component: './Configuration/Dict',
+      },
+      {
+        path: '/configuration/mail',
+        name: '邮件',
+        hideInMenu: true,
+        component: './Configuration/Mail',
       },
     ],
   },

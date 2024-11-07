@@ -11,39 +11,45 @@ import {
 import { Context } from "egg";
 import { ValidationError } from "joi";
 import { ELogOperareTarget, ELogOperareType } from "../service/systemLog";
-import { DatabaseService } from "../service/database";
-import { UpdateDatabseInput } from "../dto/database.dto";
-
+import { SMTPService } from "../service/smtp";
+import { UpdateSMTPInput } from "../dto/smtp.dto";
 
 @Provide()
 @Controller("/web-api/v1")
-export class DatabseAPIController {
+export class SMTPAPIController {
   @Inject()
   ctx: Context;
 
   @Inject()
-  databaseService: DatabaseService;
+  smtpService: SMTPService;
 
-  @Get("/database/info")
+  @Get("/smtp-configuration")
   async queryDatabaseInfo() {
-    return this.databaseService.getInfo();
+    return this.smtpService.getConfig();
   }
 
-  @Get("/database/check")
-  async checkDatabasConnect() {
-    return this.databaseService.checkConnect();
+  @Get("/smtp-configuration/check")
+  async checkSmtpConnect() {
+    return this.smtpService.validate();
   }
 
-  @Post("/database/info")
+  @Post("/smtp-configuration/check-by-params")
   @Validate()
-  async configWidget(@Body(ALL) createParam: UpdateDatabseInput) {
+  async checkSmtpByParams(@Body(ALL) createParam: UpdateSMTPInput) {
+    return this.smtpService.validateByParams(createParam)
+  }
+  
+
+  @Post("/smtp-configuration")
+  @Validate()
+  async configSmtp(@Body(ALL) createParam: UpdateSMTPInput) {
     try {
-      const res = await this.databaseService.configDatabase(createParam);
+      const res = await this.smtpService.setConfig(createParam);
       if (this.ctx.sysLogger && typeof this.ctx.sysLogger === "function") {
         this.ctx.sysLogger({
-          content: `配置数据库: ${createParam.type}`,
+          content: `配置SMTP`,
           type: ELogOperareType.CREATE,
-          target: ELogOperareTarget.DATABASE,
+          target: ELogOperareTarget.REPORT,
         });
       }
       return res;
@@ -55,5 +61,4 @@ export class DatabseAPIController {
       }
     }
   }
-
 }
