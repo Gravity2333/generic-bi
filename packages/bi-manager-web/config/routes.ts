@@ -333,7 +333,7 @@ const routes: IRouteProps[] = [
     path: '/configuration',
     name: '配置',
     icon: 'setting',
-    component: '../layouts/PageLayout',
+    component: '../layouts/PageCardLayout',
     routes: [
       {
         path: '/configuration',

@@ -1,6 +1,7 @@
-import { Menu, Tabs } from 'antd';
+import { Card, Menu } from 'antd';
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { history } from 'umi';
+import styles from './index.less';
 
 export interface IRoute {
   exact: boolean;
@@ -23,7 +24,7 @@ export interface IFlowLayout {
   children?: React.ReactNode;
 }
 
-const PageLayout: React.FC<IFlowLayout> = ({
+const PageCardLayout: React.FC<IFlowLayout> = ({
   location: { pathname },
   route: { routes },
   children,
@@ -63,7 +64,7 @@ const PageLayout: React.FC<IFlowLayout> = ({
   // 页面改变回调函数
   function handlePageChange(e: any) {
     setActiveMenu(e.key);
-    history.push(e.key)
+    history.push(e.key);
   }
   // 查找标签
   useEffect(() => {
@@ -71,19 +72,21 @@ const PageLayout: React.FC<IFlowLayout> = ({
   }, [findMatchedTag, menus, pathname]);
 
   return (
-    <>
-      <Menu
-        onClick={handlePageChange}
-        selectedKeys={[activeMenu]}
-        mode="horizontal"
-        items={menus.map((menu) => ({
-          label: menu.name,
-          key: menu.path,
-        }))}
-      />
-      {children}
-    </>
+    <Card title={undefined} size="small" className={styles['outer-card']}>
+      <>
+        <Menu
+          onClick={handlePageChange}
+          selectedKeys={[activeMenu]}
+          mode="horizontal"
+          items={menus.map((menu) => ({
+            label: menu.name,
+            key: menu.path,
+          }))}
+        />
+        {children}
+      </>
+    </Card>
   );
 };
 
-export default PageLayout;
+export default PageCardLayout;

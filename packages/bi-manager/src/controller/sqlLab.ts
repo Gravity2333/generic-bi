@@ -74,30 +74,30 @@ export class SqlLabController {
     }
   }
 
-  // @Get("/sql-json/as-list")
-  // async listAllSqlJson() {
-  //   return await this.sqlLabService.listAllSqlJson();
-  // }
+  @Get("/sql-json/as-list")
+  async listAllSqlJson() {
+    return await this.sqlLabService.listAllSqlJson();
+  }
 
-  // @Post("/sql-json")
-  // @Validate()
-  // async createSqlJson(@Body(ALL) createParam: CreateWidgetInput) {
-  //   try {
-  //     const param = await this.sqlLabService.createSqlJson(createParam);
-  //     const id = param?.getDataValue("id");
-  //     const ids = await this.utils.sqlJsonSeqService.get();
-  //     const idList = (ids?.split(",") || [])?.filter((f) => f);
-  //     idList.push(id);
-  //     this.utils.sqlJsonSeqService.set(idList.join(","));
-  //     return param;
-  //   } catch (error) {
-  //     if (error instanceof ValidationError) {
-  //       this.ctx?.throw(500, "Params Validation Error");
-  //     } else {
-  //       this.ctx?.throw(500, error);
-  //     }
-  //   }
-  // }
+  @Post("/sql-json")
+  @Validate()
+  async createSqlJson(@Body(ALL) createParam: CreateWidgetInput) {
+    try {
+      const param = await this.sqlLabService.createSqlJson(createParam);
+      const id = param?.getDataValue("id");
+      const ids = await this.utils.sqlJsonSeqService.get();
+      const idList = (ids?.split(",") || [])?.filter((f) => f);
+      idList.push(id);
+      this.utils.sqlJsonSeqService.set(idList.join(","));
+      return param;
+    } catch (error) {
+      if (error instanceof ValidationError) {
+        this.ctx?.throw(500, "Params Validation Error");
+      } else {
+        this.ctx?.throw(500, error);
+      }
+    }
+  }
 
   @Put("/sql-json/:id")
   @Validate()
