@@ -1,10 +1,11 @@
 import { BI_AUTH_TOKEN_KEY } from '@/common';
+import { queryCurrentUserInfo } from '@/services/global';
 import { login, register } from '@/services/users';
 import { LockOutlined, MessageOutlined, UserOutlined } from '@ant-design/icons';
 import { Button, Card, Input, message, Modal } from 'antd';
 import { Form } from 'antd';
 import { useWatch } from 'antd/lib/form/Form';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { history } from 'umi';
 import styles from './index.less';
 
@@ -46,6 +47,15 @@ export default function Login() {
       }
     }
   };
+
+  useEffect(()=>{
+    (async()=>{
+      const { success } = await queryCurrentUserInfo();
+      if (success) {
+        history.push('/')
+      }
+    })()
+  },[])
 
   return (
     <Card

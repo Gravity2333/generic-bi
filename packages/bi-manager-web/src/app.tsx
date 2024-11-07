@@ -30,21 +30,21 @@ function LayoutContent(children: JSX.Element) {
   const { initialState, setInitialState } = useModel('@@initialState');
   useEffect(() => {
     (async () => {
-      // const biToken = window.sessionStorage.getItem(BI_AUTH_TOKEN_KEY);
-      // setLoading(true);
-      // if (!biToken) {
-      //   setLoading(false);
-      //   return;
-      // }
-      // const { success, data } = await queryCurrentUserInfo(biToken);
-      // if (success) {
-      //   setCurrentUserInfo(data);
-      //   setInitialState({
-      //     ...(initialState || {}),
-      //     currentUserInfo: data,
-      //   } as any);
-      // }
-      // setLoading(false);
+      const biToken = window.sessionStorage.getItem(BI_AUTH_TOKEN_KEY);
+      setLoading(true);
+      if (!biToken) {
+        setLoading(false);
+        return;
+      }
+      const { success, data } = await queryCurrentUserInfo();
+      if (success) {
+        setCurrentUserInfo(data);
+        setInitialState({
+          ...(initialState || {}),
+          currentUserInfo: data,
+        } as any);
+      }
+      setLoading(false);
     })();
   }, []);
 
@@ -76,13 +76,15 @@ function LayoutContent(children: JSX.Element) {
   );
 }
 const unAuthorizedNotification = throttle(() => {
-  notification.error({
-    message: '没有权限访问',
-    description: '抱歉，您无权访问该页面',
-  });
-  window.sessionStorage.setItem(BI_AUTH_TOKEN_KEY, '');
-  location.href='/login'
-  sendMsgToParent({ unAuthorize: true });
+  if (!location.href?.includes('/login')) {
+    notification.error({
+      message: '没有权限访问',
+      description: '抱歉，您无权访问该页面',
+    });
+    window.sessionStorage.setItem(BI_AUTH_TOKEN_KEY, '');
+    location.href = '/login';
+    sendMsgToParent({ unAuthorize: true });
+  }
 }, 10000);
 
 // ProLayout 支持的api https://procomponents.ant.design/components/layout
@@ -143,5 +145,5 @@ export const request: RequestConfig = {
       description: errorMsg,
     });
     return data;
-  }
+  },
 };

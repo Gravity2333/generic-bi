@@ -1,10 +1,8 @@
 import {
-  ALL,
   Controller,
   Get,
   Inject,
   Provide,
-  Query,
 } from "@midwayjs/decorator";
 import { Context } from "egg";
 import { NpmdDictService } from "../service/dicts";

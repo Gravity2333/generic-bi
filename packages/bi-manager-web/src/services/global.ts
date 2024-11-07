@@ -97,8 +97,8 @@ export async function queryAlarms({ from, to }: { from: string; to: string }) {
 /**
  * 查询用户信息
  */
-export async function queryCurrentUserInfo(token: string) {
-  return request<IAjaxResponseFactory<IUserInfo>>(`${API_PREFIX}/current-user?token=${token}`, {
+export async function queryCurrentUserInfo() {
+  return request<IAjaxResponseFactory<IUserInfo>>(`${API_PREFIX}/current-user`, {
     method: 'GET',
   });
 }

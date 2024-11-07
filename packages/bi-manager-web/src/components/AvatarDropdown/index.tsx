@@ -1,12 +1,14 @@
 import { BI_AUTH_TOKEN_KEY } from '@/common';
 import { LogoutOutlined, SettingOutlined, UserOutlined } from '@ant-design/icons';
 import { Avatar, Menu, Modal, Spin } from 'antd';
+import { useModel } from 'umi';
 import HeaderDropdown from '../HeaderDropdown';
 import styles from './index.less';
 
 export const LOGIN_OUT_KEY = 'loginOut';
 
 function AvatarDropdown() {
+  const { initialState } = useModel('@@initialState');
   const handleMenuClick = (info: any) => {
     const { key } = info;
     // 个人信息
@@ -52,7 +54,11 @@ function AvatarDropdown() {
       <span className={`${styles.action} ${styles.account}`}>
         <Avatar size="small" icon={<UserOutlined />} />
         <div className={`${styles.name} anticon`}>
-          <span className="header-text">{'fullname'}</span>
+          <span className="header-text">
+            {(initialState as any)?.currentUserInfo?.fullname ||
+              (initialState as any)?.currentUserInfo?.username ||
+              '未知用户'}
+          </span>
         </div>
       </span>
     </HeaderDropdown>

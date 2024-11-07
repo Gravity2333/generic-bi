@@ -55,6 +55,7 @@ export class UsersService {
       return {
         jwtToken: await this.jwtService.generateToken({
           username,
+          fullname: rows[0].nickname,
           loginTime: +(new Date())
         })
       }
