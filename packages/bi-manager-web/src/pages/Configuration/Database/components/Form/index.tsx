@@ -330,7 +330,74 @@ export default function DatabaseConfig({
                   </>
                 );
               case EDatabaseType.MYSQL:
-                return <>敬请期待!</>;
+                return (
+                  <>
+                    <Form.Item
+                      label="host地址"
+                      name={['option', 'host']}
+                      {...FORM_COL}
+                      rules={[
+                        {
+                          required: true,
+                          message: '请填写数据库host地址!',
+                        },
+                      ]}
+                    >
+                      <Input disabled={readonly} placeholder="请填写数据库host地址" />
+                    </Form.Item>
+                    <Form.Item
+                      label="端口"
+                      name={['option', 'port']}
+                      {...FORM_COL}
+                      rules={[
+                        {
+                          required: true,
+                          message: '请填写数据库端口!',
+                        },
+                        {
+                          validator: validatePort,
+                        },
+                      ]}
+                    >
+                      <InputNumber
+                        style={{ width: '300px' }}
+                        min={0}
+                        max={65535}
+                        disabled={readonly}
+                        placeholder="请填写数据库端口"
+                      />
+                    </Form.Item>
+                    <Form.Item
+                      label="用户名"
+                      name={['option', 'user']}
+                      {...FORM_COL}
+                      rules={[
+                        {
+                          required: true,
+                          message: '请填写数据库用户名称!',
+                        },
+                      ]}
+                    >
+                      <Input disabled={readonly} placeholder="请填写数据库用户名称" />
+                    </Form.Item>
+                    <Form.Item  label="密码" name={['option', 'password']} {...FORM_COL}>
+                      <Input disabled={readonly} type="password" placeholder="请填写数据库密码" />
+                    </Form.Item>
+                    <Form.Item
+                      label="数据库名称"
+                      name={['option', 'database']}
+                      {...FORM_COL}
+                      rules={[
+                        {
+                          required: true,
+                          message: '请填写数据库名称!',
+                        },
+                      ]}
+                    >
+                      <Input disabled={readonly} placeholder="请填写数据库名称" />
+                    </Form.Item>
+                  </>
+                );
             }
           })()}
         </Form.Item>
@@ -353,7 +420,6 @@ export default function DatabaseConfig({
           <Button
             type="primary"
             htmlType="submit"
-            disabled={readonly || datasourceType === EDatabaseType.MYSQL}
           >
             保存
           </Button>

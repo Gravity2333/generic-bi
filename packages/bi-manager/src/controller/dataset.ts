@@ -18,9 +18,10 @@ const DATA_SET_QUERY_MAP = {
   [EDatabaseType.POSTGRE]: `SELECT tablename as name FROM pg_catalog.pg_tables WHERE schemaname != 'pg_catalog' AND schemaname != 'information_schema'`,
   [EDatabaseType.CLICKHOUSE]:
     "SELECT name, comment FROM system.tables WHERE name LIKE '%d_fpc_%'",
+  [EDatabaseType.MYSQL]: "SHOW TABLES",
 };
 
-const _GET_DATA_SET_COLUMN_QUERY_MAP = (tableName: string) => ({
+const _GET_DATA_SET_COLUMN_QUERY_MAP = (database: string, tableName: string) => ({
   [EDatabaseType.POSTGRE]: `select
               a.attname name,
               d.description comment,
@@ -54,6 +55,16 @@ const _GET_DATA_SET_COLUMN_QUERY_MAP = (tableName: string) => ({
               and c.relname = '${tableName}'
               order by c.relname,a.attnum;`,
   [EDatabaseType.CLICKHOUSE]: `desc ${tableName}`,
+  [EDatabaseType.MYSQL]: `
+    SELECT 
+    COLUMN_NAME as 'Field', 
+    COLUMN_COMMENT as 'Comment'
+    FROM 
+    information_schema.columns 
+    WHERE 
+    table_schema = '${database}' 
+    AND table_name = '${tableName}';
+   `
 });
 
 @Provide()
@@ -79,7 +90,7 @@ export class DatasetAPIController {
   ) {
     // 判断查询两个表
     const recordData = await this.databaseService.executeSql(
-      _GET_DATA_SET_COLUMN_QUERY_MAP(tableName),
+      _GET_DATA_SET_COLUMN_QUERY_MAP(database, tableName),
       database
     );
 
