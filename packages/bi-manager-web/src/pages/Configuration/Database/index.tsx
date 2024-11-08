@@ -80,6 +80,15 @@ export default function WidgetList() {
       render: (text, record) => {
         return (
           <>
+              <Button
+              type="link"
+              size="small"
+              onClick={() => {
+                ref.current.copy(record.id);
+              }}
+            >
+              拷贝
+            </Button>
             <Button
               type="link"
               size="small"

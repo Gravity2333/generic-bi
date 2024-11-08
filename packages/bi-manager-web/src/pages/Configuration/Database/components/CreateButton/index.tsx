@@ -4,9 +4,14 @@ import { Button, Modal, Skeleton } from 'antd';
 import { forwardRef, useImperativeHandle, useState } from 'react';
 import DatabaseConfigForm from '../Form';
 
-export default forwardRef(function CreateButton({updater}: {
-    updater?: any
-}, ref) {
+export default forwardRef(function CreateButton(
+  {
+    updater,
+  }: {
+    updater?: any;
+  },
+  ref,
+) {
   const [visiable, setVisiable] = useState<boolean>(false);
   const [mode, setMode] = useState<'create' | 'update'>('create');
   const [loading, setLoading] = useState<boolean>(false);
@@ -18,24 +23,10 @@ export default forwardRef(function CreateButton({updater}: {
     setVisiable(false);
   };
 
-  const handleSuccess = ()=>{
-    handleClose()
-    if(updater){
-        updater()
-    }
-  }
-
-  const renderForm = () => {
-    if (mode === 'create') {
-      return <DatabaseConfigForm onFinish={handleSuccess} />;
-    } else if (mode === 'update') {
-      return (
-        <Skeleton loading={loading}>
-          <DatabaseConfigForm onFinish={handleSuccess} initialValues={initialValues} />
-        </Skeleton>
-      );
-    } else {
-      return <></>;
+  const handleSuccess = () => {
+    handleClose();
+    if (updater) {
+      updater();
     }
   };
 
@@ -48,8 +39,24 @@ export default forwardRef(function CreateButton({updater}: {
         if (success) {
           setInitialValues({
             ...data,
-            option: JSON.parse(data.option||'{}')
+            option: JSON.parse(data.option || '{}'),
           });
+        }
+        setLoading(false);
+      };
+
+      const copyDatabaseById = async (id: string) => {
+        setLoading(true);
+        const { success, data } = await queryDatabaseById(id);
+        if (success) {
+          const newVal = {
+            ...data,
+            option: JSON.parse(data.option || '{}'),
+            readonly: '0',
+          };
+
+          delete newVal.id;
+          setInitialValues(newVal);
         }
         setLoading(false);
       };
@@ -58,6 +65,11 @@ export default forwardRef(function CreateButton({updater}: {
         update: async (id: string) => {
           await fetchDatabaseById(id);
           setMode('update');
+          setVisiable(true);
+        },
+        copy: async (id: string) => {
+          await copyDatabaseById(id);
+          setMode('create');
           setVisiable(true);
         },
       };
@@ -86,7 +98,9 @@ export default forwardRef(function CreateButton({updater}: {
         onCancel={handleClose}
         bodyStyle={{ padding: '10px' }}
       >
-        {renderForm()}
+        <Skeleton loading={loading}>
+          <DatabaseConfigForm onFinish={handleSuccess} initialValues={initialValues} />
+        </Skeleton>
       </Modal>
     </>
   );

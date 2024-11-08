@@ -6,16 +6,16 @@ import { history } from 'umi';
 import styles from './index.less';
 
 export default function Welcome() {
-  const [connect, setConnect] = useState<boolean>(true);
-  useEffect(() => {
-    (async () => {
-      setConnect((await checkDabaseConnect()) || false);
-    })();
-  }, []);
+  // const [connect, setConnect] = useState<boolean>(true);
+  // useEffect(() => {
+  //   (async () => {
+  //     setConnect((await checkDabaseConnect()) || false);
+  //   })();
+  // }, []);
 
   return (
     <>
-      {!connect ? (
+      {/* {!connect ? (
         <Alert
           icon={<DisconnectOutlined />}
           type="error"
@@ -33,7 +33,7 @@ export default function Welcome() {
             </Button>
           }
         />
-      ) : null}
+      ) : null} */}
       <Result icon={<SmileOutlined style={{ color: 'rgba(84,154,220,0.9)' }} />} title={`欢迎使用Generic-BI`} />
       <div className={styles['show-bar']}>
         <div
