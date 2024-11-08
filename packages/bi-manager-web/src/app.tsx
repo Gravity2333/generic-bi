@@ -1,14 +1,13 @@
 import { LIGHT_COLOR, updateTheme } from '@/utils/theme';
 import { Settings as LayoutSettings } from '@ant-design/pro-layout';
-import { IUserInfo, SHARE_PAGE_PREFIX } from '@bi/common';
-import { Button, ConfigProvider, notification, Result, Skeleton, Spin } from 'antd';
+import { SHARE_PAGE_PREFIX } from '@bi/common';
+import { notification, Skeleton } from 'antd';
 import { RequestConfig, RunTimeLayoutConfig, useModel } from 'umi';
 import { BI_AUTH_TOKEN_KEY, isDev } from './common';
 import RightContent from './components/RightContent';
 import { TTheme } from './interface';
 import { isIframeEmbed, throttle } from './utils';
 import { DARK_COLOR, THEME_KEY } from './utils/theme';
-import { history } from 'umi';
 import { useEffect, useState } from 'react';
 import { queryCurrentUserInfo } from './services/global';
 import { sendMsgToParent } from './utils/sendMsgToParent';
@@ -24,54 +23,45 @@ export function getInitialState(): { theme: TTheme; settings?: Partial<LayoutSet
   };
 }
 
+function backToLogin() {
+  if (!location.href?.includes('/login')) {
+    window.localStorage.removeItem(BI_AUTH_TOKEN_KEY);
+    location.href = '/login';
+  }
+}
+
 function LayoutContent(children: JSX.Element) {
-  const [currentUserInfo, setCurrentUserInfo] = useState<IUserInfo>();
   const [loading, setLoading] = useState<boolean>(true);
   const { initialState, setInitialState } = useModel('@@initialState');
+
   useEffect(() => {
     (async () => {
       const biToken = window.localStorage.getItem(BI_AUTH_TOKEN_KEY);
       setLoading(true);
       if (!biToken) {
+        backToLogin();
         setLoading(false);
         return;
       }
       const { success, data } = await queryCurrentUserInfo();
       if (success) {
-        setCurrentUserInfo(data);
         setInitialState({
           ...(initialState || {}),
           currentUserInfo: data,
         } as any);
+      } else {
+        backToLogin();
       }
       setLoading(false);
     })();
   }, []);
 
-  if (isDev || window.location.pathname.includes(SHARE_PAGE_PREFIX)) {
+  if (window.location.pathname.includes(SHARE_PAGE_PREFIX)) {
     return children;
   }
   return (
     <Skeleton active loading={loading}>
-      {currentUserInfo && currentUserInfo.username ? (
-        children
-      ) : (
-        <>
-          <Result
-            status="403"
-            title={'没有权限访问'}
-            subTitle={'抱歉，您无权访问该页面'}
-            extra={[
-              <Button key="go-back" type="primary" onClick={() => history.goBack()}>
-                返回上一级
-              </Button>,
-              <Button key="go-home" type="primary" onClick={() => history.replace('/')}>
-                返回首页
-              </Button>,
-            ]}
-          />
-        </>
-      )}
+      {children}
     </Skeleton>
   );
 }
@@ -81,8 +71,7 @@ const unAuthorizedNotification = throttle(() => {
       message: '没有权限访问',
       description: '抱歉，您无权访问该页面',
     });
-    window.localStorage.setItem(BI_AUTH_TOKEN_KEY, '');
-    location.href = '/login';
+    backToLogin();
     sendMsgToParent({ unAuthorize: true });
   }
 }, 10000);
@@ -118,7 +107,6 @@ export const request: RequestConfig = {
     const { data } = error;
     // 授权失败
     if (error?.response?.status == 401) {
-      console.log(401);
       unAuthorizedNotification();
       return data;
     }

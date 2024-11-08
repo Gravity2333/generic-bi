@@ -1,9 +1,6 @@
 import { EggAppInfo } from "egg";
 import * as path from "path";
 import { IMyAppConfig } from "./../interface/config";
-import { DataSetTypes } from "@bi/common";
-
-const HOST = "127.0.0.1";
 
 export default (appInfo: EggAppInfo) => {
   const config = {} as IMyAppConfig;
@@ -120,19 +117,6 @@ export default (appInfo: EggAppInfo) => {
     enabled: false,
     secret: "1024@Machloop@1024",
     expiresIn: "2h", // https://github.com/vercel/ms
-  };
-
-  config.externalSystem = {
-    type: DataSetTypes.POSTGRE,
-    options: {
-      protocol: "http:",
-      host: HOST,
-      path: "/",
-      port: 5433,
-      user: "postgres",
-      password: "bi@123",
-      database: "bi",
-    },
   };
 
   // config.restapi = {

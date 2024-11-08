@@ -1,7 +1,6 @@
 import { PowerPartial } from "egg";
 import { EggAppConfig } from "../../typings/app";
 import * as https from "https";
-import { DataSetTypes } from "@bi/common";
 
 /** Clickhouse 配置 */
 export interface IExternalOptions extends https.RequestOptions {
@@ -71,13 +70,6 @@ export interface IMyAppConfig extends PowerPartial<EggAppConfig> {
 
   /** 前端页面的地址 */
   web_uri: string;
-
-  // 外部系统配置
-  // ===================
-  externalSystem: {
-    type: DataSetTypes,
-    options: IExternalOptions
-  }
 
   // npmd
   restapi: {

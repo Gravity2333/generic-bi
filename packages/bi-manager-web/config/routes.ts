@@ -4,7 +4,8 @@ import { IRouteProps } from '@umijs/types';
 const isDev = process.env.NODE_ENV === 'development';
 
 const routes: IRouteProps[] = [
-  { path: '/',    hideInMenu: true, component: './Welcome', },
+  { path: '/', hideInMenu: true,layout: false, component: '../layouts/Redirect' },
+  { path: '/welcome', hideInMenu: true, component: './Welcome' },
   {
     path: SHARE_PAGE_PREFIX,
     hideInMenu: true,

@@ -12,7 +12,7 @@ export default function Welcome() {
       setConnect((await checkDabaseConnect()) || false);
     })();
   }, []);
-  console.log(connect);
+
   return (
     <>
       {!connect ? (
