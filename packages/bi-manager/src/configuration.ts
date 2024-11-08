@@ -72,7 +72,7 @@ export class ContainerConfiguration implements ILifeCycle {
     // =======================
     this.logger.info("[report-schedule] init jobs start...");
     /** bi自检,纠错 */
-    this.databaseService.initDatabase();
+    this.databaseService.initDatabaseInstance();
     /** 检查图表数据源 */
     this.widgetService.checkWidgetSource();
     /** 初始化默认仪表盘 */

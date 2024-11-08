@@ -59,6 +59,7 @@ export class exploreAPIController {
         time_grain,
         time_range,
         exist_rollup,
+        database
       } = formData;
       
       const references = [];
@@ -85,7 +86,7 @@ export class exploreAPIController {
 
           const sqlData = await this.databaseService.executeSql(
             refSql + securityQueryId
-          );
+          ,database);
 
           if (denominator) {
             const timeDiff = getTimeDiff(time_range);
@@ -111,7 +112,7 @@ export class exploreAPIController {
       const fullSql = sql + securityQueryId;
       const sqlData = await this.databaseService.executeSql(
         fullSql
-      );
+      ,database);
 
       return {
         sql,
@@ -138,8 +139,8 @@ export class exploreAPIController {
   async cancelAllQuery() {
     try {
       const killSql = `KILL QUERY WHERE query_id IN (SELECT query_id FROM system.processes where query LIKE '%*/%')`;
-      this.databaseService.executeSql(killSql);
-      this.databaseService.executeSql(killSql);
+      this.databaseService.executeSql(killSql,'');
+      this.databaseService.executeSql(killSql,'');
     } catch (e) {}
   }
 }

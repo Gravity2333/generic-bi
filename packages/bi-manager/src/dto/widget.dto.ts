@@ -12,6 +12,9 @@ export class CreateWidgetInput {
   name: string;
 
   @Rule(RuleType.string())
+  database: string;
+
+  @Rule(RuleType.string())
   datasource: string;
 
   @Rule(

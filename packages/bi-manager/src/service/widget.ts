@@ -302,7 +302,7 @@ export class WidgetService {
       })(),
     };
 
-    const { metrics, groupby } = widgetSpec;
+    const { metrics, groupby,database } = widgetSpec;
     // colName字典
     const colInfoMap = [...metrics, ...groupby].reduce((prev, curr: any) => {
       const index = curr.id || curr.field;
@@ -331,7 +331,7 @@ export class WidgetService {
     let securityQueryId = id ? `/*${base64Encode(id)}*/ ` : "";
     let fullSql = sql + securityQueryId;
 
-    let sqlData = await this.databaseService.executeSql(fullSql);
+    let sqlData = await this.databaseService.executeSql(fullSql,database);
     // 匹配标题名称
     const titleNameList = colIdList?.map((id) => {
       const c = colInfoMap[id];

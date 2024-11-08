@@ -1,6 +1,6 @@
 import { proTableSerchConfig } from '@/common';
 import { GlobalContext, IGlobalContext } from '@/layouts/GlobalLayout';
-import { queryClichhouseTableColumns } from '@/services/dataset';
+import { queryDatasourcesColumns } from '@/services/dataset';
 import { deleteDictMapping, queryDictMappings } from '@/services/dicts';
 import { BookOutlined, PlusOutlined } from '@ant-design/icons';
 import ProTable, { ActionType, ProColumns } from '@ant-design/pro-table';
@@ -12,8 +12,11 @@ import styles from './index.less';
 import useEmbed from '@/hooks/useEmbed';
 import useVariable from 'use-variable-hook';
 import TagEditDrawer, { dictMapColumns, TagEditDrawerRef } from './components/TagEditDrawer';
+import useDatabases from '@/hooks/useDatabases';
+import useDatasources from '@/hooks/useDatasource';
 
 type DatasourceVariables = {
+  selectedDatabase: string;
   selectedTable: string;
   dictMappings: IDictMapping[];
 };
@@ -22,15 +25,12 @@ export default function Datasource() {
   const [embed, location] = useEmbed();
   const actionRef = useRef<ActionType>();
   const drawerRef = useRef<TagEditDrawerRef>();
-  const {
-    datasets: tables = [],
-    datasetsLoading = false,
-    dicts = [],
-  } = useContext<IGlobalContext>(GlobalContext);
-
+  const { dicts = [] } = useContext<IGlobalContext>(GlobalContext);
+  const [databases] = useDatabases();
   const [variables, dispatch] = useVariable<DatasourceVariables>({
     variables: {
-      selectedTable: location.query.database,
+      selectedDatabase: undefined,
+      selectedTable: undefined,
       dictMappings: [],
     },
     effects: {
@@ -45,62 +45,38 @@ export default function Datasource() {
       },
     },
   });
-
+  const [datasources] = useDatasources(variables.selectedDatabase);
   // 更新 uri
   useEffect(() => {
     history.replace({
       pathname: location.pathname,
       query: {
-        table: variables.selectedTable || '',
+        table: variables.selectedTable,
       },
     });
   }, [location.pathname, variables.selectedTable]);
 
   // 初始化
   useEffect(() => {
-    if (!variables.selectedTable) {
-      variables.selectedTable = tables?.length > 0 ? tables[0].name : '';
+    if (!variables.selectedDatabase && databases?.length > 0) {
+      variables.selectedDatabase = databases[0].id!;
     }
-  }, [tables]);
+
+    if (datasources?.length > 0) {
+      variables.selectedTable = datasources[0].name!;
+      actionRef.current?.reload()
+    }
+
+  }, [databases,datasources]);
 
   //获取映射关系
   useEffect(() => {
-    if (tables.length > 0) {
+    if (datasources.length > 0) {
       dispatch({ type: 'fetchDictMappings' });
     }
   }, [variables.selectedTable]);
 
   const columns: ProColumns<IClickhouseColumn>[] = [
-    {
-      title: '表名',
-      dataIndex: 'table',
-      align: 'left',
-      hideInTable: true,
-      // @ts-ignore
-      search: true,
-      renderFormItem: () => {
-        return (
-          <Select
-            onChange={(value) => {
-              variables.selectedTable = value;
-              actionRef?.current?.reload();
-            }}
-            showSearch
-            optionFilterProp="label"
-            value={variables.selectedTable}
-          >
-            {tables.map((item) => {
-              const value = item.name!;
-              return (
-                <Select.Option key={value} value={value} label={item.comment! || value}>
-                  {item.comment! || value}
-                </Select.Option>
-              );
-            })}
-          </Select>
-        );
-      },
-    },
     {
       title: '字段名称',
       dataIndex: 'name',
@@ -215,10 +191,6 @@ export default function Datasource() {
     },
   ];
 
-  if (datasetsLoading) {
-    return <Skeleton active />;
-  }
-
   return (
     <div style={{ margin: '10px' }} className={styles['pro-table-auto-height']}>
       <ProTable<IClickhouseColumn>
@@ -227,13 +199,16 @@ export default function Datasource() {
         size="small"
         columns={columns}
         request={async () => {
-          if (tables.length <= 0 || !variables.selectedTable) {
+          if (datasources.length <= 0 || !variables.selectedTable) {
             return {
               data: [],
               success: false,
             };
           }
-          const { success, data } = await queryClichhouseTableColumns(variables.selectedTable);
+          const { success, data } = await queryDatasourcesColumns(
+            variables.selectedDatabase,
+            variables.selectedTable,
+          );
           return {
             data: success ? [...data] : [],
             success,
@@ -243,7 +218,50 @@ export default function Datasource() {
         search={{
           ...proTableSerchConfig,
           span: 12,
-          optionRender: () => [],
+          optionRender: () => [
+            <span>数据库:</span>,
+            <Select
+              onChange={(value) => {
+                variables.selectedDatabase = value;
+              }}
+              style={{ width: '200px', textAlign: 'left', marginRight: '0px' }}
+              showSearch
+              optionFilterProp="label"
+              value={variables.selectedDatabase}
+              placeholder="请选择数据库"
+              allowClear
+            >
+              {databases.map((item) => {
+                return (
+                  <Select.Option key={item.id} value={item.id} label={item.name}>
+                    {item.name}
+                  </Select.Option>
+                );
+              })}
+            </Select>,
+            <Select
+              onChange={(value) => {
+                variables.selectedTable = value;
+                actionRef.current?.reload()
+              }}
+              disabled={!variables.selectedDatabase}
+              style={{ width: '200px', textAlign: 'left', marginRight: '0px' }}
+              showSearch
+              optionFilterProp="label"
+              value={variables.selectedTable}
+              placeholder="请选择数据源"
+              allowClear
+            >
+              {datasources.map((item) => {
+                const value = item.name!;
+                return (
+                  <Select.Option key={value} value={value} label={item.comment! || value}>
+                    {item.comment! || value}
+                  </Select.Option>
+                );
+              })}
+            </Select>,
+          ],
         }}
         toolBarRender={false}
         actionRef={actionRef}

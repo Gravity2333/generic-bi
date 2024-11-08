@@ -300,6 +300,7 @@ export class WidgetAPIController {
         time_field,
         time_range: timeRange,
         exist_rollup,
+        database
       } = widgetSpec;
 
       // 标识查询 ID，用于取消查询
@@ -336,7 +337,7 @@ export class WidgetAPIController {
           );
           const sqlData = await this.databaseService.executeSql(
             refSql + securityQueryId
-          );
+          ,database);
           if (denominator) {
             references.push({
               id: r?.id,
@@ -359,7 +360,7 @@ export class WidgetAPIController {
       const fullSql = sql + securityQueryId;
       const sqlData = await this.databaseService.executeSql(
         fullSql
-      );
+      ,database);
       return {
         sql,
         colNames,

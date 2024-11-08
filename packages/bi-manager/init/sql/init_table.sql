@@ -6,8 +6,10 @@
 -- ----------------------------
 CREATE TABLE IF NOT EXISTS "public"."bi_database" (
   "id" varchar(64) COLLATE "pg_catalog"."default" NOT NULL,
+  "name" varchar(32) COLLATE "pg_catalog"."default" NOT NULL DEFAULT '',
   "type" varchar(32) COLLATE "pg_catalog"."default" NOT NULL DEFAULT '',
   "option" text COLLATE "pg_catalog"."default" NOT NULL DEFAULT '',
+  "readonly" varchar(6) COLLATE "pg_catalog"."default" NOT NULL DEFAULT '0',
   "created_at" timestamptz(6),
   "updated_at" timestamptz(6),
   "deleted_at" timestamptz(6),
@@ -15,8 +17,10 @@ CREATE TABLE IF NOT EXISTS "public"."bi_database" (
   CONSTRAINT "bi_database_pkey" PRIMARY KEY ("id")
 );
 COMMENT ON COLUMN "public"."bi_database"."id" IS '主键';
+COMMENT ON COLUMN "public"."bi_database"."name" IS '数据库名称';
 COMMENT ON COLUMN "public"."bi_database"."type" IS '数据库类型';
 COMMENT ON COLUMN "public"."bi_database"."option" IS '数据库连接配置';
+COMMENT ON COLUMN "public"."bi_database"."readonly" IS '只读';
 COMMENT ON COLUMN "public"."bi_database"."created_at" IS '创建时间';
 COMMENT ON COLUMN "public"."bi_database"."updated_at" IS '更新时间';
 COMMENT ON COLUMN "public"."bi_database"."deleted_at" IS '删除时间';
@@ -56,6 +60,7 @@ COMMENT ON COLUMN "public"."bi_dashboard"."owner" IS 'owner的id,可对Dashboard
 CREATE TABLE IF NOT EXISTS "public"."bi_widget" (
   "id" varchar(64) COLLATE "pg_catalog"."default" NOT NULL,
   "name" varchar(32) COLLATE "pg_catalog"."default" NOT NULL DEFAULT '',
+  "database" varchar(64) COLLATE "pg_catalog"."default" NOT NULL DEFAULT '',
   "datasource" varchar(64) COLLATE "pg_catalog"."default" NOT NULL DEFAULT '',
   "viz_type" varchar(32) COLLATE "pg_catalog"."default" NOT NULL DEFAULT '',
   "specification" text COLLATE "pg_catalog"."default" NOT NULL DEFAULT '',
@@ -70,6 +75,7 @@ CREATE TABLE IF NOT EXISTS "public"."bi_widget" (
 );
 COMMENT ON COLUMN "public"."bi_widget"."id" IS '主键';
 COMMENT ON COLUMN "public"."bi_widget"."name" IS 'widget名称';
+COMMENT ON COLUMN "public"."bi_widget"."database" IS '数据库';
 COMMENT ON COLUMN "public"."bi_widget"."datasource" IS '数据源';
 COMMENT ON COLUMN "public"."bi_widget"."viz_type" IS '图表展示类型';
 COMMENT ON COLUMN "public"."bi_widget"."specification" IS '配置JSON';

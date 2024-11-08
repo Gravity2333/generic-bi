@@ -26,7 +26,7 @@ export interface IReportJobFile {
 declare module "egg" {
   // 扩展 Application
   interface Application {
-    externalSystemClient: ExternalSystem;
+    externalSystemClient: Record<string, ExternalSystem>
   }
 
   // 扩展 Context

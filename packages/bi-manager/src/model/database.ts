@@ -20,12 +20,18 @@ export default class Database extends Model {
   @Column({ type: DataType.UUIDV4, comment: "ID" })
   id: string;
 
+  @Column({ type:  DataType.STRING, comment: "名称" })
+  name: string;
+
   @Column({ type:  DataType.ENUM(...Object.values(EDatabaseType)), comment: "类型" })
   type: string;
 
   @Column({ type: DataType.TEXT, comment: "数据库配置" })
   option: string;
 
+  @Column({ type: DataType.STRING, comment: "只读", defaultValue: "0" })
+  readonly: string;
+  
   @CreatedAt
   @Column
   created_at: Date;

@@ -2,18 +2,20 @@ import {
   ALL,
   Body,
   Controller,
+  Del,
   Get,
   Inject,
+  Param,
   Post,
   Provide,
+  Put,
   Validate,
 } from "@midwayjs/decorator";
 import { Context } from "egg";
 import { ValidationError } from "joi";
 import { ELogOperareTarget, ELogOperareType } from "../service/systemLog";
 import { DatabaseService } from "../service/database";
-import { UpdateDatabseInput } from "../dto/database.dto";
-
+import { CreateDatabseInput, UpdateDatabseInput } from "../dto/database.dto";
 
 @Provide()
 @Controller("/web-api/v1")
@@ -24,24 +26,30 @@ export class DatabseAPIController {
   @Inject()
   databaseService: DatabaseService;
 
-  @Get("/database/info")
-  async queryDatabaseInfo() {
-    return this.databaseService.getInfo();
+  @Get("/database/list")
+  async queryDatabasesInfo() {
+    return this.databaseService.getDatabases();
   }
 
-  @Get("/database/check")
+  @Get("/database/:id/check")
   async checkDatabasConnect() {
     return this.databaseService.checkConnect();
   }
 
-  @Post("/database/info")
+  @Get("/database/:id")
   @Validate()
-  async configWidget(@Body(ALL) createParam: UpdateDatabseInput) {
+  async queryDatabaseInfobyId(@Param() id: string) {
+    return this.databaseService.getDatabaseById(id);
+  }
+
+  @Post("/database")
+  @Validate()
+  async createDatabase(@Body(ALL) createParam: CreateDatabseInput) {
     try {
-      const res = await this.databaseService.configDatabase(createParam);
+      const res = await this.databaseService.createDatabse(createParam);
       if (this.ctx.sysLogger && typeof this.ctx.sysLogger === "function") {
         this.ctx.sysLogger({
-          content: `配置数据库: ${createParam.type}`,
+          content: `新增数据库配置: ${createParam.type}`,
           type: ELogOperareType.CREATE,
           target: ELogOperareTarget.DATABASE,
         });
@@ -56,4 +64,33 @@ export class DatabseAPIController {
     }
   }
 
+  @Put("/database/:id")
+  @Validate()
+  async updateDatabase(
+    @Param() id: string,
+    @Body(ALL) updateParam: UpdateDatabseInput
+  ) {
+    try {
+      const res = await this.databaseService.updateDatabase(updateParam);
+      if (this.ctx.sysLogger && typeof this.ctx.sysLogger === "function") {
+        this.ctx.sysLogger({
+          content: `修改数据库配置: ${updateParam.type}`,
+          type: ELogOperareType.CREATE,
+          target: ELogOperareTarget.DATABASE,
+        });
+      }
+      return res;
+    } catch (error) {
+      if (error instanceof ValidationError) {
+        this.ctx?.throw(500, "Params Validation Error");
+      } else {
+        this.ctx?.throw(500, error);
+      }
+    }
+  }
+
+  @Del("/database/:id")
+  async deleteWidget(@Param() id: string) {
+    return await this.databaseService.deleteDatabase(id);
+  }
 }

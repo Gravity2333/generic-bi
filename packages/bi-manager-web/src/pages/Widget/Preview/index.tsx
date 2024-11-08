@@ -33,7 +33,7 @@ interface IWidgetInfo {
   success: boolean;
 }
 const WidgetPreview = ({ widgetId, onWidgetReady }: IWidgetPreviewProps) => {
-  const { datasets: schemaDetails = [], dicts = [] } = useContext<IGlobalContext>(GlobalContext);
+  const {  dicts = [] } = useContext<IGlobalContext>(GlobalContext);
   const { time_range, time_grain } = useContext<ITimeRangeContext>(TimeRangeContext);
   const [queryLoading, setQueryLoading] = useState(true);
   const queryLoadingRef = useRef<boolean>(false);
@@ -64,11 +64,6 @@ const WidgetPreview = ({ widgetId, onWidgetReady }: IWidgetPreviewProps) => {
   }, [widgetInfo?.widget]);
 
   useEffect(() => {
-    if (schemaDetails?.length === 0) {
-      setQueryLoading(false);
-      return;
-    }
-
     setQueryLoading(true);
     let timer: NodeJS.Timer;
 
@@ -98,7 +93,7 @@ const WidgetPreview = ({ widgetId, onWidgetReady }: IWidgetPreviewProps) => {
               return time_range;
             }
           })(),
-          schemaDetails?.find((schema: any) => schema.name === specObj.datasource)?.exist_rollup
+          specObj.exist_rollup
             ? time_grain
             : undefined,
         )) || {};
@@ -156,7 +151,7 @@ const WidgetPreview = ({ widgetId, onWidgetReady }: IWidgetPreviewProps) => {
                   return time_range;
                 }
               })(),
-              schemaDetails?.find((schema: any) => schema.name === specObj.datasource)?.exist_rollup
+              specObj?.exist_rollup
                 ? time_grain
                 : undefined,
             )) || {};
@@ -169,7 +164,7 @@ const WidgetPreview = ({ widgetId, onWidgetReady }: IWidgetPreviewProps) => {
       }
     })();
     return () => clearInterval(timer);
-  }, [widgetId, queryId, time_range, time_grain, schemaDetails]);
+  }, [widgetId, queryId, time_range, time_grain]);
 
   if (queryLoading) {
     return (

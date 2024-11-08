@@ -23,6 +23,9 @@ export default class Widget extends Model {
   @Column({ type: DataType.STRING, comment: "名称" })
   name: string;
 
+  @Column({ type: DataType.STRING, comment: "数据库" })
+  database: string;
+
   @Column({ type: DataType.STRING, comment: "数据源" })
   datasource: string;
 

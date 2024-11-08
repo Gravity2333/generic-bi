@@ -1,5 +1,4 @@
 import { cancelQueryWidgetData, createWidget, updateWidget, widgetExplore } from '@/services';
-import { queryClichhouseTableColumns } from '@/services/dataset';
 import {
   QuestionCircleOutlined,
   SaveOutlined,
@@ -59,6 +58,7 @@ import TimeGrainSelect from './components/TimeGrainSelect';
 import { TimeFieldForm } from './components/TimeFieldForm';
 import TextArea from 'antd/lib/input/TextArea';
 import useEmbed from '@/hooks/useEmbed';
+import useSource from '@/hooks/useSource';
 
 const { Option } = Select;
 const FormItem = Form.Item;
@@ -137,10 +137,22 @@ function ConfigPanel(props: Props, ref: any) {
   const { widgetId } = useParams<any>();
   /** 是否开启预览模式 */
   const [isPreview, setIsPreview] = useState(true);
+
+  /** 当前数据库 */
+  const [currentDatabase, _setCurrentDatabase] = useState<string>();
+
   /** 当前数据源 */
-  const [currentSchema, setCurrentSchema] = useState<string>();
-  /** 当前数据源对应字段 */
-  const [currentColums, setCurrentColumns] = useState<IClickhouseColumn[]>([]);
+  const [currentSchema, _setCurrentSchema] = useState<string>();
+
+  const setCurrentDatabase = (e: string) => {
+    _setCurrentDatabase(e);
+    selectDB(e);
+  };
+
+  const setCurrentSchema = (e: string) => {
+    _setCurrentSchema(e);
+    selectTb(e);
+  };
 
   /** 表格类型 */
   const vizType = Form.useWatch('viz_type', form);
@@ -215,15 +227,27 @@ function ConfigPanel(props: Props, ref: any) {
   /** 定时刷新时间 */
   const [readonly, setReadonly] = useState<boolean>(false);
 
+  const { databases, datasources, columns: currentColums, selectDB, selectTb } = useSource();
+
+  /** 数据源列表 */
+  const databaseList = useMemo(() => {
+    return (
+      databases.map((item: any) => ({
+        id: item.id,
+        title: item.name,
+      })) || []
+    );
+  }, [databases]);
+
   /** 数据源列表 */
   const schemaList = useMemo(() => {
     return (
-      schemaDetails.map((item: any) => ({
+      datasources.map((item: any) => ({
         id: item.name,
         title: item.comment || item.name,
       })) || []
     );
-  }, [schemaDetails]);
+  }, [datasources]);
 
   const existRollup = useMemo(() => {
     return (
@@ -241,18 +265,6 @@ function ConfigPanel(props: Props, ref: any) {
       return;
     }
     setDictMappings(data);
-  };
-
-  /** 改变数据源 */
-  const changeSchema = () => {
-    const { title, description, datasource } = form.getFieldsValue();
-    form.resetFields();
-    form.setFieldsValue({
-      title,
-      description,
-      datasource,
-    });
-    resetWidget();
   };
 
   // const fetchCustomTimes = async () => {
@@ -275,6 +287,7 @@ function ConfigPanel(props: Props, ref: any) {
       template,
       templateCoverData,
     } = val;
+
     (filtersFromForm || []).forEach((item: any) => {
       if ((item as any)?.group === undefined) {
         if ((item as ICustomFilter).filter_type === EFilterType.HAVING) {
@@ -321,6 +334,7 @@ function ConfigPanel(props: Props, ref: any) {
       readonly: readonly ? '1' : '0',
       template: template ? '1' : '0',
       datasource: val.datasource,
+      database: val.database,
       viz_type,
     };
     onSubmit && onSubmit(queryObj);
@@ -386,11 +400,6 @@ function ConfigPanel(props: Props, ref: any) {
   /** 获取字段信息 */
   useEffect(() => {
     if (currentSchema) {
-      queryClichhouseTableColumns(currentSchema)
-        .then((res) => {
-          setCurrentColumns(res.data);
-        })
-        .catch((err) => {});
       fetchDictMapping();
     }
   }, [currentSchema]);
@@ -403,6 +412,7 @@ function ConfigPanel(props: Props, ref: any) {
   function updateConfigPanelValues(updateValues: any) {
     const {
       datasource,
+      database,
       chart_properties,
       y_axis_format,
       columns,
@@ -419,6 +429,7 @@ function ConfigPanel(props: Props, ref: any) {
     });
 
     setCurrentSchema(datasource);
+    setCurrentDatabase(database);
     setIsPreview(true);
     setReadonly(readonly !== '0');
     setChartProperties(chart_properties);
@@ -477,20 +488,63 @@ function ConfigPanel(props: Props, ref: any) {
   /** -----------     处理函数      -------------------------------------*/
   /** 处理数据源变化 */
   const handleDatasourceChange = (e: any) => {
-    if (!currentSchema) {
-      changeSchema();
+    function chgFn() {
+      const { title, description, datasource, database } = form.getFieldsValue();
+      form.resetFields();
+      form.setFieldsValue({
+        title,
+        description,
+        datasource,
+        database,
+      });
+      resetWidget();
       setCurrentSchema(e);
-      return;
+      selectTb(e);
+    }
+
+    if (!currentSchema) {
+      return chgFn();
     }
     Modal.confirm({
       title: '更换数据源会清空图表配置!',
       onOk: () => {
-        changeSchema();
-        setCurrentSchema(e);
+        chgFn();
       },
       onCancel: () => {
         form.setFieldsValue({
           datasource: currentSchema,
+        });
+      },
+    });
+  };
+
+  /** 处理数据库变化 */
+  const handleDatabaseChange = (e: any) => {
+    function chgFn() {
+      const { title, description, database } = form.getFieldsValue();
+      form.resetFields();
+      form.setFieldsValue({
+        title,
+        description,
+        database,
+      });
+      resetWidget();
+      setCurrentDatabase(e);
+      selectDB(e);
+    }
+
+    if (!currentSchema) {
+      chgFn();
+      return;
+    }
+    Modal.confirm({
+      title: '更换数据库会清空图表配置!',
+      onOk: () => {
+        chgFn();
+      },
+      onCancel: () => {
+        form.setFieldsValue({
+          datasource: currentDatabase,
         });
       },
     });
@@ -597,6 +651,25 @@ function ConfigPanel(props: Props, ref: any) {
                 </FormItem>
 
                 <Divider orientation="left">数据源 & 图表类型</Divider>
+                {/* 数据库 */}
+                <FormItem name="database" label="数据库" rules={[{ required: true }]}>
+                  <Select
+                    showSearch
+                    optionFilterProp="label"
+                    placeholder="请选择数据库"
+                    getPopupContainer={getPopupContainer}
+                    onChange={handleDatabaseChange}
+                    style={{ width: '100%' }}
+                    disabled={readonly}
+                  >
+                    {databaseList.length &&
+                      databaseList.map((item: any) => (
+                        <Option key={item.id} value={item.id} label={item.title}>
+                          {item.title}
+                        </Option>
+                      ))}
+                  </Select>
+                </FormItem>
                 {/* 数据源 */}
                 <FormItem name="datasource" label="数据源" rules={[{ required: true }]}>
                   <Select
@@ -606,7 +679,7 @@ function ConfigPanel(props: Props, ref: any) {
                     getPopupContainer={getPopupContainer}
                     onChange={handleDatasourceChange}
                     style={{ width: '100%' }}
-                    disabled={readonly}
+                    disabled={readonly || !currentDatabase}
                   >
                     {schemaList.length &&
                       schemaList.map((item: any) => (
@@ -632,7 +705,7 @@ function ConfigPanel(props: Props, ref: any) {
                     },
                   ]}
                 >
-                  <VizTypeForm form={form} disabled={readonly} />
+                  <VizTypeForm form={form} disabled={currentColums?.length === 0 || readonly} />
                 </FormItem>
                 <Divider orientation="left">数据查询</Divider>
 
@@ -774,7 +847,10 @@ function ConfigPanel(props: Props, ref: any) {
                     rules={[
                       {
                         validator: async () => {
-                          if (form.getFieldValue('time_field') && !form.getFieldValue('time_range')) {
+                          if (
+                            form.getFieldValue('time_field') &&
+                            !form.getFieldValue('time_range')
+                          ) {
                             throw new Error('请选择时间范围!');
                           }
                         },

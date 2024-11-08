@@ -247,6 +247,8 @@ export interface IWidgetSpecification {
 
   // 数据查询
   // -----------------
+  /** 数据库 */
+  database: string;
   /** 数据源 */
   datasource: string;
 
@@ -354,6 +356,7 @@ interface IWidgetBase {
   id?: string;
   name: string;
   datasource: string;
+  database: string,
   viz_type: EVisualizationType;
   description?: string;
   created_at?: string;
