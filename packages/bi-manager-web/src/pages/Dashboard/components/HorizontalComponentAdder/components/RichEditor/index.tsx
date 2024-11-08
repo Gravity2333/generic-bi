@@ -76,7 +76,7 @@ export default function ({
   }, []);
 
   return (
-    <div style={{ height: '100%', width: '100%', position: 'relative', zIndex: 99 }}>
+    <div style={{ height: '90%', width: '100%', position: 'relative', zIndex: 99 }}>
       <div
         ref={editorElemMenu as any}
         style={{

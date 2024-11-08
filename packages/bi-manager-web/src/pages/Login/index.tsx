@@ -42,7 +42,7 @@ export default function Login() {
       });
       if (success) {
         message.success('登录成功！');
-        window.sessionStorage.setItem(BI_AUTH_TOKEN_KEY, data?.jwtToken);
+        window.localStorage.setItem(BI_AUTH_TOKEN_KEY, data?.jwtToken);
         location.href='/'
       }
     }

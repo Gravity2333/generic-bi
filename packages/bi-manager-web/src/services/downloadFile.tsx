@@ -1,4 +1,4 @@
-const biToken = window.sessionStorage.getItem(BI_AUTH_TOKEN_KEY);
+const biToken = window.localStorage.getItem(BI_AUTH_TOKEN_KEY);
 import { BI_AUTH_TOKEN_KEY } from '@/common';
 import { message } from 'antd';
 

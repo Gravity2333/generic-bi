@@ -30,7 +30,7 @@ function LayoutContent(children: JSX.Element) {
   const { initialState, setInitialState } = useModel('@@initialState');
   useEffect(() => {
     (async () => {
-      const biToken = window.sessionStorage.getItem(BI_AUTH_TOKEN_KEY);
+      const biToken = window.localStorage.getItem(BI_AUTH_TOKEN_KEY);
       setLoading(true);
       if (!biToken) {
         setLoading(false);
@@ -81,7 +81,7 @@ const unAuthorizedNotification = throttle(() => {
       message: '没有权限访问',
       description: '抱歉，您无权访问该页面',
     });
-    window.sessionStorage.setItem(BI_AUTH_TOKEN_KEY, '');
+    window.localStorage.setItem(BI_AUTH_TOKEN_KEY, '');
     location.href = '/login';
     sendMsgToParent({ unAuthorize: true });
   }
@@ -109,7 +109,7 @@ const REQUEST_TIME_OUT = 600000;
 export const request: RequestConfig = {
   headers: {
     ...(() => {
-      const biToken = window.sessionStorage.getItem(BI_AUTH_TOKEN_KEY);
+      const biToken = window.localStorage.getItem(BI_AUTH_TOKEN_KEY);
       return biToken ? { Authorization: `Bearer ${biToken}` } : {};
     })(),
   } as any,

@@ -59,7 +59,7 @@ export default function DatabaseConfig() {
         <Form.Item wrapperCol={{ offset: 4, span: 16 }}>
           <Form.Item name="datasource_type" initialValue={EDatabaseType.CLICKHOUSE} noStyle>
             <List
-              grid={{ gutter: 10, column: 4 }}
+              grid={{ gutter: 10, column: 5 }}
               dataSource={[
                 {
                   title: 'CLICKHOUSE',

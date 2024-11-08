@@ -29,7 +29,7 @@ import useEmbed from '@/hooks/useEmbed';
 
 const DEFAULT_PAGE_SIZE = 10;
 const DEFAULT_PAGE = 1;
-const biToken = window.sessionStorage.getItem(BI_AUTH_TOKEN_KEY);
+const biToken = window.localStorage.getItem(BI_AUTH_TOKEN_KEY);
 
 export default function WidgetList() {
   const actionRef = useRef<ActionType>();
