@@ -11,7 +11,7 @@ import { DARK_COLOR, THEME_KEY } from './utils/theme';
 import { useEffect, useState } from 'react';
 import { queryCurrentUserInfo } from './services/global';
 import { sendMsgToParent } from './utils/sendMsgToParent';
-
+const biToken = window.localStorage.getItem(BI_AUTH_TOKEN_KEY);
 export function getInitialState(): { theme: TTheme; settings?: Partial<LayoutSettings> } {
   const theme = (window.localStorage.getItem(THEME_KEY) as TTheme) || 'light';
   const isDark = theme === 'dark';
@@ -36,7 +36,7 @@ function LayoutContent(children: JSX.Element) {
 
   useEffect(() => {
     (async () => {
-      const biToken = window.localStorage.getItem(BI_AUTH_TOKEN_KEY);
+
       setLoading(true);
       if (!biToken) {
         backToLogin();
@@ -97,10 +97,7 @@ const REQUEST_TIME_OUT = 600000;
 
 export const request: RequestConfig = {
   headers: {
-    ...(() => {
-      const biToken = window.localStorage.getItem(BI_AUTH_TOKEN_KEY);
-      return biToken ? { Authorization: `Bearer ${biToken}` } : {};
-    })(),
+    ...( biToken ? { Authorization: `Bearer ${biToken}` } : {})
   } as any,
   timeout: REQUEST_TIME_OUT,
   errorHandler: (error: any) => {
