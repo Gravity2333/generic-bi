@@ -71,12 +71,13 @@ const WidgetPreview = ({ widgetId, onWidgetReady }: IWidgetPreviewProps) => {
       const widgetDetail = await queryWidgetDetail(widgetId);
       let info = {};
       const specObj = parseObjJson<IWidgetSpecification>(widgetDetail?.data?.specification);
+      const hasTimeColumn = specObj.time_range && Object.keys(specObj.time_range)?.length>0
       const widgetqueriesData =
         (await queryWidgetData(
           widgetId,
           queryId,
           (() => {
-            if (!time_range) {
+            if (hasTimeColumn&&!time_range) {
               return time_range;
             }
 
@@ -90,7 +91,9 @@ const WidgetPreview = ({ widgetId, onWidgetReady }: IWidgetPreviewProps) => {
                 include_lower: true,
               };
             } else {
-              return time_range;
+              if(hasTimeColumn){
+                return time_range;
+              }
             }
           })(),
           specObj.exist_rollup
@@ -108,7 +111,7 @@ const WidgetPreview = ({ widgetId, onWidgetReady }: IWidgetPreviewProps) => {
           specification: JSON.stringify({
             ...JSON.parse(widgetDetail?.data?.specification),
             ...(() => {
-              if (time_range) {
+              if (hasTimeColumn&&time_range) {
                 return {
                   time_range,
                 };
@@ -139,7 +142,7 @@ const WidgetPreview = ({ widgetId, onWidgetReady }: IWidgetPreviewProps) => {
               widgetId,
               queryId,
               (() => {
-                if (!time_range) {
+                if (hasTimeColumn&&!time_range) {
                   return time_range;
                 }
                 if (specObj.viz_type === EVisualizationType.TimeHistogram) {
@@ -148,7 +151,9 @@ const WidgetPreview = ({ widgetId, onWidgetReady }: IWidgetPreviewProps) => {
                     include_lower: true,
                   };
                 } else {
-                  return time_range;
+                  if(hasTimeColumn){
+                    return time_range;
+                  }
                 }
               })(),
               specObj?.exist_rollup

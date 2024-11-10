@@ -26,7 +26,7 @@ export class exploreAPIController {
 
   @Inject()
   databaseService: DatabaseService;
-  
+
   @Inject()
   npmdDictService: NpmdDictService;
 
@@ -44,14 +44,6 @@ export class exploreAPIController {
     }
   ) {
     try {
-      // 标识查询 ID，用于取消查询
-      const securityQueryId = queryId ? `/*${base64Encode(queryId)}*/ ` : "";
-      // 组装成 sql 语句
-      const { sql, colNames, colIdList } = generateSql(
-        formData,
-        false
-      );
-      // console.log(sql);
       const {
         reference = [],
         datasource,
@@ -61,7 +53,18 @@ export class exploreAPIController {
         exist_rollup,
         database
       } = formData;
-      
+
+      // 标识查询 ID，用于取消查询
+      const securityQueryId = queryId ? `/*${base64Encode(queryId)}*/ ` : "";
+      const DBType = this.ctx.app.externalSystemClient[database]?.type
+      // 组装成 sql 语句
+      const { sql, colNames, colIdList } = generateSql(
+        formData,
+        DBType
+      );
+      // console.log(sql);
+
+
       const references = [];
       if (reference?.length > 0) {
         for (let r of reference) {
@@ -81,12 +84,12 @@ export class exploreAPIController {
           // 生成sql
           const { sql: refSql } = generateSql(
             refSpecification as any,
-            false,
+            DBType
           );
 
           const sqlData = await this.databaseService.executeSql(
             refSql + securityQueryId
-          ,database);
+            , database);
 
           if (denominator) {
             const timeDiff = getTimeDiff(time_range);
@@ -110,9 +113,10 @@ export class exploreAPIController {
 
       // 可能携带查询 ID 的完整 sql 语句
       const fullSql = sql + securityQueryId;
+    console.log(fullSql)
       const sqlData = await this.databaseService.executeSql(
         fullSql
-      ,database);
+        , database);
 
       return {
         sql,
@@ -132,15 +136,15 @@ export class exploreAPIController {
     try {
       const idList = queryIds ? queryIds.split(",") : [];
       await this.databaseService.cancelQueries(idList);
-    } catch (e) {}
+    } catch (e) { }
   }
 
   @Post("/slow-queries/cancelAll")
   async cancelAllQuery() {
     try {
       const killSql = `KILL QUERY WHERE query_id IN (SELECT query_id FROM system.processes where query LIKE '%*/%')`;
-      this.databaseService.executeSql(killSql,'');
-      this.databaseService.executeSql(killSql,'');
-    } catch (e) {}
+      this.databaseService.executeSql(killSql, '');
+      this.databaseService.executeSql(killSql, '');
+    } catch (e) { }
   }
 }

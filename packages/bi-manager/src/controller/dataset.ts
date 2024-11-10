@@ -93,7 +93,6 @@ export class DatasetAPIController {
       _GET_DATA_SET_COLUMN_QUERY_MAP(database, tableName),
       database
     );
-
     return recordData;
   }
 }

@@ -1,4 +1,5 @@
 import {
+  EDatabaseType,
   EVisualizationType,
   IWidgetSpecification,
 } from '../../typings';
@@ -20,9 +21,10 @@ import { generateTimeColumn } from './widgets/timeColumn';
  */
 export function generateSql(
   widgetSpecification: IWidgetSpecification,
-  pretty = true,
+  DBType = EDatabaseType.CLICKHOUSE
 ): { sql: string; colNames: string[]; colIdList: string[] } {
   const { viz_type } = widgetSpecification;
+  (widgetSpecification as any).DBType = DBType
   if (viz_type === EVisualizationType.BigNumberTotal) {
     return generateBigNumber(widgetSpecification);
   } else if (viz_type === EVisualizationType.Pie) {

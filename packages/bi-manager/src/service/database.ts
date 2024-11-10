@@ -75,7 +75,6 @@ export class DatabaseService {
     id: string,
     databaseConfig: ParsedDBConfig
   ) => {
-    console.log(this.app.externalSystemClient,id,databaseConfig)
     if (!this.app.externalSystemClient) {
       this.app.externalSystemClient = {};
       (global as any).app = {

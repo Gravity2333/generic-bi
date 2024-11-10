@@ -75,6 +75,7 @@ export function generateBar(
     endTime,
     filterOperator,
     customTimes: custom_times as unknown as ICustomTime,
+    DBType: (widgetSpecification as any).DBType
   });
 
   // where

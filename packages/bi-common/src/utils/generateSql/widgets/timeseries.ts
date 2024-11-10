@@ -1,5 +1,5 @@
 import { addArrayJoin, getUtcTimeRange } from '../..';
-import { IWidgetSpecification } from '../../../typings';
+import { _GLOBAL_IN_DIFF_SQL_, EDatabaseType, IWidgetSpecification } from '../../../typings';
 import {
   checkAggregateType,
   convertAggregateType,
@@ -60,6 +60,7 @@ export function generateTimeHistgram(
     startTime,
     endTime,
     filterOperator,
+    DBType: (widgetSpecification as any).DBType
   });
 
   // 排序
@@ -95,9 +96,8 @@ export function generateTimeHistgram(
       ?.filter((f) => f.field !== time_field)
       .map((g) => g.field)
       .concat(timeAlias)
-      .join(',')} \n ${orderByExpr} ${
-      limit ? `LIMIT ${SqlString.escape(limit)}` : ''
-    }`;
+      .join(',')} \n ${orderByExpr} ${limit ? `LIMIT ${SqlString.escape(limit)}` : ''
+      }`;
   } else {
     sql = `select ${columnsExpr},${(() => {
       let interval = 60;
@@ -108,12 +108,12 @@ export function generateTimeHistgram(
       } else if (time_grain === '5m') {
         interval = 300;
       }
-      if (!exist_rollup) {
-        // 详单表 进行分时统计
-
-        return `toDateTime(multiply(ceil(divide(toUnixTimestamp(${time_field}), ${interval})), ${interval}), 'UTC') as ${time_field?.toUpperCase()}`;
+      if ((widgetSpecification as any).DBType === EDatabaseType.CLICKHOUSE) {
+        return `toStartOfInterval(, INTERVAL ${interval} second) AS ${timeAlias}`;
+      } else {
+        return `date_trunc('second', ${time_field})::timestamp(0) - INTERVAL '${interval} seconds' AS ${timeAlias}`;
       }
-      return `toStartOfInterval(${time_field}, INTERVAL ${interval} second) AS ${timeAlias}`;
+
     })()} \n FROM ${tableName} \n WHERE 1=1 AND `;
     if (whereExpr) {
       sql += whereExpr;
@@ -143,7 +143,7 @@ export function generateTimeHistgram(
         timeField: time_field!,
         startTime,
         endTime,
-
+        DBType: (widgetSpecification as any).DBType,
         filterOperator,
       });
       sql += ` AND ${(() => {
@@ -152,26 +152,23 @@ export function generateTimeHistgram(
         } else {
           return groupby[0]?.field;
         }
-      })()} global IN ( SELECT ${globalInColumnsExpr} FROM  ${tableName} WHERE 1=1 ${
-        globalInWhereExpr ? ` AND ${globalInWhereExpr}` : ''
-      } \n GROUP BY ${groupby[0]?.field} \n ${orderByExpr} ${
-        limit ? `LIMIT ${SqlString.escape(limit)}` : ''
-      } ) \n GROUP BY ${timeAlias},${`\n${groupby
-        .map((group) => {
-          const { type, field, arrayJoin } = group;
-          if (/^Array((.*))$/.test(type || '')) {
-            return addArrayJoin(field, arrayJoin);
-          }
-          if (checkAggregateType(type!) && field === time_field) {
-            return timeAlias;
-          }
-          return field;
-        })
-        .join(',')}`}`;
+      })()} ${_GLOBAL_IN_DIFF_SQL_[(widgetSpecification as any).DBType]} ( SELECT ${globalInColumnsExpr} FROM  ${tableName} WHERE 1=1 ${globalInWhereExpr ? ` AND ${globalInWhereExpr}` : ''
+        } \n GROUP BY ${groupby[0]?.field} \n ${orderByExpr} ${limit ? `LIMIT ${SqlString.escape(limit)}` : ''
+        } ) \n GROUP BY ${timeAlias},${`\n${groupby
+          .map((group) => {
+            const { type, field, arrayJoin } = group;
+            if (/^Array((.*))$/.test(type || '')) {
+              return addArrayJoin(field, arrayJoin);
+            }
+            if (checkAggregateType(type!) && field === time_field) {
+              return timeAlias;
+            }
+            return field;
+          })
+          .join(',')}`}`;
     } else {
-      sql += `\n GROUP BY ${timeAlias} \n ${orderByExpr} ${
-        limit ? `LIMIT ${SqlString.escape(limit)}` : ''
-      }`;
+      sql += `\n GROUP BY ${timeAlias} \n ${orderByExpr} ${limit ? `LIMIT ${SqlString.escape(limit)}` : ''
+        }`;
     }
   }
 

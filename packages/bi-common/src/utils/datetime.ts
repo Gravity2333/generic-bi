@@ -27,26 +27,8 @@ export function fixedZero(val: number): string {
  * ```
  */
 export function getUtcTime(time?: Date | number | string): string {
-  const d = new Date(time || new Date());
-  const YYYY = d.getUTCFullYear();
-  const M = d.getUTCMonth() + 1;
-  const D = d.getUTCDate();
-  const H = d.getUTCHours();
-  const m = d.getUTCMinutes();
-  const s = d.getUTCSeconds();
-  return (
-    YYYY +
-    '-' +
-    fixedZero(M) +
-    '-' +
-    fixedZero(D) +
-    ' ' +
-    fixedZero(H) +
-    ':' +
-    fixedZero(m) +
-    ':' +
-    fixedZero(s)
-  );
+  const d = moment(new Date(time || new Date()).valueOf());
+  return d.format('YYYY-MM-DD HH:mm:ss')
 }
 
 /**
@@ -171,6 +153,7 @@ export function getUtcTimeRange(timeRange: ITimeRange) {
   } else {
     // 为了防止起止时间计算出现偏差，这里采用统一的当前时间
     const t = new Date().setSeconds(0);
+ 
     // 转换时间
     endTime = getUtcTime(t);
     startTime = getUtcTime(getRelativeTime(timeRange.range, timeRange.unit, t));

@@ -12,6 +12,7 @@ import { Utils } from "./utils";
 import { WidgetService } from "./service/widget";
 import { NpmdDictService } from "./service/dicts";
 import { DatabaseService } from "./service/database";
+import { OsService } from "./service/os";
 @Configuration({
   imports: [
     "@midwayjs/sequelize",
@@ -36,6 +37,9 @@ export class ContainerConfiguration implements ILifeCycle {
 
   @Inject()
   dashboardService: DashboardService;
+
+  @Inject()
+  osService: OsService;
 
   @Inject()
   npmdDictMappingService: NpmdDictMappingService;
@@ -81,6 +85,8 @@ export class ContainerConfiguration implements ILifeCycle {
     this.widgetService.initDefaultWidget();
     /** 初始化字典映射 */
     this.npmdDictMappingService.initDictMapping();
+    /** 定时查询系统信息 */
+    this.osService.runSysInfoTask()
 
     // 查询定时报表
     const reportList = await this.reportService.listAllReports();

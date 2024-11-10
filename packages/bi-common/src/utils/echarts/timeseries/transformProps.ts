@@ -32,7 +32,7 @@ const getBorderTime = (
     if (end.second() > 0) {
       return [
         start.set('s', 0).valueOf(),
-        end.set('s', 0).add('m', 1).valueOf(),
+        end.set('s', 0).valueOf(),
       ];
     }
     return [start.set('s', 0).valueOf(), end.set('s', 0).valueOf()];
@@ -40,7 +40,7 @@ const getBorderTime = (
     if (end.minute() > 0) {
       return [
         start.set('s', 0).set('m', 0).valueOf(),
-        end.set('s', 0).set('m', 0).add('h', 1).valueOf(),
+        end.set('s', 0).set('m', 0).valueOf(),
       ];
     }
     return [
@@ -112,6 +112,7 @@ export default function transformProps(params: ITransformEChartOptionsParams) {
     const metricNameMap = {};
     const metricIdMap = {};
     let max = 0;
+
     for (let key in groupedData) {
       const list: any[] = groupedData[key];
       list.forEach((item) => {
@@ -122,8 +123,9 @@ export default function transformProps(params: ITransformEChartOptionsParams) {
             legendCnt[key] += parseFloat(item[sortIndex] || '0');
           }
         }
+
         metricsList.forEach((metric) => {
-          const time = item[timeFieldAlias!];
+          const time = item[timeFieldAlias!]||item[time_field!];
           const { isBandwidth, id } = metric;
           const value =
             isBandwidth && interval
@@ -143,7 +145,8 @@ export default function transformProps(params: ITransformEChartOptionsParams) {
           }`;
           const mergedId = `${key}^${id}`;
           metricNameMap[mergedId] = newName;
-          const timestamp = moment(time).add(8, 'h').valueOf();
+         
+          const timestamp = moment(moment(time).format('YYYY-MM-DD:HH:mm:00')).zone('+0800').valueOf();
           result[mergedId] = result[mergedId] || [];
           result[mergedId].push([timestamp, value]);
           result[mergedId].max = max;

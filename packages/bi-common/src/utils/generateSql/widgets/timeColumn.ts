@@ -54,10 +54,7 @@ export function generateTimeColumn(
     } else if (time_grain === '5m') {
       interval = 300;
     }
-    if (!exist_rollup) {
-      // 详单表 进行分时统计
-      return `toDateTime(multiply(ceil(divide(toUnixTimestamp(${time_field}), ${interval})), ${interval}), 'UTC') as ${time_field?.toUpperCase()}`;
-    }
+
     return `toStartOfInterval(${time_field}, INTERVAL ${interval} second) AS ${timeAlias}`;
   })()}`;
 
@@ -80,13 +77,15 @@ export function generateTimeColumn(
 
   /** 时间 */
   const [startTime, endTime] = getUtcTimeRange(time_range!);
+
   const whereExpr = getWhereExpr({
     filters,
     timeRange: time_range!,
     timeField: time_field!,
     startTime,
     endTime,
-    filterOperator
+    filterOperator,
+    DBType: (widgetSpecification as any).DBType
   });
 
   // where
