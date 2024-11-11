@@ -215,6 +215,7 @@ export default function GridLayout(props: IGridLayoutProps) {
       layouts={{
         lg: layoutsFormatter,
       }}
+      style={{minHeight:'100%'}}
       autoSize={true}
       cols={cols}
       preventCollision={readonly}

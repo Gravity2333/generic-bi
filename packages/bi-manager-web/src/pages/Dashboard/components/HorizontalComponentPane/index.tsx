@@ -1,16 +1,18 @@
 import { Card, Popover } from 'antd';
 import HorizontalWidgetAdder from '../HorizontalWidgetAdder';
 import styles from './index.less';
-import HorizontalComponentAdder, { CARD_HEIGHT } from '../HorizontalComponentAdder';
+import HorizontalComponentAdder from '../HorizontalComponentAdder';
 import { useState } from 'react';
 import { DownSquareOutlined, UpSquareOutlined } from '@ant-design/icons';
+import HorizontalBackground from '../HorizontalBackground';
 
 enum ETabTitle {
   'WIDGET' = 'widget',
   'COMPONENT' = 'compoent',
+  'BACKGROUND' = 'BACKGROUND',
 }
 
-const HorizontalComponentPane = () => {
+const HorizontalComponentPane = ({setBackground}: {setBackground: any}) => {
   const [activeKey, setActiveKey] = useState<string>(ETabTitle.WIDGET);
   const [hide, setHide] = useState<boolean>(false);
   const tabList = [
@@ -21,6 +23,10 @@ const HorizontalComponentPane = () => {
     {
       key: ETabTitle.COMPONENT,
       tab: '小组件',
+    },
+    {
+      key: ETabTitle.BACKGROUND,
+      tab: '背景',
     },
   ];
 
@@ -59,6 +65,8 @@ const HorizontalComponentPane = () => {
             <HorizontalWidgetAdder />
           ) : activeKey === ETabTitle.COMPONENT ? (
             <HorizontalComponentAdder />
+          ) : activeKey === ETabTitle.BACKGROUND ? (
+            <HorizontalBackground setBackground={setBackground}/>
           ) : (
             ''
           )

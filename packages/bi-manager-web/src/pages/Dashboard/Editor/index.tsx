@@ -44,6 +44,8 @@ import { isDev } from '@/common';
 import { COMPONENT_TYPE_LIST } from '../components/HorizontalComponentAdder/typing';
 import { cancelAllQuery } from '@/services';
 import { DashboardContext, IDashboardContext } from '@/layouts/DashboardLayout';
+import { EBACKGROUNDTYPE } from '../components/HorizontalBackground/typing';
+import { SET_DASHBOARD_BACKGOUNRD } from '@/utils/layout';
 
 const { Option } = Select;
 const { RangePicker } = DatePicker;
@@ -125,7 +127,12 @@ export default function DashboardEditor({
   const [showTimeRange, setShowTimeRange] = useState<ITimeRange>();
   /** 弹出框开关 */
   const [timeRangeHide, setTimeRangeHide] = useState<boolean>(true);
-
+  /** 背景 */
+  const [background, _setBackground] = useState<EBACKGROUNDTYPE>(EBACKGROUNDTYPE.EMPTY);
+  const setDashboardBackGround = (b: EBACKGROUNDTYPE) => {
+    SET_DASHBOARD_BACKGOUNRD(b);
+    _setBackground(b);
+  };
   const layoutInfoFunc = useRef<any>();
 
   const [texts, setTexts] = useState<Map<string, any>>(new Map());
@@ -346,6 +353,7 @@ export default function DashboardEditor({
         layouts,
         time_range: timeRange,
         texts: texts ? encodeMap(texts) : {},
+        background,
       }),
       readonly: readonly ? '1' : '0',
       // @ts-ignore
@@ -401,9 +409,14 @@ export default function DashboardEditor({
   };
 
   useEffect(() => {
-    const { time_range, texts } = parseObjJson<IDashboardSpecification>(specification || '');
+    const {
+      time_range,
+      texts,
+      background: back,
+    } = parseObjJson<IDashboardSpecification>(specification || '');
     setReadonly(dashboard?.readonly === '1');
     setTexts(texts ? decodeMap(texts) : new Map());
+    setDashboardBackGround(back || (EBACKGROUNDTYPE.EMPTY as any));
     setContextKey(uuidv4());
     if (!tab) {
       setTimeRange(time_range);
@@ -513,7 +526,15 @@ export default function DashboardEditor({
         </div>
       ) : (
         <div style={{ position: 'relative' }}>
-          <div style={{ width: '100px;', position: 'absolute', right: '0px', top: '0px',zIndex:'10' }}>
+          <div
+            style={{
+              width: '100px;',
+              position: 'absolute',
+              right: '0px',
+              top: '0px',
+              zIndex: '10',
+            }}
+          >
             {toolMenu}
           </div>
         </div>
@@ -545,25 +566,14 @@ export default function DashboardEditor({
                 texts={texts}
               />
             </TimeRangeContext.Provider>
-
-            {/* 组件拖拽配置选项 */}
-            {/* {!preview && (
-              <AutoHeightContainer
-                className={styles['dashboard-sidepane']}
-                contentStyle={{ overflowY: 'auto' }}
-              >
-                <BuilderComponentPane />
-              </AutoHeightContainer>
-            )} */}
           </div>
         </div>
       </FullScreenCard>
       {!preview && !readonly && (
         <div>
-          <HorizontalComponentPane />
+          <HorizontalComponentPane setBackground={setDashboardBackGround} />
         </div>
       )}
     </div>
   );
 }
-

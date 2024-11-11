@@ -31,4 +31,5 @@ export interface IDashboardSpecification {
   layouts: any[];
   time_range?: ITimeRange;
   texts?: Record<string, any>;
+  background?: string,
 }
