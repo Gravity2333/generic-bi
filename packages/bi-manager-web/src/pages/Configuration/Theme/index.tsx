@@ -87,7 +87,7 @@ export default function Theme() {
             />
           </Upload>
         </Card>
-        {__DEFAULT_BACKGROUNDS__.map(({ name, path,cover }: any) => {
+        {__DEFAULT_BACKGROUNDS__.map(({ name, path, cover }: any) => {
           return <Card hoverable cover={<img width={350} height={250} alt="example" src={cover} />} >
             <Meta
               title={name}

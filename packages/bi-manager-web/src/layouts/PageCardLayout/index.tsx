@@ -72,8 +72,11 @@ const PageCardLayout: React.FC<IFlowLayout> = ({
   }, [findMatchedTag, menus, pathname]);
 
   return (
-    <Card title={undefined} size="small" className={styles['outer-card']} style={{ opacity: '0.9' }}>
-      <>
+    <Card title={undefined} size="small" className={styles['outer-card']} 
+    style={{ opacity: '0.9', height: '80vh', overflow: 'auto' }}
+    bodyStyle={{height:'100%'}}
+    >
+      <div style={{ height: '100%', display: 'flex', flexFlow: 'column nowrap' }}>
         <Menu
           onClick={handlePageChange}
           selectedKeys={[activeMenu]}
@@ -83,8 +86,10 @@ const PageCardLayout: React.FC<IFlowLayout> = ({
             key: menu.path,
           }))}
         />
-        {children}
-      </>
+        <div style={{ height: 'calc( 100% - 30px )', overflow: 'auto' }}>
+          {children}
+        </div>
+      </div>
     </Card>
   );
 };
