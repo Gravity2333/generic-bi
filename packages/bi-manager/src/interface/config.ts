@@ -70,7 +70,8 @@ export interface IMyAppConfig extends PowerPartial<EggAppConfig> {
 
   /** 前端页面的地址 */
   web_uri: string;
-
+  /** 共享文件地址 */
+  asset_uri: string
   // npmd
   restapi: {
     url_origin: string;
@@ -78,5 +79,6 @@ export interface IMyAppConfig extends PowerPartial<EggAppConfig> {
     app_token: string;
   };
 
+  backgrounds: string,
   bi_mode: "main" | "11j";
 }

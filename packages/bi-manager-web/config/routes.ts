@@ -384,6 +384,12 @@ const routes: IRouteProps[] = [
         hideInMenu: true,
         component: './Configuration/Layout',
       },
+      {
+        path: '/configuration/theme',
+        name: '主题',
+        hideInMenu: true,
+        component: './Configuration/Theme',
+      },
     ],
   },
   {

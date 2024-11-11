@@ -11,6 +11,8 @@ export default (appInfo: EggAppInfo) => {
   config.isDev = true;
   config.mode = "embed";
 
+  config.backgrounds = join(__dirname, "../app/resources/backgrounds")
+
   config.report = {
     pdf_dir: join(__dirname, "../app/resources/pdf/"),
   };
@@ -54,7 +56,7 @@ export default (appInfo: EggAppInfo) => {
   // };
 
   config.web_uri = "http://127.0.0.1:8000/bi";
-
+  config.asset_uri = "http://127.0.0.1:7001/public";
   /** 配置日志清理 */
   config.midwayLogger = {
     default: {
@@ -67,6 +69,11 @@ export default (appInfo: EggAppInfo) => {
    *  主线 - main
    */
   config.bi_mode = "main";
+
+  config.static = {
+    prefix: "/public/",
+    dir: join(appInfo.baseDir, "app")
+  };
 
   return config;
 };

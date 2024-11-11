@@ -15,3 +15,9 @@ export async function getLayoutTitle() {
     method: 'GET',
   });
 }
+
+export async function getBackgroundUrls() {
+  return request(`${API_PREFIX}/background/urls`, {
+    method: 'GET',
+  });
+}
