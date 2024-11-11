@@ -33,6 +33,10 @@ export function TimeFieldForm({
                     style={{ width: '100%' }}
                     placeholder="请选择时间字段"
                     disabled={disabled}
+                    allowClear
+                    onClear={()=>{
+                      setFieldValue('time_range',undefined)
+                    }}
                     onChange={(e) => {
                       setFieldValue(
                         'time_field_type',
@@ -41,7 +45,6 @@ export function TimeFieldForm({
                     }}
                   >
                     {timeColumns
-                      ?.filter(({ type }: { type: string }) => type.includes('DateTime'))
                       .map((item: any) => {
                         return (
                           <Select.Option key={item.name} value={item.name}>

@@ -166,7 +166,7 @@ function ConfigPanel(props: Props, ref: any) {
   function checkAggreate(
     type: 'groupby' | 'metrics' | 'sorts',
     values: any[] = [],
-    next: (newMetrics?: any[]) => void = () => {},
+    next: (newMetrics?: any[]) => void = () => { },
   ) {
     if (
       vizType === EVisualizationType.Table &&
@@ -455,7 +455,7 @@ function ConfigPanel(props: Props, ref: any) {
           setIsPreview(true);
           form.submit();
         })
-        .catch(() => {});
+        .catch(() => { });
       isMount.current = false;
     }
   }, [dictMappings]);
@@ -473,7 +473,7 @@ function ConfigPanel(props: Props, ref: any) {
             setIsPreview(false);
             form.submit();
           })
-          .catch(() => {})
+          .catch(() => { })
           .finally(() => {
             form.setFieldsValue({ prevent_jump: true });
           });
@@ -832,9 +832,7 @@ function ConfigPanel(props: Props, ref: any) {
                   {/* 时间字段 */}
                   <TimeFieldForm
                     disabled={currentColums?.length === 0 || readonly}
-                    timeColumns={currentColums?.filter(({ type }: { type: string }) =>
-                      type.includes('DateTime'),
-                    )}
+                    timeColumns={currentColums?.filter(({ type }: { type: string }) => ['timestamp', 'DateTime']?.findIndex(ctype => type?.includes(ctype)) >= 0)}
                     required={[
                       EVisualizationType.TimeHistogram,
                       EVisualizationType.Time_Column,

@@ -9,7 +9,7 @@ export * from './customTimes';
 export * from './user';
 export * from './datasets'
 export * from './database'
-
+export * from './diffSql'
 export interface IPageFactory<T> {
   rows: T[];
   total: number;

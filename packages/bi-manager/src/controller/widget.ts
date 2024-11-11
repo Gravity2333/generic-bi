@@ -289,11 +289,6 @@ export class WidgetAPIController {
         })(),
       };
 
-      // 转成 sql 语句
-      const { sql, colNames, colIdList } = generateSql(
-        widgetSpec,
-        false,
-      );
       const {
         reference = [],
         datasource,
@@ -302,6 +297,14 @@ export class WidgetAPIController {
         exist_rollup,
         database
       } = widgetSpec;
+
+      const DBType = this.ctx.app.externalSystemClient[database]?.type
+      // 转成 sql 语句
+      const { sql, colNames, colIdList } = generateSql(
+        widgetSpec,
+        DBType
+      );
+
 
       // 标识查询 ID，用于取消查询
       const securityQueryId = queryId ? `/*${base64Encode(queryId)}*/ ` : "";
@@ -333,11 +336,11 @@ export class WidgetAPIController {
           // 生成sql
           const { sql: refSql } = generateSql(
             refSpecification as any,
-            false,
+            DBType
           );
           const sqlData = await this.databaseService.executeSql(
             refSql + securityQueryId
-          ,database);
+            , database);
           if (denominator) {
             references.push({
               id: r?.id,
@@ -360,7 +363,7 @@ export class WidgetAPIController {
       const fullSql = sql + securityQueryId;
       const sqlData = await this.databaseService.executeSql(
         fullSql
-      ,database);
+        , database);
       return {
         sql,
         colNames,

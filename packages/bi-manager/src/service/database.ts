@@ -5,9 +5,10 @@ import { IMyAppConfig } from "../interface";
 import DatabaseModel from "../model/database";
 import { CreateDatabseInput, UpdateDatabseInput } from "../dto/database.dto";
 import { EDatabaseType, ExternalSystem, IDatasetTable } from "@bi/common";
-import * as ClickHouse from "@posthog/clickhouse";
 import { Application } from "@midwayjs/web";
-import { Pool } from "pg";
+import { postgrePlugin } from "../plugins/postgrePlugin";
+import { clickhousePlugin } from "../plugins/clickhousePlugin";
+import { mysqlPlugin } from "../plugins/mysqlPlugins";
 
 type ParsedDBConfig = {
   id: string;
@@ -57,60 +58,13 @@ export class DatabaseService {
     let client = null;
     switch (type) {
       case EDatabaseType.POSTGRE:
-        // 处理postgre
-        const pool = new Pool({
-          user: option?.user,
-          password: option?.password,
-          host: option?.host,
-          port: option?.port,
-          database: option?.database,
-          max: 20, // 连接池中最大的连接数
-          idleTimeoutMillis: 30000, // 一个连接被回收前可以保持空闲的时间
-          connectionTimeoutMillis: 2000, // 建立连接时的超时时间
-        });
-        client = {
-          type: EDatabaseType.POSTGRE,
-          querying: function <T>(sql: string) {
-            return new Promise<{ data: T }>((resolve, reject) => {
-              pool.connect((err, client, done) => {
-                if (err) reject(err);
-                // 执行查询
-                client?.query(sql, (err, res) => {
-                  if (err) {
-                    done();
-                    reject(err);
-                  } else {
-                    done();
-                    resolve(res.rows);
-                  }
-                });
-              });
-            });
-          },
-        };
+        client = postgrePlugin(option)
         break;
       case EDatabaseType.CLICKHOUSE:
-        // 处理postgre
-        client = new ClickHouse({
-          protocol: option?.protocol,
-          host: option?.host,
-          port: option?.port,
-          path: option?.path,
-          format: "JSON",
-          user: option?.user,
-          password: option?.password,
-          queryOptions: {
-            database: option?.database,
-          },
-          ...(option?.ca
-            ? {
-                ca: option.ca,
-                requestCert: true,
-                rejectUnauthorized: false,
-              }
-            : {}),
-        });
-        client.type = EDatabaseType.CLICKHOUSE;
+        client = clickhousePlugin(option)
+        break;
+      case EDatabaseType.MYSQL:
+        client = mysqlPlugin(option)
         break;
     }
     externalSystemClient[id] = client;
@@ -121,7 +75,6 @@ export class DatabaseService {
     id: string,
     databaseConfig: ParsedDBConfig
   ) => {
-    console.log(this.app.externalSystemClient,id,databaseConfig)
     if (!this.app.externalSystemClient) {
       this.app.externalSystemClient = {};
       (global as any).app = {
@@ -223,14 +176,17 @@ export class DatabaseService {
       if(!execSql){
         this.ctx?.throw(500, "SQL对应查询数据库错误！");
       }
-      
+  
       const execDataRes = await DBInstance.querying<any>(execSql).catch((error) => {
         this.ctx?.throw(500, error);
       });
+     
 
       if (DBInstance.type === EDatabaseType.CLICKHOUSE) {
         return execDataRes.data as IDatasetTable[];
       } else if (DBInstance.type === EDatabaseType.POSTGRE) {
+        return execDataRes as IDatasetTable[];
+      }else if(DBInstance.type === EDatabaseType.MYSQL){
         return execDataRes as IDatasetTable[];
       }
       return execDataRes as IDatasetTable[];

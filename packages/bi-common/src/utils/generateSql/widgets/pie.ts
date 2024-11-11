@@ -73,6 +73,7 @@ export function generatePie(widgetSpecification: IWidgetSpecification) {
     endTime,
     filterOperator,
     customTimes: custom_times as unknown as ICustomTime,
+    DBType: (widgetSpecification as any).DBType
   });
 
   // where

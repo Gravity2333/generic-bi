@@ -232,3 +232,24 @@ COMMENT ON COLUMN "public"."bi_users"."created_at" IS '创建时间';
 COMMENT ON COLUMN "public"."bi_users"."updated_at" IS '更新时间';
 COMMENT ON COLUMN "public"."bi_users"."deleted_at" IS '删除时间';
 COMMENT ON COLUMN "public"."bi_users"."owner" IS 'owner的id,可对Dashbase进行增删改';
+
+-- ----------------------------
+-- Table structure for bi_system
+-- ----------------------------
+CREATE TABLE IF NOT EXISTS "public"."bi_system" (
+  "id" varchar(64) COLLATE "pg_catalog"."default" NOT NULL,
+  "memorate_usage" FLOAT,
+  "cpu_usage" FLOAT,
+  "disk_usage" FLOAT,
+  "created_at" timestamptz(6),
+  "updated_at" timestamptz(6),
+  "deleted_at" timestamptz(6),
+  CONSTRAINT "bi_system_pkey" PRIMARY KEY ("id")
+);
+COMMENT ON COLUMN "public"."bi_system"."id" IS '主键';
+COMMENT ON COLUMN "public"."bi_system"."memorate_usage" IS '内存使用率';
+COMMENT ON COLUMN "public"."bi_system"."cpu_usage" IS 'CPU使用率';
+COMMENT ON COLUMN "public"."bi_system"."disk_usage" IS '存储空间使用率';
+COMMENT ON COLUMN "public"."bi_system"."created_at" IS '创建时间';
+COMMENT ON COLUMN "public"."bi_system"."updated_at" IS '更新时间';
+COMMENT ON COLUMN "public"."bi_system"."deleted_at" IS '删除时间';

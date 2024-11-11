@@ -66,6 +66,7 @@ export function generateTable(
 
   /** 时间 */
   const [startTime, endTime] = getUtcTimeRange(time_range!);
+
   const whereExpr = getWhereExpr({
     filters,
     timeRange: time_range!,
@@ -74,6 +75,7 @@ export function generateTable(
     endTime,
     filterOperator,
     customTimes: custom_times as unknown as ICustomTime,
+    DBType: (widgetSpecification as any).DBType
   });
 
   // where

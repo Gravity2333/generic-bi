@@ -46,7 +46,6 @@ export class jwtAuthMiddleware implements IWebMiddleware {
         }
 
         const userInfo = await this.jwtService.parseToken(token);
-        console.log(token,userInfo)
         ctx.userInfo = userInfo;
       } catch (err) {
         console.log(err)

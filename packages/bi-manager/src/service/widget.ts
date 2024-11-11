@@ -175,8 +175,7 @@ export class WidgetService {
       );
       if (dashboard) {
         throw new Error(
-          `图表:${widget?.name || id}已被 Dashboard 【${
-            dashboard.name
+          `图表:${widget?.name || id}已被 Dashboard 【${dashboard.name
           }】使用，无法删除`
         );
       }
@@ -207,7 +206,7 @@ export class WidgetService {
         force: true,
       });
       // }
-    } catch (e) {}
+    } catch (e) { }
   }
 
   async importWidget(fileContent: string) {
@@ -302,7 +301,7 @@ export class WidgetService {
       })(),
     };
 
-    const { metrics, groupby,database } = widgetSpec;
+    const { metrics, groupby, database } = widgetSpec;
     // colName字典
     const colInfoMap = [...metrics, ...groupby].reduce((prev, curr: any) => {
       const index = curr.id || curr.field;
@@ -321,17 +320,18 @@ export class WidgetService {
       },
       {}
     );
+    const DBType = this.ctx.app.externalSystemClient[database]?.type
     // 转成 sql 语句
     const { sql, colNames, colIdList } = generateSql(
       widgetSpec,
-      false,
+      DBType
     );
-  
+
     // 标识查询 ID，用于取消查询
     let securityQueryId = id ? `/*${base64Encode(id)}*/ ` : "";
     let fullSql = sql + securityQueryId;
 
-    let sqlData = await this.databaseService.executeSql(fullSql,database);
+    let sqlData = await this.databaseService.executeSql(fullSql, database);
     // 匹配标题名称
     const titleNameList = colIdList?.map((id) => {
       const c = colInfoMap[id];

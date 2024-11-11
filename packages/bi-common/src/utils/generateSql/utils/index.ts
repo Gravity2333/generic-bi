@@ -1,6 +1,8 @@
 import { addArrayJoin } from '../..';
 import {
+  _GET_UTC_DIFF_DATETIME_SQL,
   ECustomTimeType,
+  EDatabaseType,
   ESortDirection,
   ICustomTime,
   IFilterCondition,
@@ -16,10 +18,12 @@ function getDisposableTime({
   customTimeSetting,
   timeField,
   currentWhereExpr,
+  DBType = EDatabaseType.CLICKHOUSE
 }: {
   customTimeSetting: any;
   timeField: string;
   currentWhereExpr: string;
+  DBType: EDatabaseType
 }) {
   let customStartTime = '';
   let customEndTime = '';
@@ -32,7 +36,7 @@ function getDisposableTime({
     }
   });
   if (customStartTime && customEndTime) {
-    const customTimeWhereExpr = `${timeField} >= toDateTime64('${customStartTime}', 3, 'UTC') AND ${timeField} <= toDateTime64('${customEndTime}', 3, 'UTC')`;
+    const customTimeWhereExpr = `${timeField} >= ${_GET_UTC_DIFF_DATETIME_SQL(customStartTime,DBType)} AND ${timeField} <= ${_GET_UTC_DIFF_DATETIME_SQL(customEndTime,DBType)}`;
     if (currentWhereExpr) {
       currentWhereExpr += ' AND ';
       currentWhereExpr += '(';
@@ -135,6 +139,7 @@ export function getWhereExpr({
   endTime,
   filterOperator = 'AND',
   customTimes,
+  DBType = EDatabaseType.CLICKHOUSE
 }: {
   filters: IFilterCondition;
   timeRange: ITimeRange;
@@ -143,6 +148,7 @@ export function getWhereExpr({
   endTime?: string;
   filterOperator: string;
   customTimes?: ICustomTime;
+  DBType: EDatabaseType
 }) {
   let whereExpr = '';
   if (filters.length > 0) {
@@ -154,8 +160,9 @@ export function getWhereExpr({
   if(startTime&&endTime){
     const startTimeOperator = timeRange!.include_lower ? '>=' : '>';
     const endTimeOperator = timeRange!.include_upper ? '<=' : '<';
-  
-    const timeWhereExpr = `(${timeField} ${startTimeOperator} toDateTime64('${startTime}', 3, 'UTC') AND ${timeField} ${endTimeOperator} toDateTime64('${endTime}', 3, 'UTC'))`;
+    
+    
+    const timeWhereExpr = `(${timeField} ${startTimeOperator} ${_GET_UTC_DIFF_DATETIME_SQL(startTime,DBType)} AND ${timeField} ${endTimeOperator} ${_GET_UTC_DIFF_DATETIME_SQL(endTime,DBType)})`;
   
     if (whereExpr) {
       whereExpr += ' AND ';
@@ -189,6 +196,7 @@ export function getWhereExpr({
         customTimeSetting: customTimeSettingList[0],
         currentWhereExpr: whereExpr,
         timeField,
+        DBType,
       });
     }
   }
