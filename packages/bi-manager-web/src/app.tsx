@@ -3,7 +3,7 @@ import { Settings as LayoutSettings } from '@ant-design/pro-layout';
 import { SHARE_PAGE_PREFIX } from '@bi/common';
 import { notification, Skeleton } from 'antd';
 import { RequestConfig, RunTimeLayoutConfig, useModel } from 'umi';
-import { BI_AUTH_TOKEN_KEY, isDev } from './common';
+import { BI_AUTH_TOKEN_KEY } from './common';
 import RightContent from './components/RightContent';
 import { TTheme } from './interface';
 import { isIframeEmbed, throttle } from './utils';
@@ -11,6 +11,8 @@ import { DARK_COLOR, THEME_KEY } from './utils/theme';
 import { useEffect, useState } from 'react';
 import { queryCurrentUserInfo } from './services/global';
 import { sendMsgToParent } from './utils/sendMsgToParent';
+import { getLayoutTitle } from './services/layout';
+import { dynamicSetHeaderTitle } from './utils/layout';
 const biToken = window.localStorage.getItem(BI_AUTH_TOKEN_KEY);
 export function getInitialState(): { theme: TTheme; settings?: Partial<LayoutSettings> } {
   const theme = (window.localStorage.getItem(THEME_KEY) as TTheme) || 'light';
@@ -36,7 +38,6 @@ function LayoutContent(children: JSX.Element) {
 
   useEffect(() => {
     (async () => {
-
       setLoading(true);
       if (!biToken) {
         backToLogin();
@@ -54,15 +55,24 @@ function LayoutContent(children: JSX.Element) {
       }
       setLoading(false);
     })();
+
+    (async () => {
+      const { success, data } = await getLayoutTitle();
+      if (success) {
+        dynamicSetHeaderTitle(data);
+      }
+    })();
   }, []);
 
   if (window.location.pathname.includes(SHARE_PAGE_PREFIX)) {
     return children;
   }
   return (
-    <Skeleton active loading={loading}>
-      {children}
-    </Skeleton>
+    <>
+      <Skeleton active loading={loading}>
+        {children}
+      </Skeleton>
+    </>
   );
 }
 const unAuthorizedNotification = throttle(() => {
@@ -79,7 +89,7 @@ const unAuthorizedNotification = throttle(() => {
 // ProLayout 支持的api https://procomponents.ant.design/components/layout
 export const layout: RunTimeLayoutConfig = ({ initialState }) => {
   return {
-    logo: false,
+    logo: true,
     navTheme: initialState?.theme === 'dark' ? 'realDark' : 'light',
     layout: 'top',
     primaryColor: initialState?.theme === 'dark' ? DARK_COLOR : LIGHT_COLOR,
@@ -97,7 +107,7 @@ const REQUEST_TIME_OUT = 600000;
 
 export const request: RequestConfig = {
   headers: {
-    ...( biToken ? { Authorization: `Bearer ${biToken}` } : {})
+    ...(biToken ? { Authorization: `Bearer ${biToken}` } : {}),
   } as any,
   timeout: REQUEST_TIME_OUT,
   errorHandler: (error: any) => {

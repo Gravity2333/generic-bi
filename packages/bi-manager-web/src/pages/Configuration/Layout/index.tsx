@@ -1,10 +1,8 @@
-import { Form, InputNumber, Button, Modal, message, Input } from 'antd';
+import { Form, Button, Modal, message, Input } from 'antd';
 import { useEffect } from 'react';
 import { SettingOutlined } from '@ant-design/icons';
-import { queryMailConfig } from '@/services/global';
-import { getLoginTimeout, setLoginTimeout } from '@/services/users';
-import { BI_AUTH_TOKEN_KEY } from '@/common';
 import { getLayoutTitle, setLayoutTitle } from '@/services/layout';
+import { dynamicSetHeaderTitle } from '@/utils/layout';
 
 /** SMTP表单参数 */
 export interface ILayoutForm {
@@ -26,6 +24,7 @@ const LayoutConfig = () => {
         const { success } = await setLayoutTitle(params['title']);
         if (success) {
           message.success('配置成功！');
+          dynamicSetHeaderTitle(params['title'])
         }
       },
     });
@@ -41,7 +40,7 @@ const LayoutConfig = () => {
   }, []);
 
   return (
-    <>
+    <> 
       <Form
         name="layout-config-form"
         labelCol={{ span: 5 }}

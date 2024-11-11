@@ -6,4 +6,5 @@ export default defineConfig({
     'primary-color': '#000000',
   },
   favicon: '/favicon.ico',
+  layout: {},
 });
