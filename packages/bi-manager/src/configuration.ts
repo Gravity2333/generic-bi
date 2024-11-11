@@ -85,8 +85,10 @@ export class ContainerConfiguration implements ILifeCycle {
     this.widgetService.initDefaultWidget();
     /** 初始化字典映射 */
     this.npmdDictMappingService.initDictMapping();
+    /** 设置默认数据库 */
+    this.databaseService.initDefaultDatabse();
     /** 定时查询系统信息 */
-    this.osService.runSysInfoTask()
+    this.osService.runSysInfoTask();
 
     // 查询定时报表
     const reportList = await this.reportService.listAllReports();

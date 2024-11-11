@@ -1,10 +1,15 @@
-import { ALL, App, Config, Inject, Logger, Provide } from "@midwayjs/decorator";
+import { App, Config, Inject, Logger, Provide } from "@midwayjs/decorator";
 import { Context } from "egg";
 import { IMidwayLogger } from "@midwayjs/logger";
 import { IMyAppConfig } from "../interface";
 import DatabaseModel from "../model/database";
 import { CreateDatabseInput, UpdateDatabseInput } from "../dto/database.dto";
-import { EDatabaseType, ExternalSystem, IDatasetTable } from "@bi/common";
+import {
+  DEFAULT_DB_ID,
+  EDatabaseType,
+  ExternalSystem,
+  IDatasetTable,
+} from "@bi/common";
 import { Application } from "@midwayjs/web";
 import { postgrePlugin } from "../plugins/postgrePlugin";
 import { clickhousePlugin } from "../plugins/clickhousePlugin";
@@ -23,8 +28,8 @@ export class DatabaseService {
   @Logger()
   readonly logger: IMidwayLogger;
 
-  @Config(ALL)
-  config: IMyAppConfig;
+  @Config("sequelize")
+  defaultConfig: IMyAppConfig;
 
   @App()
   app: Application;
@@ -58,13 +63,13 @@ export class DatabaseService {
     let client = null;
     switch (type) {
       case EDatabaseType.POSTGRE:
-        client = postgrePlugin(option)
+        client = postgrePlugin(option);
         break;
       case EDatabaseType.CLICKHOUSE:
-        client = clickhousePlugin(option)
+        client = clickhousePlugin(option);
         break;
       case EDatabaseType.MYSQL:
-        client = mysqlPlugin(option)
+        client = mysqlPlugin(option);
         break;
     }
     externalSystemClient[id] = client;
@@ -81,10 +86,7 @@ export class DatabaseService {
         externalSystemClient: this.app.externalSystemClient as ExternalSystem,
       };
     }
-    this._handleDBInit(
-      this.app.externalSystemClient,
-      databaseConfig
-    );
+    this._handleDBInit(this.app.externalSystemClient, databaseConfig);
   };
 
   /** 删除数据库实例 */
@@ -164,7 +166,10 @@ export class DatabaseService {
    * @param sql sql 语句
    * @returns 查询结果
    */
-  executeSql = async (sql: string|Record<string, string>, databaseId: string): Promise<any> => {
+  executeSql = async (
+    sql: string | Record<string, string>,
+    databaseId: string
+  ): Promise<any> => {
     // 处理错误
     try {
       const DBInstance = this.ctx.app.externalSystemClient[databaseId];
@@ -172,21 +177,22 @@ export class DatabaseService {
         this.ctx?.throw(500, "数据库实例不存在！");
       }
 
-      const execSql = typeof sql === 'object'?sql[DBInstance.type]:sql
-      if(!execSql){
+      const execSql = typeof sql === "object" ? sql[DBInstance.type] : sql;
+      if (!execSql) {
         this.ctx?.throw(500, "SQL对应查询数据库错误！");
       }
-  
-      const execDataRes = await DBInstance.querying<any>(execSql).catch((error) => {
-        this.ctx?.throw(500, error);
-      });
-     
+
+      const execDataRes = await DBInstance.querying<any>(execSql).catch(
+        (error) => {
+          this.ctx?.throw(500, error);
+        }
+      );
 
       if (DBInstance.type === EDatabaseType.CLICKHOUSE) {
         return execDataRes.data as IDatasetTable[];
       } else if (DBInstance.type === EDatabaseType.POSTGRE) {
         return execDataRes as IDatasetTable[];
-      }else if(DBInstance.type === EDatabaseType.MYSQL){
+      } else if (DBInstance.type === EDatabaseType.MYSQL) {
         return execDataRes as IDatasetTable[];
       }
       return execDataRes as IDatasetTable[];
@@ -266,5 +272,25 @@ export class DatabaseService {
     //   default:
     //     return false;
     // }
+  };
+
+  initDefaultDatabse = async () => {
+    try {
+      const row = await this.getDatabaseById(DEFAULT_DB_ID);
+      if (row) return;
+      const createdDBConfig = await DatabaseModel.create({
+        id: DEFAULT_DB_ID,
+        name: "系统数据库",
+        type: EDatabaseType.POSTGRE,
+        readonly: "1",
+        option: JSON.stringify(this.defaultConfig.options || {}),
+      } as any);
+      return this._addAndCoverDatabaseInstance(
+        createdDBConfig.id,
+        this._parseDatabseInput(createdDBConfig)
+      );
+    } catch (e) {
+      this.logger.error(`初始化系统数据库失败，错误信息：${e}`);
+    }
   };
 }

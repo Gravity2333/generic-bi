@@ -17,6 +17,7 @@ CREATE USER genericbiserver WITH PASSWORD 'genericbiserver@123';
 
 给权限
 grant all on schema public to genericbiserver;
+grant all on table_name to genericbiserver
 
 ## 安装redis
 下载地址  https://redis.io/docs/latest/operate/oss_and_stack/install/install-redis

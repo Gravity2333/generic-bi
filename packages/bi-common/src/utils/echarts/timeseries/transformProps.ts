@@ -32,7 +32,7 @@ const getBorderTime = (
     if (end.second() > 0) {
       return [
         start.set('s', 0).valueOf(),
-        end.set('s', 0).valueOf(),
+        end.set('s', 0).add('m', 1).valueOf(),
       ];
     }
     return [start.set('s', 0).valueOf(), end.set('s', 0).valueOf()];
@@ -40,7 +40,7 @@ const getBorderTime = (
     if (end.minute() > 0) {
       return [
         start.set('s', 0).set('m', 0).valueOf(),
-        end.set('s', 0).set('m', 0).valueOf(),
+        end.set('s', 0).add('h', 1).valueOf(),
       ];
     }
     return [

@@ -10,6 +10,8 @@ export * from './user';
 export * from './datasets'
 export * from './database'
 export * from './diffSql'
+export * from './default'
+
 export interface IPageFactory<T> {
   rows: T[];
   total: number;
