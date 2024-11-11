@@ -72,7 +72,7 @@ const PageCardLayout: React.FC<IFlowLayout> = ({
   }, [findMatchedTag, menus, pathname]);
 
   return (
-    <Card title={undefined} size="small" className={styles['outer-card']}>
+    <Card title={undefined} size="small" className={styles['outer-card']} style={{ opacity: '0.9' }}>
       <>
         <Menu
           onClick={handlePageChange}

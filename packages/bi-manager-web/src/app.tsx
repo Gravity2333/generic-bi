@@ -12,7 +12,7 @@ import { useEffect, useState } from 'react';
 import { queryCurrentUserInfo } from './services/global';
 import { sendMsgToParent } from './utils/sendMsgToParent';
 import { getLayoutTitle } from './services/layout';
-import { dynamicSetHeaderTitle } from './utils/layout';
+import { dynamicSetHeaderTitle, updateBackground } from './utils/layout';
 
 export function getInitialState(): { theme: TTheme; settings?: Partial<LayoutSettings> } {
   const theme = (window.localStorage.getItem(THEME_KEY) as TTheme) || 'light';
@@ -61,6 +61,8 @@ function LayoutContent(children: JSX.Element) {
         } as any);
       }
     })();
+
+    updateBackground()
   }, []);
 
   if (window.location.pathname.includes(SHARE_PAGE_PREFIX)) {
