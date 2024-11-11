@@ -27,6 +27,16 @@ export interface ISqlJsonSeqService {
   get: () => Promise<string>;
 }
 
+export interface IJwtTimeoutService {
+  set: (timeout: number) => void;
+  get: () => Promise<number>;
+}
+
+export interface ISysTitleService {
+  set: (title: string) => void;
+  get: () => Promise<string>;
+}
+
 /**
  * 编码成 Base64
  * @param str 字符串
@@ -40,6 +50,8 @@ const RED_LOCK = Symbol("Utils#redlock");
 const SCHEDULE_JOB_MAP = Symbol("Utils#scheduleJobMap");
 const DASHBOARD_SEQ_MAP = Symbol("Utils#dashbroadSeqMap");
 const SQL_JSON_SEQ_MAP = Symbol("Utils#sqlJsonSeqMap");
+const JWT_TIMEOUT_MAP = Symbol("Utils#jwtTimeoutMap");
+const SYS_TITLE_MAP = Symbol("Utils#SysTitleMap");
 @Provide()
 @Scope(ScopeEnum.Singleton)
 export class Utils {
@@ -99,6 +111,34 @@ export class Utils {
       };
     }
     return this[SQL_JSON_SEQ_MAP];
+  }
+
+  /** jwt过期时间 */
+  get jwtTimeoutService(): IJwtTimeoutService {
+    if (!this[JWT_TIMEOUT_MAP]) {
+      this[JWT_TIMEOUT_MAP] = {};
+      this[JWT_TIMEOUT_MAP].set = (timeout) => {
+        this.redisService.set(JWT_TIMEOUT_MAP as any, timeout);
+      };
+      this[JWT_TIMEOUT_MAP].get = async () => {
+        return (await this.redisService.get(JWT_TIMEOUT_MAP as any)) || "";
+      };
+    }
+    return this[JWT_TIMEOUT_MAP];
+  }
+
+  /** 系统标题 */
+  get sysTitleService(): ISysTitleService {
+    if (!this[SYS_TITLE_MAP]) {
+      this[SYS_TITLE_MAP] = {};
+      this[SYS_TITLE_MAP].set = (title) => {
+        this.redisService.set(SYS_TITLE_MAP as any, title);
+      };
+      this[SYS_TITLE_MAP].get = async () => {
+        return (await this.redisService.get(SYS_TITLE_MAP as any)) || "";
+      };
+    }
+    return this[SYS_TITLE_MAP];
   }
 }
 
@@ -161,5 +201,5 @@ export function downloadWidgetCSV({
 
   const csv = json2csvParser.parse(dataList);
 
-  return '\ufeff'+csv;
+  return "\ufeff" + csv;
 }

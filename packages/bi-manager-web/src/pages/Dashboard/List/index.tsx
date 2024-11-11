@@ -5,7 +5,7 @@ import {
   exportDashboard,
   queryDashboards,
 } from '@/services/dashboard';
-import { PlusOutlined, UploadOutlined } from '@ant-design/icons';
+import { BarsOutlined, PlusOutlined, UploadOutlined } from '@ant-design/icons';
 import ProTable, { ActionType, ProColumns } from '@ant-design/pro-table';
 import { IDashboardFormData } from '@bi/common';
 import { Badge, Button, Checkbox, message, Popconfirm, Popover, Upload } from 'antd';
@@ -131,7 +131,7 @@ export default function DashboardList() {
             <Button
               type="link"
               size="small"
-              disabled={ (!isDev && record?.readonly === '1')}
+              disabled={!isDev && record?.readonly === '1'}
               onClick={() => {
                 if (embed) {
                   history.push(`/embed/dashboard/${record.id}/update`);
@@ -241,70 +241,60 @@ export default function DashboardList() {
         tableAlertOptionRender={operationLineRender}
         search={{
           ...proTableSerchConfig,
-          span: 12,
+          span: 10,
           optionRender: (searchConfig, formProps, dom) => [
-            <div
-              style={{
-                display: 'flex',
-                width: '350px',
-                justifyContent: 'space-between',
-                whiteSpace: 'nowrap',
-              }}
-            >
-              {dom.reverse()}
-              <Button
-                icon={<PlusOutlined />}
-                onClick={() => {
-                  if (embed) {
-                    history.push('/embed/dashboard/create');
-                  } else {
-                    history.push('/dashboard/create');
-                  }
-                }}
-                key="created"
-                type="primary"
-              >
-                新建
-              </Button>
-              <Upload
-                {...{
-                  name: 'file',
-                  headers: {
-                    ...(biToken ? { Authorization: `Bearer ${biToken}` } : {}),
-                  },
-                  method: 'post',
-                  action: `${API_PREFIX}/dashboards/as-import`,
-                  showUploadList: false,
-                  withCredentials: true,
-                  onChange(info) {
-                    if (info.file.status !== 'uploading') {
-                      message.loading('上传中!');
-                    }
-                    if (info.file.status === 'done') {
-                      message.destroy();
-                      message.success(`上传完成!`);
-                      actionRef.current?.reload();
-                    } else if (info.file.status === 'error') {
-                      message.destroy();
-                      message.error(`上传失败!`);
-                    }
-                  },
-                  accept: '.bi',
-                }}
-              >
-                <Button icon={<UploadOutlined />}>导入</Button>
-              </Upload>
-              {/* <Button
-                icon={<BarsOutlined />}
-                onClick={() => {
-                  history.push('/embed/dashboard/tab');
-                }}
-                key="tab"
-                disabled={!hasOnlineSensor}
-              >
-                简约视图
-              </Button> */}
-            </div>,
+            <Button
+            icon={<BarsOutlined />}
+            onClick={() => {
+              history.push('/embed/dashboard/tab');
+            }}
+            key="tab"
+          >
+            展示模式
+          </Button>,
+          dom.reverse(),
+          <Button
+            icon={<PlusOutlined />}
+            onClick={() => {
+              if (embed) {
+                history.push('/embed/dashboard/create');
+              } else {
+                history.push('/dashboard/create');
+              }
+            }}
+            key="created"
+            type="primary"
+          >
+            新建
+          </Button>,
+          <Upload
+            {...{
+              name: 'file',
+              headers: {
+                ...(biToken ? { Authorization: `Bearer ${biToken}` } : {}),
+              },
+              method: 'post',
+              action: `${API_PREFIX}/dashboards/as-import`,
+              showUploadList: false,
+              withCredentials: true,
+              onChange(info) {
+                if (info.file.status !== 'uploading') {
+                  message.loading('上传中!');
+                }
+                if (info.file.status === 'done') {
+                  message.destroy();
+                  message.success(`上传完成!`);
+                  actionRef.current?.reload();
+                } else if (info.file.status === 'error') {
+                  message.destroy();
+                  message.error(`上传失败!`);
+                }
+              },
+              accept: '.bi',
+            }}
+          >
+            <Button icon={<UploadOutlined />}>导入</Button>
+          </Upload>
           ],
         }}
         toolBarRender={false}

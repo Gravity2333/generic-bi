@@ -1,12 +1,55 @@
-import { CHART_TYPE_LIST, DataBaseParsedType, EVisualizationType } from '@bi/common';
-import { Badge, Button, Descriptions, message, Popconfirm, Popover } from 'antd';
+import { DataBaseParsedType } from '@bi/common';
+import { Button, Descriptions, message, Popconfirm, Popover } from 'antd';
 import { useEffect, useRef, useState } from 'react';
-import { history } from 'umi';
 import { Table } from 'antd';
 import { deleteDatabase, queryDatabases } from '@/services/database';
 import CreateButton from './components/CreateButton';
 import { ColumnType } from 'antd/lib/table';
-queryDatabases;
+
+const renderDesc = (obj: Record<string, any>) => {
+  return (
+    <Popover
+      content={
+        <Descriptions
+          bordered
+          size="small"
+          column={2}
+          style={{ maxHeight: '300px', marginTop: '10px', maxWidth: '600px' }}
+        >
+          {Object.keys(obj || {}).filter(k=>typeof (obj || {})[k] !== 'object').map((k) => {
+            if (typeof (obj || {})[k] === 'object') {
+              return <></>
+            }
+            return (
+              <Descriptions.Item
+                style={{
+                  textOverflow: 'ellipsis',
+                  overflow: 'hidden',
+                }}
+                label={k}
+              >
+                <div
+                  style={{
+                    maxWidth: '150px',
+                    maxHeight: '100px',
+                    textOverflow: 'ellipsis',
+                    overflow: 'auto',
+                  }}
+                >
+                  {(obj || {})[k]}
+                </div>
+              </Descriptions.Item>
+            );
+          })}
+        </Descriptions>
+      }
+      trigger="click"
+    >
+      <Button type="link">[点击查看详情]</Button>
+    </Popover>
+  );
+};
+
 export default function WidgetList() {
   const [loading, setLoading] = useState<boolean>(true);
   const [tableData, setTableData] = useState<DataBaseParsedType[]>([]);
@@ -34,42 +77,7 @@ export default function WidgetList() {
       width: 150,
       align: 'center',
       render: (_, record) => {
-        return (
-          <Popover
-            content={
-              <Descriptions
-                bordered
-                size="small"
-                column={2}
-                style={{ maxHeight: '300px', marginTop: '10px', maxWidth: '600px' }}
-              >
-                {Object.keys(record.option || {}).map((k) => (
-                  <Descriptions.Item
-                    style={{
-                      textOverflow: 'ellipsis',
-                      overflow: 'hidden',
-                    }}
-                    label={k}
-                  >
-                    <div
-                      style={{
-                        maxWidth: '150px',
-                        maxHeight: '100px',
-                        textOverflow: 'ellipsis',
-                        overflow: 'auto',
-                      }}
-                    >
-                      {(record.option || {})[k]}
-                    </div>
-                  </Descriptions.Item>
-                ))}
-              </Descriptions>
-            }
-            trigger="click"
-          >
-            <Button type="link">[点击查看详情]</Button>
-          </Popover>
-        );
+        return (renderDesc(record.option));
       },
     },
     {
@@ -80,7 +88,7 @@ export default function WidgetList() {
       render: (text, record) => {
         return (
           <>
-              <Button
+            <Button
               type="link"
               size="small"
               onClick={() => {
@@ -141,13 +149,13 @@ export default function WidgetList() {
 
   return (
     <>
-    <style>
-      {`
+      <style>
+        {`
         .default-row{
           background-color: rgba(0,0,0,.1) !important;
         }
       `}
-    </style>
+      </style>
       <div style={{ display: 'flex', justifyContent: 'end', padding: '10px' }}>
         <CreateButton ref={ref} updater={fetchDatabases} />
       </div>
@@ -157,11 +165,11 @@ export default function WidgetList() {
         bordered
         style={{ margin: '0px 10px' }}
         columns={columns}
-        rowClassName={(record)=>{
-          if(record.readonly === '1'){
-            return 'default-row'
+        rowClassName={(record) => {
+          if (record.readonly === '1') {
+            return 'default-row';
           }
-          return ''
+          return '';
         }}
         loading={loading}
         dataSource={tableData}

@@ -16,13 +16,24 @@ export async function register(params: {
   });
 }
 
-export async function login(params: {
-  username: string;
-  password: string;
-}) {
+export async function login(params: { username: string; password: string }) {
   return request(`${API_PREFIX}/login`, {
     method: 'POST',
     data: params,
   });
 }
 
+export async function setLoginTimeout(timeout: number) {
+  return request(`${API_PREFIX}/login/timeout`, {
+    method: 'POST',
+    data: {
+      timeout,
+    },
+  });
+}
+
+export async function getLoginTimeout() {
+  return request(`${API_PREFIX}/login/timeout`, {
+    method: 'GET',
+  });
+}

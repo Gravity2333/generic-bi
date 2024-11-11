@@ -29,6 +29,7 @@ const MaiLConfig = () => {
       title: '确定保存吗?',
       icon: <SettingOutlined />,
       okText: '确定',
+      centered: true,
       cancelText: '取消',
       onOk: async () => {
         const { success } = await configMail(params);

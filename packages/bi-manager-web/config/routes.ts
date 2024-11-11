@@ -372,6 +372,18 @@ const routes: IRouteProps[] = [
         hideInMenu: true,
         component: './Configuration/Mail',
       },
+      {
+        path: '/configuration/login',
+        name: '登录',
+        hideInMenu: true,
+        component: './Configuration/Login',
+      },
+      {
+        path: '/configuration/layout',
+        name: '页面布局',
+        hideInMenu: true,
+        component: './Configuration/Layout',
+      },
     ],
   },
   {
