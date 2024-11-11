@@ -73,9 +73,6 @@ export default (appInfo: EggAppInfo) => {
     csrf: false,
   };
 
-  config.static = {
-    prefix: "/bi/web-static/",
-  };
 
   config.view = {
     defaultViewEngine: "ejs",
@@ -83,6 +80,8 @@ export default (appInfo: EggAppInfo) => {
       ".html": "ejs",
     },
   };
+
+  config.backgrounds = path.join(__dirname, "../resources/backgrounds")
 
   config.report = {
     pdf_dir: path.join(__dirname, "../resources/pdf"),
@@ -113,6 +112,8 @@ export default (appInfo: EggAppInfo) => {
 
   config.web_uri = "http://127.0.0.1:41130/bi";
 
+  config.asset_uri = "http://127.0.0.1:41130/public";
+
   config.jwt = {
     enabled: false,
     secret: "1024@Machloop@1024",
@@ -138,5 +139,9 @@ export default (appInfo: EggAppInfo) => {
    */
   config.bi_mode = "main";
 
+  config.static = {
+    prefix: "/public/",
+    dir: path.join(appInfo.baseDir, "app")
+  };
   return config;
 };
