@@ -24,7 +24,7 @@ export class UsersService {
         username: { [Op.eq]: username },
       },
     });
-  
+
     if (rows?.length > 0) {
       // 存在同名用户，报错
       this.ctx?.throw(500, "注册失败，用户名重复！");
@@ -41,25 +41,50 @@ export class UsersService {
   }
 
   async login(userInfo: LoginInput) {
-    const { username,password} = userInfo;
+    const { username, password } = userInfo;
     const { rows } = await UsersModel.findAndCountAll({
       where: {
         username: { [Op.eq]: username },
       },
     });
-    if(!rows[0]){
+    if (!rows[0]) {
       this.ctx?.throw(500, "用户不存在！");
     }
-    if(rows[0].password === password){
+    if (rows[0].password === password) {
       this.logger.info(`[登录] 用户 ${username} 登录成功!`);
       return {
         jwtToken: await this.jwtService.generateToken({
           username,
           fullname: rows[0].nickname,
-          loginTime: +(new Date())
-        })
-      }
-    }else{
+          loginTime: +new Date(),
+        }),
+      };
+    } else {
+      this.ctx?.throw(500, "密码错误！");
+    }
+  }
+
+  async changePassword(userInfo: {
+    username: string;
+    password: string;
+    oldPassword: string;
+  }) {
+    const { username, password, oldPassword } = userInfo;
+    const { rows } = await UsersModel.findAndCountAll({
+      where: {
+        username: { [Op.eq]: username },
+      },
+    });
+    if (!rows[0]) {
+      this.ctx?.throw(500, "用户不存在！");
+    }
+    if (rows[0].password === oldPassword) {
+      this.logger.info(`[修改密码] 用户 ${username} 修改密码成功!`);
+      return await rows[0].update({
+        ...rows[0],
+        password,
+      });
+    } else {
       this.ctx?.throw(500, "密码错误！");
     }
   }

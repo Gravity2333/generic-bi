@@ -15,7 +15,18 @@ import {
 } from '@ant-design/icons';
 import ProTable, { ActionType, ProColumns } from '@ant-design/pro-table';
 import { CHART_TYPE_LIST, EVisualizationType, IWidgetFormData } from '@bi/common';
-import { Badge, Button, Dropdown, Menu, message, Modal, Popconfirm, Tooltip, Upload } from 'antd';
+import {
+  Badge,
+  Button,
+  Card,
+  Dropdown,
+  Menu,
+  message,
+  Modal,
+  Popconfirm,
+  Tooltip,
+  Upload,
+} from 'antd';
 import React, { useRef, useState } from 'react';
 import { history } from 'umi';
 import AddToDashboard from '../components/Renderer/components/AddToDashboard';
@@ -293,260 +304,271 @@ export default function WidgetList() {
   ];
 
   return (
-    <div className={styles['pro-table-auto-height']}>
-      <ProTable
-        rowKey="id"
-        bordered
-        size="small"
-        columns={columns}
-        actionRef={actionRef}
-        style={{ margin: '10px' }}
-        scroll={{ x: 'max-content' }}
-        request={async (params) => {
-          const { current, pageSize, name } = params;
-          const { success, data } = await queryWidgets({
-            name,
-            pageSize: pageSize || DEFAULT_PAGE_SIZE,
-            pageNumber: (current || DEFAULT_PAGE) - 1,
-          });
-          if (!success) {
+    <Card
+      title={undefined}
+      size="small"
+      className={styles['outer-card']}
+      bodyStyle={{ height: '100%' }}
+    >
+      <div className={styles['pro-table-auto-height']}>
+        <ProTable
+          rowKey="id"
+          bordered
+          size="small"
+          columns={columns}
+          actionRef={actionRef}
+          style={{ margin: '10px' }}
+          scroll={{ x: 'max-content' }}
+          request={async (params) => {
+            const { current, pageSize, name } = params;
+            const { success, data } = await queryWidgets({
+              name,
+              pageSize: pageSize || DEFAULT_PAGE_SIZE,
+              pageNumber: (current || DEFAULT_PAGE) - 1,
+            });
+            if (!success) {
+              return {
+                data: [],
+                success,
+              };
+            }
+            const { rows, total, pageNumber } = data as any;
             return {
-              data: [],
-              success,
+              data: rows,
+              success: success,
+              page: pageNumber,
+              total,
             };
-          }
-          const { rows, total, pageNumber } = data as any;
-          return {
-            data: rows,
-            success: success,
-            page: pageNumber,
-            total,
-          };
-        }}
-        pagination={getTablePaginationDefaultSettings()}
-        rowSelection={{
-          type: 'checkbox',
-          selectedRowKeys,
-          onChange: (selectedRowKeys: React.Key[], widgets) => {
-            setSelectedWidget(widgets);
-            setSelectedRowKeys(selectedRowKeys);
-          },
-        }}
-        tableAlertOptionRender={operationLineRender}
-        search={{
-          ...proTableSerchConfig,
-          span: 12,
-          optionRender: (searchConfig, formProps, dom) => [
-            // <Button
-            //   icon={<ConsoleSqlOutlined />}
-            //   onClick={() => {
-            //     if (embed) {
-            //       history.push('/embed/sql-lab');
-            //     } else {
-            //       history.push('/sql-lab');
-            //     }
-            //   }}
-            //   key="sqllab"
-            //   type="primary"
-            // >
-            //   SQL查询
-            // </Button>,
-            ...dom.reverse(),
-            <Button
-              icon={<PlusOutlined />}
-              onClick={() => {
-                if (embed) {
-                  history.push('/embed/widget/create');
-                } else {
-                  history.push('/widget/create');
-                }
-              }}
-              key="created"
-              type="primary"
-            >
-              新建
-            </Button>,
-            <Upload
-              {...{
-                name: 'file',
-                headers: {
-                  ...(biToken ? { Authorization: `Bearer ${biToken}` } : {}),
-                },
-                method: 'post',
-                action: `${API_PREFIX}/widgets/as-import`,
-                showUploadList: false,
-                withCredentials: true,
-                onChange(info) {
-                  if (info.file.status !== 'uploading') {
-                    message.loading('上传中!');
+          }}
+          pagination={getTablePaginationDefaultSettings()}
+          rowSelection={{
+            type: 'checkbox',
+            selectedRowKeys,
+            onChange: (selectedRowKeys: React.Key[], widgets) => {
+              setSelectedWidget(widgets);
+              setSelectedRowKeys(selectedRowKeys);
+            },
+          }}
+          tableAlertOptionRender={operationLineRender}
+          search={{
+            ...proTableSerchConfig,
+            span: 12,
+            optionRender: (searchConfig, formProps, dom) => [
+              // <Button
+              //   icon={<ConsoleSqlOutlined />}
+              //   onClick={() => {
+              //     if (embed) {
+              //       history.push('/embed/sql-lab');
+              //     } else {
+              //       history.push('/sql-lab');
+              //     }
+              //   }}
+              //   key="sqllab"
+              //   type="primary"
+              // >
+              //   SQL查询
+              // </Button>,
+              ...dom.reverse(),
+              <Button
+                icon={<PlusOutlined />}
+                onClick={() => {
+                  if (embed) {
+                    history.push('/embed/widget/create');
+                  } else {
+                    history.push('/widget/create');
                   }
-                  if (info.file.status === 'done') {
-                    message.destroy();
-                    message.success(`上传完成!`);
-                    actionRef.current?.reload();
-                  } else if (info.file.status === 'error') {
-                    message.destroy();
-                    message.error(`上传失败!`);
-                  }
-                },
-                accept: '.bi',
-              }}
-            >
-              <Button icon={<UploadOutlined />}>导入</Button>
-            </Upload>,
-          ],
-        }}
-        toolBarRender={false}
-      />
+                }}
+                key="created"
+                type="primary"
+              >
+                新建
+              </Button>,
+              <Upload
+                {...{
+                  name: 'file',
+                  headers: {
+                    ...(biToken ? { Authorization: `Bearer ${biToken}` } : {}),
+                  },
+                  method: 'post',
+                  action: `${API_PREFIX}/widgets/as-import`,
+                  showUploadList: false,
+                  withCredentials: true,
+                  onChange(info) {
+                    if (info.file.status !== 'uploading') {
+                      message.loading('上传中!');
+                    }
+                    if (info.file.status === 'done') {
+                      message.destroy();
+                      message.success(`上传完成!`);
+                      actionRef.current?.reload();
+                    } else if (info.file.status === 'error') {
+                      message.destroy();
+                      message.error(`上传失败!`);
+                    }
+                  },
+                  accept: '.bi',
+                }}
+              >
+                <Button icon={<UploadOutlined />}>导入</Button>
+              </Upload>,
+            ],
+          }}
+          toolBarRender={false}
+        />
 
-      <Modal
-        title={
-          <div style={{ position: 'relative' }}>
-            {(() => {
-              if (previewWidget?.readonly === '1') {
-                return (
-                  <Badge.Ribbon
-                    placement="start"
-                    text="内置"
-                    style={{ position: 'absolute', top: '-20px', left: '-33px' }}
-                    color="gray"
+        <Modal
+          title={
+            <div style={{ position: 'relative' }}>
+              {(() => {
+                if (previewWidget?.readonly === '1') {
+                  return (
+                    <Badge.Ribbon
+                      placement="start"
+                      text="内置"
+                      style={{ position: 'absolute', top: '-20px', left: '-33px' }}
+                      color="gray"
+                    >
+                      <div>{previewWidget?.name}</div>
+                    </Badge.Ribbon>
+                  );
+                } else if (previewWidget?.viz_type === EVisualizationType.SQL) {
+                  return (
+                    <Badge.Ribbon
+                      placement="start"
+                      text="SQL查询"
+                      style={{ position: 'absolute', top: '-20px', left: '-33px' }}
+                    >
+                      <div>{previewWidget?.name}</div>
+                    </Badge.Ribbon>
+                  );
+                }
+                return <div>{previewWidget?.name}</div>;
+              })()}
+              <div style={{ position: 'absolute', right: '30px', top: '-3px' }}>
+                {previewWidget?.viz_type === EVisualizationType.Table && (
+                  <Dropdown
+                    overlay={
+                      <Menu>
+                        <Menu.Item
+                          key={'csv'}
+                          onClick={() => {
+                            downloadWidgetCSV(previewWidget?.id!);
+                          }}
+                        >
+                          导出 CSV 文件
+                        </Menu.Item>
+                        <Menu.Item
+                          key={'excel'}
+                          onClick={() => {
+                            downloadWidgetExcel(previewWidget?.id!);
+                          }}
+                        >
+                          导出 Excel 文件
+                        </Menu.Item>
+                      </Menu>
+                    }
+                    trigger={['click']}
                   >
-                    <div>{previewWidget?.name}</div>
-                  </Badge.Ribbon>
-                );
-              } else if (previewWidget?.viz_type === EVisualizationType.SQL) {
-                return (
-                  <Badge.Ribbon
-                    placement="start"
-                    text="SQL查询"
-                    style={{ position: 'absolute', top: '-20px', left: '-33px' }}
+                    <Button
+                      // size="small"
+                      type="primary"
+                      style={{ marginRight: '10px' }}
+                      icon={<ExportOutlined />}
+                    >
+                      导出
+                    </Button>
+                  </Dropdown>
+                )}
+                {previewWidget?.viz_type === EVisualizationType.SQL && (
+                  <Dropdown
+                    overlay={
+                      <Menu>
+                        <Menu.Item
+                          key={'csv'}
+                          onClick={() => {
+                            downloadSqlJsonCSV(previewWidget?.specification);
+                          }}
+                        >
+                          导出 CSV 文件
+                        </Menu.Item>
+                        <Menu.Item
+                          key={'excel'}
+                          onClick={() => {
+                            downloadSqlJsonExcel(previewWidget?.specification);
+                          }}
+                        >
+                          导出 Excel 文件
+                        </Menu.Item>
+                      </Menu>
+                    }
+                    trigger={['click']}
                   >
-                    <div>{previewWidget?.name}</div>
-                  </Badge.Ribbon>
-                );
-              }
-              return <div>{previewWidget?.name}</div>;
-            })()}
-            <div style={{ position: 'absolute', right: '30px', top: '-3px' }}>
-              {previewWidget?.viz_type === EVisualizationType.Table && (
-                <Dropdown
-                  overlay={
-                    <Menu>
-                      <Menu.Item
-                        key={'csv'}
-                        onClick={() => {
-                          downloadWidgetCSV(previewWidget?.id!);
-                        }}
-                      >
-                        导出 CSV 文件
-                      </Menu.Item>
-                      <Menu.Item
-                        key={'excel'}
-                        onClick={() => {
-                          downloadWidgetExcel(previewWidget?.id!);
-                        }}
-                      >
-                        导出 Excel 文件
-                      </Menu.Item>
-                    </Menu>
-                  }
-                  trigger={['click']}
-                >
-                  <Button
-                    // size="small"
-                    type="primary"
-                    style={{ marginRight: '10px' }}
-                    icon={<ExportOutlined />}
-                  >
-                    导出
-                  </Button>
-                </Dropdown>
-              )}
-              {previewWidget?.viz_type === EVisualizationType.SQL && (
-                <Dropdown
-                  overlay={
-                    <Menu>
-                      <Menu.Item
-                        key={'csv'}
-                        onClick={() => {
-                          downloadSqlJsonCSV(previewWidget?.specification);
-                        }}
-                      >
-                        导出 CSV 文件
-                      </Menu.Item>
-                      <Menu.Item
-                        key={'excel'}
-                        onClick={() => {
-                          downloadSqlJsonExcel(previewWidget?.specification);
-                        }}
-                      >
-                        导出 Excel 文件
-                      </Menu.Item>
-                    </Menu>
-                  }
-                  trigger={['click']}
-                >
-                  <Button type="primary" icon={<ExportOutlined />} style={{ marginRight: '10px' }}>
-                    导出
-                  </Button>
-                </Dropdown>
-              )}
-              <AddToDashboard
-                btnType="default"
-                title="添加到仪表盘"
-                isCheckSaved={false}
-                id={previewWidget?.id}
-                mode="button"
-              />
-              <Tooltip title={'全屏展示'}>
-                <Button
-                  style={{ marginLeft: '10px' }}
-                  type="link"
-                  icon={<FullscreenOutlined />}
-                  onClick={() => setFullScreen(true)}
+                    <Button
+                      type="primary"
+                      icon={<ExportOutlined />}
+                      style={{ marginRight: '10px' }}
+                    >
+                      导出
+                    </Button>
+                  </Dropdown>
+                )}
+                <AddToDashboard
+                  btnType="default"
+                  title="添加到仪表盘"
+                  isCheckSaved={false}
+                  id={previewWidget?.id}
+                  mode="button"
                 />
-              </Tooltip>
+                <Tooltip title={'全屏展示'}>
+                  <Button
+                    style={{ marginLeft: '10px' }}
+                    type="link"
+                    icon={<FullscreenOutlined />}
+                    onClick={() => setFullScreen(true)}
+                  />
+                </Tooltip>
+              </div>
             </div>
-          </div>
-        }
-        bodyStyle={{
-          height: 600,
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}
-        width="70%"
-        visible={!!previewWidget?.id}
-        destroyOnClose
-        footer={false}
-        onCancel={() => setPreviewWidget(undefined)}
-        maskClosable={false}
-        keyboard={false}
-      >
-        {(() => {
-          const widgetContent =
-            previewWidget?.viz_type === EVisualizationType.SQL ? (
-              <SQLPreview sql={previewWidget?.specification} />
-            ) : (
-              previewWidget?.id && <WidgetPreview widgetId={previewWidget?.id} />
+          }
+          bodyStyle={{
+            height: 600,
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+          width="70%"
+          visible={!!previewWidget?.id}
+          destroyOnClose
+          footer={false}
+          onCancel={() => setPreviewWidget(undefined)}
+          maskClosable={false}
+          keyboard={false}
+        >
+          {(() => {
+            const widgetContent =
+              previewWidget?.viz_type === EVisualizationType.SQL ? (
+                <SQLPreview sql={previewWidget?.specification} />
+              ) : (
+                previewWidget?.id && <WidgetPreview widgetId={previewWidget?.id} />
+              );
+            return (
+              <>
+                {fullScreen ? (
+                  <FullScreenCard
+                    onClose={() => {
+                      setFullScreen(false);
+                    }}
+                    fullScreen={true}
+                  >
+                    {widgetContent}
+                  </FullScreenCard>
+                ) : null}
+                {widgetContent}
+              </>
             );
-          return (
-            <>
-              {fullScreen ? (
-                <FullScreenCard
-                  onClose={() => {
-                    setFullScreen(false);
-                  }}
-                  fullScreen={true}
-                >
-                  {widgetContent}
-                </FullScreenCard>
-              ) : null}
-              {widgetContent}
-            </>
-          );
-        })()}
-      </Modal>
-    </div>
+          })()}
+        </Modal>
+      </div>
+    </Card>
   );
 }

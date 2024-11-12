@@ -8,7 +8,7 @@ import {
 import { BarsOutlined, PlusOutlined, UploadOutlined } from '@ant-design/icons';
 import ProTable, { ActionType, ProColumns } from '@ant-design/pro-table';
 import { IDashboardFormData } from '@bi/common';
-import { Badge, Button, Checkbox, message, Popconfirm, Popover, Upload } from 'antd';
+import { Badge, Button, Card, Checkbox, message, Popconfirm, Popover, Upload } from 'antd';
 import { useRef, useState } from 'react';
 import { history } from 'umi';
 import styles from './index.less';
@@ -209,96 +209,103 @@ export default function DashboardList() {
   };
 
   return (
-    <div className={styles['pro-table-auto-height']}>
-      <ProTable
-        rowKey="id"
-        bordered
-        size="small"
-        columns={columns}
-        actionRef={actionRef}
-        style={{ margin: '10px' }}
-        request={async (params = {}) => {
-          const { success, data } = await queryDashboards({
-            pageNumber: params.current! - 1,
-            pageSize: params.pageSize,
-          });
+    <Card
+      title={undefined}
+      size="small"
+      className={styles['outer-card']}
+      bodyStyle={{ height: '100%' }}
+    >
+      <div className={styles['pro-table-auto-height']}>
+        <ProTable
+          rowKey="id"
+          bordered
+          size="small"
+          columns={columns}
+          actionRef={actionRef}
+          style={{ margin: '10px' }}
+          request={async (params = {}) => {
+            const { success, data } = await queryDashboards({
+              pageNumber: params.current! - 1,
+              pageSize: params.pageSize,
+            });
 
-          return {
-            data: success ? data.rows : [],
-            success: success,
-            total: success ? data.total : 0,
-          };
-        }}
-        pagination={getTablePaginationDefaultSettings()}
-        rowSelection={{
-          type: 'checkbox',
-          selectedRowKeys,
-          onChange: (selectedRowKeys: React.Key[], widgets) => {
-            setSelectedWidget(widgets);
-            setSelectedRowKeys(selectedRowKeys);
-          },
-        }}
-        tableAlertOptionRender={operationLineRender}
-        search={{
-          ...proTableSerchConfig,
-          span: 10,
-          optionRender: (searchConfig, formProps, dom) => [
-            <Button
-            icon={<BarsOutlined />}
-            onClick={() => {
-              history.push('/embed/dashboard/tab');
-            }}
-            key="tab"
-          >
-            展示模式
-          </Button>,
-          dom.reverse(),
-          <Button
-            icon={<PlusOutlined />}
-            onClick={() => {
-              if (embed) {
-                history.push('/embed/dashboard/create');
-              } else {
-                history.push('/dashboard/create');
-              }
-            }}
-            key="created"
-            type="primary"
-          >
-            新建
-          </Button>,
-          <Upload
-            {...{
-              name: 'file',
-              headers: {
-                ...(biToken ? { Authorization: `Bearer ${biToken}` } : {}),
-              },
-              method: 'post',
-              action: `${API_PREFIX}/dashboards/as-import`,
-              showUploadList: false,
-              withCredentials: true,
-              onChange(info) {
-                if (info.file.status !== 'uploading') {
-                  message.loading('上传中!');
-                }
-                if (info.file.status === 'done') {
-                  message.destroy();
-                  message.success(`上传完成!`);
-                  actionRef.current?.reload();
-                } else if (info.file.status === 'error') {
-                  message.destroy();
-                  message.error(`上传失败!`);
-                }
-              },
-              accept: '.bi',
-            }}
-          >
-            <Button icon={<UploadOutlined />}>导入</Button>
-          </Upload>
-          ],
-        }}
-        toolBarRender={false}
-      />
-    </div>
+            return {
+              data: success ? data.rows : [],
+              success: success,
+              total: success ? data.total : 0,
+            };
+          }}
+          pagination={getTablePaginationDefaultSettings()}
+          rowSelection={{
+            type: 'checkbox',
+            selectedRowKeys,
+            onChange: (selectedRowKeys: React.Key[], widgets) => {
+              setSelectedWidget(widgets);
+              setSelectedRowKeys(selectedRowKeys);
+            },
+          }}
+          tableAlertOptionRender={operationLineRender}
+          search={{
+            ...proTableSerchConfig,
+            span: 10,
+            optionRender: (searchConfig, formProps, dom) => [
+              <Button
+                icon={<BarsOutlined />}
+                onClick={() => {
+                  history.push('/embed/dashboard/tab');
+                }}
+                key="tab"
+              >
+                展示模式
+              </Button>,
+              dom.reverse(),
+              <Button
+                icon={<PlusOutlined />}
+                onClick={() => {
+                  if (embed) {
+                    history.push('/embed/dashboard/create');
+                  } else {
+                    history.push('/dashboard/create');
+                  }
+                }}
+                key="created"
+                type="primary"
+              >
+                新建
+              </Button>,
+              <Upload
+                {...{
+                  name: 'file',
+                  headers: {
+                    ...(biToken ? { Authorization: `Bearer ${biToken}` } : {}),
+                  },
+                  method: 'post',
+                  action: `${API_PREFIX}/dashboards/as-import`,
+                  showUploadList: false,
+                  withCredentials: true,
+                  onChange(info) {
+                    if (info.file.status !== 'uploading') {
+                      message.loading('上传中!');
+                    }
+                    if (info.file.status === 'done') {
+                      message.destroy();
+                      message.success(`上传完成!`);
+                      actionRef.current?.reload();
+                    } else if (info.file.status === 'error') {
+                      message.destroy();
+                      message.error(`上传失败!`);
+                    }
+                  },
+                  accept: '.bi',
+                }}
+              >
+                <Button icon={<UploadOutlined />}>导入</Button>
+              </Upload>,
+            ],
+          }}
+          toolBarRender={false}
+        />
+      </div>
+    </Card>
   );
 }

@@ -1,3 +1,5 @@
+import { BI_AUTH_TOKEN_KEY } from "@/common";
+
 export const isIframeEmbed = window.self !== window.top;
 
 /**
@@ -21,6 +23,7 @@ export const abortAjax = (apis: string[]) => {
       }
     });
   };
+  
 
 
 
@@ -52,4 +55,11 @@ export function removeObjectNullValue(obj: Record<string, any>) {
   return keys.reduce((currentRes, key) => {
     return { ...currentRes, [key]: obj[key] };
   }, {});
+}
+
+export function backToLogin() {
+  if (!location.href?.includes('/login')) {
+    window.localStorage.removeItem(BI_AUTH_TOKEN_KEY);
+    location.href = '/login';
+  }
 }

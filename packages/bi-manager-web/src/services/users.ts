@@ -38,4 +38,10 @@ export async function getLoginTimeout() {
   });
 }
 
+export async function changePassword(params: { username: string; password: string,oldPassword: string; }) {
+  return request(`${API_PREFIX}/change-password`, {
+    method: 'POST',
+    data: params,
+  });
+}
 

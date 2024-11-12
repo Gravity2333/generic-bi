@@ -8,7 +8,7 @@ import {
   IReportFormData,
   ISendorOptions,
 } from '@bi/common';
-import { Button, message, Popconfirm, Tag } from 'antd';
+import { Button, Card, message, Popconfirm, Tag } from 'antd';
 import { useRef } from 'react';
 import { history } from 'umi';
 import cronstrue from 'cronstrue/i18n';
@@ -20,7 +20,7 @@ import MailConfigAlert from '../components/MailConfigAlert';
 import useAttachmentSourceMap from '../hooks/useAttachmentSourceMap';
 import ReportLogModal from '../components/ReportLogModal';
 import useEmbed from '@/hooks/useEmbed';
-import useVariable, { UseVariableParams } from 'use-variable-hook'
+import useVariable, { UseVariableParams } from 'use-variable-hook';
 
 const DEFAULT_PAGE_SIZE = 10;
 const DEFAULT_PAGE = 1;
@@ -91,10 +91,7 @@ export default function List() {
         const tagElem = (dashboard_ids || widget_ids || []).map((id) => {
           const { name } = attachmentSourceMap[id] || {};
           return (
-            <Tag
-              style={{ cursor: 'default' }}
-              color={'blue'}
-            >
+            <Tag style={{ cursor: 'default' }} color={'blue'}>
               {name}
             </Tag>
           );
@@ -228,67 +225,74 @@ export default function List() {
   ];
 
   return (
-    <div className={styles['pro-table-auto-height']}>
-      {/* 邮箱配置提醒 */}
-      <MailConfigAlert />
-      <ProTable
-        rowKey="id"
-        bordered
-        size="small"
-        columns={columns}
-        actionRef={actionRef}
-        request={async (params) => {
-          const { current, pageSize, name } = params;
-          const { success, data } = await queryReports({
-            name,
-            pageSize: pageSize || DEFAULT_PAGE_SIZE,
-            pageNumber: (current || DEFAULT_PAGE) - 1,
-          });
-          if (!success) {
+    <Card
+      title={undefined}
+      size="small"
+      className={styles['outer-card']}
+      bodyStyle={{ height: '100%' }}
+    >
+      <div className={styles['pro-table-auto-height']}>
+        {/* 邮箱配置提醒 */}
+        <MailConfigAlert />
+        <ProTable
+          rowKey="id"
+          bordered
+          size="small"
+          columns={columns}
+          actionRef={actionRef}
+          request={async (params) => {
+            const { current, pageSize, name } = params;
+            const { success, data } = await queryReports({
+              name,
+              pageSize: pageSize || DEFAULT_PAGE_SIZE,
+              pageNumber: (current || DEFAULT_PAGE) - 1,
+            });
+            if (!success) {
+              return {
+                data: [],
+                success,
+              };
+            }
+            const { rows, total, pageNumber } = data as any;
             return {
-              data: [],
-              success,
+              data: rows,
+              success: success,
+              page: pageNumber,
+              total,
             };
-          }
-          const { rows, total, pageNumber } = data as any;
-          return {
-            data: rows,
-            success: success,
-            page: pageNumber,
-            total,
-          };
-        }}
-        pagination={getTablePaginationDefaultSettings()}
-        search={{
-          ...proTableSerchConfig,
-          span: 12,
-          optionRender: (searchConfig, formProps, dom) => [
-            ...dom.reverse(),
-            <Button
-              icon={<PlusOutlined />}
-              onClick={() => {
-                if (!embed) {
-                  history.push('/report/create');
-                } else {
-                  history.push('/embed/report/create');
-                }
-              }}
-              key="created"
-              type="primary"
-            >
-              新建
-            </Button>,
-          ],
-        }}
-        toolBarRender={false}
-      />
-      <ReportLogModal
-        reportId={variables.currentReport?.id || ''}
-        showLogs={variables.showLogs}
-        setShowLogs={(modalSwitch) => {
-          variables.showLogs = modalSwitch;
-        }}
-      />
-    </div>
+          }}
+          pagination={getTablePaginationDefaultSettings()}
+          search={{
+            ...proTableSerchConfig,
+            span: 12,
+            optionRender: (searchConfig, formProps, dom) => [
+              ...dom.reverse(),
+              <Button
+                icon={<PlusOutlined />}
+                onClick={() => {
+                  if (!embed) {
+                    history.push('/report/create');
+                  } else {
+                    history.push('/embed/report/create');
+                  }
+                }}
+                key="created"
+                type="primary"
+              >
+                新建
+              </Button>,
+            ],
+          }}
+          toolBarRender={false}
+        />
+        <ReportLogModal
+          reportId={variables.currentReport?.id || ''}
+          showLogs={variables.showLogs}
+          setShowLogs={(modalSwitch) => {
+            variables.showLogs = modalSwitch;
+          }}
+        />
+      </div>
+    </Card>
   );
 }

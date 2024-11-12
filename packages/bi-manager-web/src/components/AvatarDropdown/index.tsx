@@ -6,6 +6,7 @@ import HeaderDropdown from '../HeaderDropdown';
 import styles from './index.less';
 import Meta from 'antd/lib/card/Meta';
 import { forwardRef, useImperativeHandle, useRef, useState } from 'react';
+import ChangePassword from '../ChangePassword';
 
 export const LOGIN_OUT_KEY = 'loginOut';
 
@@ -68,7 +69,8 @@ const UserInfoModal = forwardRef(function ({ currentUserInfo: {
 
 function AvatarDropdown() {
   const { initialState } = useModel('@@initialState');
- 
+  console.log(initialState)
+  const changepasswdRef = useRef<any>()
   const ref = useRef<any>()
   const handleMenuClick = (info: any) => {
     const { key } = info;
@@ -78,6 +80,7 @@ function AvatarDropdown() {
     }
     // 修改密码
     if (key === 'changePassword') {
+      changepasswdRef.current.open()
     }
 
     if (key === 'logout') {
@@ -140,6 +143,7 @@ function AvatarDropdown() {
         </span>
       )
     }
+    <ChangePassword ref={changepasswdRef} username={(initialState as any)?.currentUserInfo?.username}/>
     <UserInfoModal ref={ref} currentUserInfo={(initialState as any).currentUserInfo||{}} />
   </>
 }

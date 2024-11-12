@@ -96,16 +96,6 @@ export default function Theme() {
                   <Button size='small' type='link' onClick={() => {
                     changeBackground(path)
                   }}>设置为背景</Button>
-                  <Button size='small' type='link' danger
-                    onClick={() => {
-                      (async () => {
-                        const { success } = await deleteBackground(path)
-                        if (success) {
-                          message.success('删除素材成功！')
-                          refreshUrls();
-                        }
-                      })()
-                    }}>删除素材</Button>
                 </>
               } />
           </Card>;

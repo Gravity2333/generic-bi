@@ -34,6 +34,18 @@ export class UsersController {
     return this.usersService.login(registerParams);
   }
 
+  @Post("/change-password")
+  async changePassword(
+    @Body(ALL)
+    registerParams: {
+      username: string;
+      password: string;
+      oldPassword: string;
+    }
+  ) {
+    return this.usersService.changePassword(registerParams);
+  }
+
   @Get("/current-user")
   async querCurrentUserInfo() {
     return await this.ctx.userInfo;

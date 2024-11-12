@@ -5,7 +5,7 @@ import { deleteDictMapping, queryDictMappings } from '@/services/dicts';
 import { BookOutlined, PlusOutlined } from '@ant-design/icons';
 import ProTable, { ActionType, ProColumns } from '@ant-design/pro-table';
 import { IClickhouseColumn, IDictMapping } from '@bi/common';
-import { message, Modal, Popover, Select, Skeleton, Table, Tag } from 'antd';
+import { Card, message, Modal, Popover, Select, Skeleton, Table, Tag } from 'antd';
 import { useContext, useEffect, useRef, useState } from 'react';
 import { history } from 'umi';
 import styles from './index.less';
@@ -64,10 +64,9 @@ export default function Datasource() {
 
     if (datasources?.length > 0) {
       variables.selectedTable = datasources[0].name!;
-      actionRef.current?.reload()
+      actionRef.current?.reload();
     }
-
-  }, [databases,datasources]);
+  }, [databases, datasources]);
 
   //获取映射关系
   useEffect(() => {
@@ -192,88 +191,95 @@ export default function Datasource() {
   ];
 
   return (
-    <div style={{ margin: '10px' }} className={styles['pro-table-auto-height']}>
-      <ProTable<IClickhouseColumn>
-        rowKey={(row) => `${variables.selectedTable}__${row.name}__${row.type}`}
-        bordered
-        size="small"
-        columns={columns}
-        request={async () => {
-          if (datasources.length <= 0 || !variables.selectedTable) {
+    <Card
+      title={undefined}
+      size="small"
+      className={styles['outer-card']}
+      bodyStyle={{ height: '100%' }}
+    >
+      <div style={{ margin: '10px' }} className={styles['pro-table-auto-height']}>
+        <ProTable<IClickhouseColumn>
+          rowKey={(row) => `${variables.selectedTable}__${row.name}__${row.type}`}
+          bordered
+          size="small"
+          columns={columns}
+          request={async () => {
+            if (datasources.length <= 0 || !variables.selectedTable) {
+              return {
+                data: [],
+                success: false,
+              };
+            }
+            const { success, data } = await queryDatasourcesColumns(
+              variables.selectedDatabase,
+              variables.selectedTable,
+            );
             return {
-              data: [],
-              success: false,
+              data: success ? [...data] : [],
+              success,
             };
-          }
-          const { success, data } = await queryDatasourcesColumns(
-            variables.selectedDatabase,
-            variables.selectedTable,
-          );
-          return {
-            data: success ? [...data] : [],
-            success,
-          };
-        }}
-        pagination={false}
-        search={{
-          ...proTableSerchConfig,
-          span: 12,
-          optionRender: () => [
-            <span>数据库:</span>,
-            <Select
-              onChange={(value) => {
-                variables.selectedDatabase = value;
-              }}
-              style={{ width: '200px', textAlign: 'left', marginRight: '0px' }}
-              showSearch
-              optionFilterProp="label"
-              value={variables.selectedDatabase}
-              placeholder="请选择数据库"
-              allowClear
-            >
-              {databases.map((item) => {
-                return (
-                  <Select.Option key={item.id} value={item.id} label={item.name}>
-                    {item.name}
-                  </Select.Option>
-                );
-              })}
-            </Select>,
-            <Select
-              onChange={(value) => {
-                variables.selectedTable = value;
-                actionRef.current?.reload()
-              }}
-              disabled={!variables.selectedDatabase}
-              style={{ width: '200px', textAlign: 'left', marginRight: '0px' }}
-              showSearch
-              optionFilterProp="label"
-              value={variables.selectedTable}
-              placeholder="请选择数据源"
-              allowClear
-            >
-              {datasources.map((item) => {
-                const value = item.name!;
-                return (
-                  <Select.Option key={value} value={value} label={item.comment! || value}>
-                    {item.comment! || value}
-                  </Select.Option>
-                );
-              })}
-            </Select>,
-          ],
-        }}
-        toolBarRender={false}
-        actionRef={actionRef}
-      />
-      <TagEditDrawer
-        ref={drawerRef}
-        onSuccess={() => {
-          dispatch({ type: 'fetchDictMappings' });
-          actionRef.current?.reload();
-        }}
-        dicts={dicts}
-      />
-    </div>
+          }}
+          pagination={false}
+          search={{
+            ...proTableSerchConfig,
+            span: 12,
+            optionRender: () => [
+              <span>数据库:</span>,
+              <Select
+                onChange={(value) => {
+                  variables.selectedDatabase = value;
+                }}
+                style={{ width: '200px', textAlign: 'left', marginRight: '0px' }}
+                showSearch
+                optionFilterProp="label"
+                value={variables.selectedDatabase}
+                placeholder="请选择数据库"
+                allowClear
+              >
+                {databases.map((item) => {
+                  return (
+                    <Select.Option key={item.id} value={item.id} label={item.name}>
+                      {item.name}
+                    </Select.Option>
+                  );
+                })}
+              </Select>,
+              <Select
+                onChange={(value) => {
+                  variables.selectedTable = value;
+                  actionRef.current?.reload();
+                }}
+                disabled={!variables.selectedDatabase}
+                style={{ width: '200px', textAlign: 'left', marginRight: '0px' }}
+                showSearch
+                optionFilterProp="label"
+                value={variables.selectedTable}
+                placeholder="请选择数据源"
+                allowClear
+              >
+                {datasources.map((item) => {
+                  const value = item.name!;
+                  return (
+                    <Select.Option key={value} value={value} label={item.comment! || value}>
+                      {item.comment! || value}
+                    </Select.Option>
+                  );
+                })}
+              </Select>,
+            ],
+          }}
+          toolBarRender={false}
+          actionRef={actionRef}
+        />
+        <TagEditDrawer
+          ref={drawerRef}
+          onSuccess={() => {
+            dispatch({ type: 'fetchDictMappings' });
+            actionRef.current?.reload();
+          }}
+          dicts={dicts}
+        />
+      </div>
+    </Card>
   );
 }

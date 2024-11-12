@@ -6,7 +6,7 @@ import { RequestConfig, RunTimeLayoutConfig, useModel } from 'umi';
 import { BI_AUTH_TOKEN_KEY } from './common';
 import RightContent from './components/RightContent';
 import { TTheme } from './interface';
-import { isIframeEmbed, throttle } from './utils';
+import { backToLogin, isIframeEmbed, throttle } from './utils';
 import { DARK_COLOR, THEME_KEY } from './utils/theme';
 import { useEffect, useState } from 'react';
 import { queryCurrentUserInfo } from './services/global';
@@ -25,13 +25,6 @@ export function getInitialState(): { theme: TTheme; settings?: Partial<LayoutSet
   };
 }
 
-function backToLogin() {
-  if (!location.href?.includes('/login')) {
-    // window.localStorage.removeItem(BI_AUTH_TOKEN_KEY);
-    // location.href = '/login';
-  }
-}
-
 function LayoutContent(children: JSX.Element) {
   const [loading, setLoading] = useState<boolean>(true);
   const { initialState, setInitialState } = useModel('@@initialState');
@@ -41,10 +34,10 @@ function LayoutContent(children: JSX.Element) {
       setLoading(true);
       const { success, data } = await queryCurrentUserInfo();
       if (success) {
-        setInitialState({
-          ...(initialState || {}),
+        setInitialState(prev=>({
+          ...(prev || {}),
           currentUserInfo: data,
-        } as any);
+        }) as any);
       } else {
         backToLogin();
       }
@@ -55,10 +48,10 @@ function LayoutContent(children: JSX.Element) {
       const { success, data } = await getLayoutTitle();
       if (success&&data) {
         dynamicSetHeaderTitle(data);
-        setInitialState({
-          ...(initialState || {}),
+        setInitialState(prev=>({
+          ...(prev || {}),
           title: data,
-        } as any);
+        }) as any);
       }
     })();
 
