@@ -9,7 +9,7 @@ export default (appInfo: EggAppInfo) => {
     listen: {
       path: "",
       port: 41130,
-      hostname: "127.0.0.1",
+      hostname: "0.0.0.0",
     },
   };
 
@@ -35,9 +35,10 @@ export default (appInfo: EggAppInfo) => {
   config.sequelize = {
     options: {
       dialect: "postgres",
-      host: "127.0.0.1",
-      port: 5433,
+      host: "generic-bi-postgres",
+      port: 5432,
       database: "bi",
+      user: "genericbiserver",
       username: "genericbiserver",
       password: "genericbiserver@123",
       timezone: "+08:00",
@@ -62,7 +63,7 @@ export default (appInfo: EggAppInfo) => {
 
   config.redis = {
     client: {
-      host: "bi-redis", // default value
+      host: "generic-bi-redis", // default value
       port: 6379, // default value
       // password: "Machloop@123",
       db: 0,

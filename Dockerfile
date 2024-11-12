@@ -1,8 +1,8 @@
-FROM node:16.13.0-alpine3.11 as npmd-hj-x86
+FROM node:16.13.0-alpine3.11 as generic-bi-x86
 
 ENV NODE_OPTIONS=--max_old_space_size=2048
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true 
-RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.tuna.tsinghua.edu.cn/g' /etc/apk/repositories
+RUN sed -i 's#https\?://dl-cdn.alpinelinux.org/alpine#https://mirrors.tuna.tsinghua.edu.cn/alpine#g' /etc/apk/repositories
 
 RUN \
   # npm install -g nrm \
@@ -63,8 +63,10 @@ RUN \
   && mkdir -p /usr/src/app/dist \
   && mkdir -p /usr/src/app/node_modules \
   && mkdir -p /usr/src/app/dist/resources/pdf \
+  && mkdir -p /usr/src/app/dist/resources/backgrounds \
   && cd /usr/src/app/dist/resources/ \
   && chmod 777 ./pdf \
+  && chmod 777 ./backgrounds \
   && mkdir -p -m 777 /usr/src/app/dist/init/dashboard \
   && mkdir -p -m 777 /usr/src/app/dist/init/widget \
   && mkdir -p -m 777 /usr/src/app/dist/init/sql \
@@ -83,18 +85,18 @@ ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
 
 WORKDIR /usr/src/app
 # 拷贝 nodejs 服务
-COPY --from=npmd-hj-x86 /build/packages/bi-manager/package.json /build/packages/bi-manager/tsconfig.json /usr/src/app/
-COPY --from=npmd-hj-x86 /build/packages/bi-manager/dist/ /usr/src/app/dist/
-COPY --from=npmd-hj-x86 /build/bi-manager-prod/node_modules/ /usr/src/app/node_modules/
+COPY --from=generic-bi-x86 /build/packages/bi-manager/package.json /build/packages/bi-manager/tsconfig.json /usr/src/app/
+COPY --from=generic-bi-x86 /build/packages/bi-manager/dist/ /usr/src/app/dist/
+COPY --from=generic-bi-x86 /build/bi-manager-prod/node_modules/ /usr/src/app/node_modules/
 
 # Copy Web production
-COPY --from=npmd-hj-x86 /build/packages/bi-manager-web/dist/index.html /usr/src/app/view/
-COPY --from=npmd-hj-x86 /build/packages/bi-manager-web/dist/ /usr/src/app/dist/app/public/
+COPY --from=generic-bi-x86 /build/packages/bi-manager-web/dist/index.html /usr/src/app/view/
+COPY --from=generic-bi-x86 /build/packages/bi-manager-web/dist/ /usr/src/app/dist/app/public/
 
 # 拷贝初始化仪表盘文件
-COPY --from=npmd-hj-x86 /build/packages/bi-manager/dist/app/init/dashboard/* /usr/src/app/dist/init/dashboard/
-COPY --from=npmd-hj-x86 /build/packages/bi-manager/dist/app/init/widget/* /usr/src/app/dist/init/widget/
-COPY --from=npmd-hj-x86 /build/packages/bi-manager/dist/app/init/sql/init_data.sql /usr/src/app/dist/init/sql/
+COPY --from=generic-bi-x86 /build/packages/bi-manager/dist/app/init/dashboard/* /usr/src/app/dist/init/dashboard/
+COPY --from=generic-bi-x86 /build/packages/bi-manager/dist/app/init/widget/* /usr/src/app/dist/init/widget/
+COPY --from=generic-bi-x86 /build/packages/bi-manager/dist/app/init/sql/init_data.sql /usr/src/app/dist/init/sql/
 
 EXPOSE 41130
 

@@ -11,6 +11,9 @@
 ## 创建数据库
 CREATE DATABASE bi;
 \c bi
+
+docker: psql -h localhost -U genericbiserver -d genericbiserver -d bi
+psql -h generic-bi-postgres -U genericbiserver -d genericbiserver -d bi -w genericbiserver@123
 ## 创建用户
 超级管理员 postgre下：
 CREATE USER genericbiserver WITH PASSWORD 'genericbiserver@123';
@@ -159,3 +162,5 @@ postgres-container
 docker run -d -p 8080:41130 --name=my_generic_bi11 generic-bi /bin/sh -c "tail -f /dev/null"  
 
 docker run -d -p 8080:41130 --name=my_generic_bi22 --network my_network generic-bi /bin/sh -c "tail -f /dev/null"
+
+apk add postgresql-client
