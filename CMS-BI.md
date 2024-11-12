@@ -111,17 +111,3 @@ docker-compose down
 # 再重启服务
 docker-compose up -d
 ```
-
-
-### 获取docker服务器权限
-```
-探针
-cp -f /opt/machloop/config/nginx/certs/ca.crt /etc/pki/ca-trust/source/anchors/
-update-ca-trust
-systemctl restart docker
-
-cms
-cp -f /opt/components/openresty/conf/certs/ca.crt /etc/pki/ca-trust/source/anchors/
-update-ca-trust
-systemctl restart docker
-```

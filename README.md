@@ -10,13 +10,15 @@
 
 ## 创建数据库
 CREATE DATABASE bi;
-
+\c bi
 ## 创建用户
 超级管理员 postgre下：
 CREATE USER genericbiserver WITH PASSWORD 'genericbiserver@123';
-
+ALTER USER genericbiserver WITH PASSWORD 'genericbiserver@123';
 给权限
 grant all on schema public to genericbiserver;
+ GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO genericbiserver;
+  GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO genericbiserver;
 grant all on table_name to genericbiserver
 
 ## 安装redis
@@ -145,3 +147,15 @@ https://wbt5.com/jsdom-canvas.html
 docker-compose -f docker-compose.dev.yml stop
 docker-compose -f docker-compose.dev.yml up -d
 ```
+
+
+
+# docker run --name iptables --privileged -it registry/iptables:v1 bash
+
+psql -h postgres-container -U postgres -d postgres
+
+postgres-container
+
+docker run -d -p 8080:41130 --name=my_generic_bi11 generic-bi /bin/sh -c "tail -f /dev/null"  
+
+docker run -d -p 8080:41130 --name=my_generic_bi22 --network my_network generic-bi /bin/sh -c "tail -f /dev/null"
