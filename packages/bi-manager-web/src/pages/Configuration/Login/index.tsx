@@ -1,7 +1,6 @@
 import { Form, InputNumber, Button, Modal, message } from 'antd';
 import { useEffect } from 'react';
 import { SettingOutlined } from '@ant-design/icons';
-import { queryMailConfig } from '@/services/global';
 import { getLoginTimeout, setLoginTimeout } from '@/services/users';
 import { BI_AUTH_TOKEN_KEY } from '@/common';
 

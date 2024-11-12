@@ -37,6 +37,11 @@ export interface ISysTitleService {
   get: () => Promise<string>;
 }
 
+export interface IDefaultBackgroundPathService {
+  set: (path: string) => void;
+  get: () => Promise<string>;
+}
+
 /**
  * 编码成 Base64
  * @param str 字符串
@@ -52,6 +57,7 @@ const DASHBOARD_SEQ_MAP = Symbol("Utils#dashbroadSeqMap");
 const SQL_JSON_SEQ_MAP = Symbol("Utils#sqlJsonSeqMap");
 const JWT_TIMEOUT_MAP = Symbol("Utils#jwtTimeoutMap");
 const SYS_TITLE_MAP = Symbol("Utils#SysTitleMap");
+const DEFAULT_BACKGROUND_PATH_MAP = Symbol("Utils#DefaultBackgroundPathMap");
 @Provide()
 @Scope(ScopeEnum.Singleton)
 export class Utils {
@@ -140,7 +146,22 @@ export class Utils {
     }
     return this[SYS_TITLE_MAP];
   }
+
+  /** 背景 */
+get defaultBackgroundPathService(): IDefaultBackgroundPathService {
+  if (!this[DEFAULT_BACKGROUND_PATH_MAP]) {
+    this[DEFAULT_BACKGROUND_PATH_MAP] = {};
+    this[DEFAULT_BACKGROUND_PATH_MAP].set = (title) => {
+      this.redisService.set(DEFAULT_BACKGROUND_PATH_MAP as any, title);
+    };
+    this[DEFAULT_BACKGROUND_PATH_MAP].get = async () => {
+      return (await this.redisService.get(DEFAULT_BACKGROUND_PATH_MAP as any)) || "";
+    };
+  }
+  return this[DEFAULT_BACKGROUND_PATH_MAP];
 }
+}
+
 
 export const formatTime = function (fmt, date) {
   var o = {

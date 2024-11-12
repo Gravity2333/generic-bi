@@ -3,6 +3,7 @@ import {
   Body,
   Config,
   Controller,
+  Del,
   Get,
   Inject,
   Post,
@@ -14,7 +15,7 @@ import { Utils } from "../utils";
 const formidable = require("formidable");
 import * as fs from "fs";
 import { IMyAppConfig } from "../interface";
-import {v4 as uuidv4} from 'uuid'
+import { v4 as uuidv4 } from 'uuid'
 
 @Provide()
 @Controller("/web-api/v1")
@@ -46,7 +47,7 @@ export class LayoutController {
   async importBackground() {
     try {
       const form = formidable({ multiples: true });
-      const { success, info,ext } = await new Promise<{
+      const { success, info, ext } = await new Promise<{
         success: boolean;
         info: any;
         ext: string,
@@ -56,7 +57,7 @@ export class LayoutController {
             reject({ success: false, info: error });
           }
           const fileContext = fs.readFileSync(file.filepath);
-          resolve({ success: true, info: fileContext,ext: file.originalFilename?.split(".")[1] });
+          resolve({ success: true, info: fileContext, ext: file.originalFilename?.split(".")[1] });
         });
       });
       if (!success) {
@@ -74,12 +75,33 @@ export class LayoutController {
     }
   }
 
-  
+
   @Get("/background/urls")
   async getBackgroundUrls() {
     const prefix = this.asset_uri
     const backgroundsPath = this.backgroundsPath;
     const fileList = fs.readdirSync(`${backgroundsPath}`)
-    return fileList.map(url=>prefix+`/resources/backgrounds/${url}`)
+    return fileList.map(url => prefix + `/resources/backgrounds/${url}`)
+  }
+
+  @Del("/background")
+  async deletebackground(@Body(ALL) { path }: { path: string }) {
+    try {
+      const pathList = path.split('/')
+      return fs.unlinkSync(this.backgroundsPath + '/' + pathList.pop())
+    } catch (error) {
+      this.ctx?.throw(500, error);
+    }
+  }
+
+  @Post("/default/background")
+  async setDefaultBackground(@Body(ALL) { path }: { path: string }) {
+    return await this.utils.defaultBackgroundPathService.set(path);
+  }
+
+  @Get("/default/background")
+  async getDefaultBackground() {
+    return await this.utils.defaultBackgroundPathService
+      .get();
   }
 }

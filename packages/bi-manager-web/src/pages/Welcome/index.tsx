@@ -2,7 +2,7 @@ import { checkDabaseConnect } from '@/services/database';
 import { DisconnectOutlined, SmileOutlined } from '@ant-design/icons';
 import { Alert, Button, Card, Result } from 'antd';
 import { useEffect, useState } from 'react';
-import { history } from 'umi';
+import { history, useModel } from 'umi';
 import styles from './index.less';
 
 export default function Welcome() {
@@ -12,7 +12,7 @@ export default function Welcome() {
   //     setConnect((await checkDabaseConnect()) || false);
   //   })();
   // }, []);
-
+  const { initialState } = useModel('@@initialState');
   return (
     <>
       {/* {!connect ? (
@@ -34,7 +34,7 @@ export default function Welcome() {
           }
         />
       ) : null} */}
-      <Result icon={<SmileOutlined style={{ color: 'rgba(84,154,220,0.9)' }} />} title={`欢迎使用Generic-BI`} />
+      <Result icon={<SmileOutlined style={{ color: 'rgba(84,154,220,0.9)' }} />} title={'欢迎使用'+(initialState as any)?.title || `Generic-BI`} />
       <div className={styles['show-bar']}>
         <div
           className={`${styles['show-bar__card']} ${styles['show-bar__card__db-cover']}`}

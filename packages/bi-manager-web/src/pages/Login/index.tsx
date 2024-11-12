@@ -43,19 +43,19 @@ export default function Login() {
       if (success) {
         message.success('登录成功！');
         window.localStorage.setItem(BI_AUTH_TOKEN_KEY, data?.jwtToken);
-        location.href='/'
+        location.href = '/'
       }
     }
   };
 
-  useEffect(()=>{
-    (async()=>{
+  useEffect(() => {
+    (async () => {
       const { success } = await queryCurrentUserInfo();
       if (success) {
         history.push('/')
       }
     })()
-  },[])
+  }, [])
 
   return (
     <Card

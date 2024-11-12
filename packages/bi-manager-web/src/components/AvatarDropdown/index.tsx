@@ -68,7 +68,7 @@ const UserInfoModal = forwardRef(function ({ currentUserInfo: {
 
 function AvatarDropdown() {
   const { initialState } = useModel('@@initialState');
-  console.log(initialState)
+ 
   const ref = useRef<any>()
   const handleMenuClick = (info: any) => {
     const { key } = info;

@@ -12,8 +12,8 @@ import { useEffect, useState } from 'react';
 import { queryCurrentUserInfo } from './services/global';
 import { sendMsgToParent } from './utils/sendMsgToParent';
 import { getLayoutTitle } from './services/layout';
-import { dynamicSetHeaderTitle } from './utils/layout';
-const biToken = window.localStorage.getItem(BI_AUTH_TOKEN_KEY);
+import { dynamicSetHeaderTitle, updateBackground } from './utils/layout';
+
 export function getInitialState(): { theme: TTheme; settings?: Partial<LayoutSettings> } {
   const theme = (window.localStorage.getItem(THEME_KEY) as TTheme) || 'light';
   const isDark = theme === 'dark';
@@ -27,8 +27,8 @@ export function getInitialState(): { theme: TTheme; settings?: Partial<LayoutSet
 
 function backToLogin() {
   if (!location.href?.includes('/login')) {
-    window.localStorage.removeItem(BI_AUTH_TOKEN_KEY);
-    location.href = '/login';
+    // window.localStorage.removeItem(BI_AUTH_TOKEN_KEY);
+    // location.href = '/login';
   }
 }
 
@@ -39,11 +39,6 @@ function LayoutContent(children: JSX.Element) {
   useEffect(() => {
     (async () => {
       setLoading(true);
-      if (!biToken) {
-        backToLogin();
-        setLoading(false);
-        return;
-      }
       const { success, data } = await queryCurrentUserInfo();
       if (success) {
         setInitialState({
@@ -58,10 +53,16 @@ function LayoutContent(children: JSX.Element) {
 
     (async () => {
       const { success, data } = await getLayoutTitle();
-      if (success) {
+      if (success&&data) {
         dynamicSetHeaderTitle(data);
+        setInitialState({
+          ...(initialState || {}),
+          title: data,
+        } as any);
       }
     })();
+
+    updateBackground()
   }, []);
 
   if (window.location.pathname.includes(SHARE_PAGE_PREFIX)) {
@@ -106,9 +107,10 @@ export const layout: RunTimeLayoutConfig = ({ initialState }) => {
 const REQUEST_TIME_OUT = 600000;
 
 export const request: RequestConfig = {
-  headers: {
-    ...(biToken ? { Authorization: `Bearer ${biToken}` } : {}),
-  } as any,
+  headers: (()=>{
+    const biToken = window.localStorage.getItem(BI_AUTH_TOKEN_KEY);
+    return biToken ? { Authorization: `Bearer ${biToken}` } : {}
+  })() as any,
   timeout: REQUEST_TIME_OUT,
   errorHandler: (error: any) => {
     const { data } = error;
