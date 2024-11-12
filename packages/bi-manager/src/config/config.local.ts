@@ -66,6 +66,7 @@ export default (appInfo: EggAppInfo) => {
 
   config.web_uri = "http://127.0.0.1:8000/bi";
   config.asset_uri = "http://127.0.0.1:7001/public";
+  
   /** 配置日志清理 */
   config.midwayLogger = {
     default: {

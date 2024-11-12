@@ -35,6 +35,7 @@ export interface IMyAppConfig extends PowerPartial<EggAppConfig> {
    * @param single 单机部署
    * @param embed 内嵌部署，当做其他应用的组件
    */
+  isDev: boolean,
   mode: "single" | "embed";
   /** 定时报表保存路径 */
   report: {

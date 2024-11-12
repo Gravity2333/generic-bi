@@ -98,6 +98,11 @@ COPY --from=generic-bi-x86 /build/packages/bi-manager/dist/app/init/dashboard/* 
 COPY --from=generic-bi-x86 /build/packages/bi-manager/dist/app/init/widget/* /usr/src/app/dist/init/widget/
 COPY --from=generic-bi-x86 /build/packages/bi-manager/dist/app/init/sql/init_data.sql /usr/src/app/dist/init/sql/
 
+RUN \
+  mkdir -p /usr/src/app/dist/app/public/static/resources \
+  && cd /usr/src/app/dist/app/public/static/resources \
+  && mkdir -p /usr/src/app/dist/app/public/static/resources/backgrounds
+
 EXPOSE 41130
 
 CMD yarn run start:docker
