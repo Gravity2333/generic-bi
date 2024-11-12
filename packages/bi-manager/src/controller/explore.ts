@@ -113,7 +113,7 @@ export class exploreAPIController {
 
       // 可能携带查询 ID 的完整 sql 语句
       const fullSql = sql + securityQueryId;
-    console.log(fullSql)
+    // console.log(fullSql)
       const sqlData = await this.databaseService.executeSql(
         fullSql
         , database);

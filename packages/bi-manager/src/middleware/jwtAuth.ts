@@ -48,7 +48,7 @@ export class jwtAuthMiddleware implements IWebMiddleware {
         const userInfo = await this.jwtService.parseToken(token);
         ctx.userInfo = userInfo;
       } catch (err) {
-        console.log(err)
+        // console.log(err)
         ctx?.throw(401, "授权失败");
       }
       // 全处理完成 继续下一步

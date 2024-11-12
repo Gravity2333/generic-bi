@@ -27,7 +27,7 @@ export function getInitialState(): { theme: TTheme; settings?: Partial<LayoutSet
 
 function LayoutContent(children: JSX.Element) {
   const [loading, setLoading] = useState<boolean>(true);
-  const { initialState, setInitialState } = useModel('@@initialState');
+  const { setInitialState } = useModel('@@initialState');
 
   useEffect(() => {
     (async () => {

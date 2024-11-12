@@ -45,3 +45,11 @@ export async function changePassword(params: { username: string; password: strin
   });
 }
 
+export async function changeNickname(nickname: string) {
+  return request(`${API_PREFIX}/change-nickname`, {
+    method: 'POST',
+    data: {nickname},
+  });
+}
+
+

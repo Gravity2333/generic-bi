@@ -88,4 +88,48 @@ export class UsersService {
       this.ctx?.throw(500, "密码错误！");
     }
   }
+
+  async changeNickname(username: string, nickname: string ) {
+    const { rows } = await UsersModel.findAndCountAll({
+      where: {
+        username: { [Op.eq]: username },
+      },
+    });
+    if (!rows[0]) {
+      this.ctx?.throw(500, "用户不存在！");
+    }
+    return await rows[0].update({
+      ...rows[0],
+      nickname,
+    });
+  }
+
+  async importAvator(username: string, avatorBuffer: Buffer) {
+    const { rows } = await UsersModel.findAndCountAll({
+      where: {
+        username: { [Op.eq]: username },
+      },
+    });
+    if (!rows[0]) {
+      this.ctx?.throw(500, "用户不存在！");
+    }
+    const base64Code = Buffer.from(avatorBuffer).toString("base64");
+    // console.log(base64Code)
+    rows[0].update({
+      ...rows[0],
+      avator: base64Code,
+    });
+  }
+
+  async getUserInfoByUsername(username: string) {
+    const { rows } = await UsersModel.findAndCountAll({
+      where: {
+        username: { [Op.eq]: username },
+      },
+    });
+    if (!rows[0]) {
+      this.ctx?.throw(500, "用户不存在！");
+    }
+    return rows[0]?.dataValues || {};
+  }
 }
