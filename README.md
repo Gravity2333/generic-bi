@@ -1,6 +1,6 @@
 # Generic-bi-server
 一个通用的bi系统,目前支持Clickhouse Postgre Mysql的数据可视化
-
+![alt text](image.png)
 ## Getting Started
 
 ## 安装postgre

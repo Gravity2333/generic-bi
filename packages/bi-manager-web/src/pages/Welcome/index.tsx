@@ -34,7 +34,10 @@ export default function Welcome() {
           }
         />
       ) : null} */}
-      <Result icon={<SmileOutlined style={{ color: 'rgba(84,154,220,0.9)' }} />} title={'欢迎使用'+(initialState as any)?.title || `Generic-BI`} />
+      <Result
+        icon={<SmileOutlined style={{ color: 'rgba(84,154,220,0.9)' }} />}
+        title={<h4 style={{ color: 'rgba(84,154,220,0.9)' }}>{'欢迎使用' + (initialState as any)?.title || `Generic-BI`}</h4>}
+      />
       <div className={styles['show-bar']}>
         <div
           className={`${styles['show-bar__card']} ${styles['show-bar__card__db-cover']}`}

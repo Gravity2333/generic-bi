@@ -20,7 +20,7 @@ import EditableTitle from '../EditableTitle';
 import { changeNickname } from '@/services/users';
 import { history } from 'umi';
 //@ts-ignore
-import PINE_FOREST from "!!file-loader?name=static/[name].[ext]!../../assets/backgrounds/pine-forest.jpg"
+import PINE_FOREST from '!!file-loader?name=static/[name].[ext]!../../assets/backgrounds/pine-forest.jpg';
 
 export const LOGIN_OUT_KEY = 'loginOut';
 const biToken = window.localStorage.getItem(BI_AUTH_TOKEN_KEY);
@@ -85,13 +85,8 @@ const UserInfoModal = forwardRef(function (
     >
       <Card
         style={{ width: 300 }}
-        bodyStyle={{position:'relative'}}
-        cover={
-          <img
-            alt="example"
-            src={PINE_FOREST}
-          />
-        }
+        bodyStyle={{ position: 'relative' }}
+        cover={<img alt="example" src={PINE_FOREST} />}
         actions={[
           <SettingOutlined
             key="setting"
@@ -178,7 +173,11 @@ const UserInfoModal = forwardRef(function (
                 }}
                 showTooltip={false}
               ></EditableTitle>
-              {editMode ? <Tag style={{position:'absolute',top:'-25px',right:'3px'}}>编辑模式</Tag> : ''}
+              {editMode ? (
+                <Tag style={{ position: 'absolute', top: '-25px', right: '3px' }}>编辑模式</Tag>
+              ) : (
+                ''
+              )}
             </>
           }
           description={`账户名：${username}`}
