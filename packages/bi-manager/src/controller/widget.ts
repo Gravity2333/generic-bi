@@ -8,6 +8,7 @@ import {
 } from "@bi/common";
 import {
   ALL,
+  App,
   Body,
   Controller,
   Del,
@@ -32,7 +33,8 @@ import * as fs from "fs";
 import { base64Encode } from "../utils";
 import { NpmdDictService } from "../service/dicts";
 import { ELogOperareTarget, ELogOperareType } from "../service/systemLog";
-import { DatabaseService } from "../service/database";
+import { DatabaseService, externalServersCache } from "../service/database";
+import { Application } from "egg";
 const formidable = require("formidable");
 
 @Provide()
@@ -53,6 +55,9 @@ export class WidgetAPIController {
   @Inject()
   npmdDictService: NpmdDictService;
 
+  @App()
+  app: Application;
+  
   @Get("/widgets")
   @Validate()
   async listWidgets(@Query(ALL) params: QueryWidgetInput) {
@@ -298,7 +303,7 @@ export class WidgetAPIController {
         database
       } = widgetSpec;
 
-      const DBType = this.ctx.app.externalSystemClient[database]?.type
+      const DBType = externalServersCache.get(database)?.type 
       // 转成 sql 语句
       const { sql, colNames, colIdList } = generateSql(
         widgetSpec,

@@ -13,6 +13,7 @@ import { WidgetService } from "./service/widget";
 import { NpmdDictService } from "./service/dicts";
 import { DatabaseService } from "./service/database";
 import { OsService } from "./service/os";
+
 @Configuration({
   imports: [
     "@midwayjs/sequelize",
@@ -25,6 +26,9 @@ import { OsService } from "./service/os";
   // @see https://midwayjs.org/docs/env_config#%E4%B8%9A%E5%8A%A1%E9%85%8D%E7%BD%AE%E5%8A%A0%E8%BD%BD
   importConfigs: [join(__dirname, "./config/")],
 })
+
+
+
 export class ContainerConfiguration implements ILifeCycle {
   @App()
   app: Application;

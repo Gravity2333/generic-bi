@@ -9,7 +9,7 @@ import {
   generateSql,
   parseObjJson,
 } from "@bi/common";
-import { ALL, Config, Inject, Logger, Provide } from "@midwayjs/decorator";
+import { ALL, App, Config, Inject, Logger, Provide } from "@midwayjs/decorator";
 import { Context } from "egg";
 import { Op } from "sequelize";
 import { CreateWidgetInput, UpdateWidgetInput } from "../dto/widget.dto";
@@ -27,7 +27,8 @@ import { EBooleanString, IMyAppConfig } from "../interface";
 import * as fs from "fs";
 import path = require("path");
 import { ELogOperareTarget, ELogOperareType } from "./systemLog";
-import { DatabaseService } from "./database";
+import { DatabaseService, externalServersCache } from "./database";
+import { Application } from "egg";
 
 @Provide()
 export class WidgetService {
@@ -50,6 +51,9 @@ export class WidgetService {
   @Inject()
   npmdDictService: NpmdDictService;
 
+  @App()
+  app: Application;
+  
   async listWidgets(
     pageNumber: number,
     pageSize: number,
@@ -320,7 +324,7 @@ export class WidgetService {
       },
       {}
     );
-    const DBType = this.ctx.app.externalSystemClient[database]?.type
+    const DBType = externalServersCache.get(database)?.type
     // 转成 sql 语句
     const { sql, colNames, colIdList } = generateSql(
       widgetSpec,

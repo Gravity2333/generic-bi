@@ -7,6 +7,7 @@ import {
 } from "@bi/common";
 import {
   ALL,
+  App,
   Body,
   Controller,
   Inject,
@@ -16,7 +17,8 @@ import {
 import { Context } from "egg";
 import { base64Encode } from "../utils";
 import { NpmdDictService } from "../service/dicts";
-import { DatabaseService } from "../service/database";
+import { DatabaseService, externalServersCache } from "../service/database";
+import { Application } from "egg";
 
 @Provide()
 @Controller("/web-api/v1")
@@ -30,6 +32,9 @@ export class exploreAPIController {
   @Inject()
   npmdDictService: NpmdDictService;
 
+  @App()
+  app: Application;
+  
   @Post("/explore-json")
   async listWidgets(
     @Body(ALL)
@@ -56,7 +61,7 @@ export class exploreAPIController {
 
       // 标识查询 ID，用于取消查询
       const securityQueryId = queryId ? `/*${base64Encode(queryId)}*/ ` : "";
-      const DBType = this.ctx.app.externalSystemClient[database]?.type
+      const DBType = externalServersCache.get(database)?.type
       // 组装成 sql 语句
       const { sql, colNames, colIdList } = generateSql(
         formData,

@@ -14,6 +14,9 @@ import { Application } from "@midwayjs/web";
 import { postgrePlugin } from "../plugins/postgrePlugin";
 import { clickhousePlugin } from "../plugins/clickhousePlugin";
 import { mysqlPlugin } from "../plugins/mysqlPlugins";
+import { SharedCache } from "../utils/sharedCache";
+
+export const externalServersCache = new SharedCache<ExternalSystem>();
 
 type ParsedDBConfig = {
   id: string;
@@ -55,11 +58,8 @@ export class DatabaseService {
     };
   };
 
-  private _handleDBInit = (
-    externalSystemClient: Record<string, ExternalSystem>,
-    databaseConfig: ParsedDBConfig
-  ) => {
-    const { type, option, id } = databaseConfig;
+  private _handlePlugins = (databaseConfig: ParsedDBConfig) => {
+    const { type, option } = databaseConfig;
     let client = null;
     switch (type) {
       case EDatabaseType.POSTGRE:
@@ -72,7 +72,14 @@ export class DatabaseService {
         client = mysqlPlugin(option);
         break;
     }
-    externalSystemClient[id] = client;
+
+    return client;
+  };
+
+  private _handleDBInit = (databaseConfig: ParsedDBConfig) => {
+    const { id } = databaseConfig;
+    console.log(this._handlePlugins(databaseConfig))
+    externalServersCache.set(id, this._handlePlugins(databaseConfig));
   };
 
   /** 增加数据库实例 */
@@ -80,25 +87,16 @@ export class DatabaseService {
     id: string,
     databaseConfig: ParsedDBConfig
   ) => {
-    if (!this.app.externalSystemClient) {
-      this.app.externalSystemClient = {};
-      (global as any).app = {
-        externalSystemClient: this.app.externalSystemClient as ExternalSystem,
-      };
-    }
-    this._handleDBInit(this.app.externalSystemClient, databaseConfig);
+    this._handleDBInit.call(this, {
+      id,
+      ...databaseConfig,
+    });
   };
 
   /** 删除数据库实例 */
-  private _removeDatabaseInastance = async (id: string) => {
-    if (!this.app.externalSystemClient) {
-      this.app.externalSystemClient = {};
-      (global as any).app = {
-        externalSystemClient: this.app.externalSystemClient as ExternalSystem,
-      };
-    }
-    delete this.app.externalSystemClient[id];
-  };
+  // private async _removeDatabaseInastance(id: string){
+  //   return externalServersCache.del(id)
+  // };
 
   /** 获取解析后的DB信息 */
   private async _getParsedInfos(): Promise<ParsedDBConfig[]> {
@@ -112,13 +110,10 @@ export class DatabaseService {
   }
 
   /** 创建DB */
-  async createDatabse(databaseConfig: CreateDatabseInput) {
-    const createdDBConfig = await DatabaseModel.create(databaseConfig as any);
-    return this._addAndCoverDatabaseInstance(
-      createdDBConfig.id,
-      this._parseDatabseInput(createdDBConfig)
-    );
-  }
+  createDatabse = async (databaseConfig: CreateDatabseInput) => {
+    await DatabaseModel.create(databaseConfig as any);
+    return this.initDatabaseInstance();
+  };
 
   /** 更新DB */
   async updateDatabase(databaseConfig: UpdateDatabseInput) {
@@ -129,10 +124,7 @@ export class DatabaseService {
         this.ctx?.throw(404, "数据库配置未找到！");
       }
       await target.update(databaseConfig);
-      return this._addAndCoverDatabaseInstance(
-        databaseConfig.id,
-        this._parseDatabseInput(databaseConfig)
-      );
+      return this.initDatabaseInstance();
     }
   }
 
@@ -143,23 +135,18 @@ export class DatabaseService {
       this.ctx?.throw(404, "数据库配置未找到！");
     }
     await target.destroy();
-    return this._removeDatabaseInastance(id);
+    return this.initDatabaseInstance();
   }
 
   /** 初始化数据库中已经有的配置 */
-  initDatabaseInstance = async () => {
+  async initDatabaseInstance() {
+    console.log("init db");
     // 初始化 外部系统 客户端
     // =======================
     const databaseConfigs = await this._getParsedInfos();
-    this.app.externalSystemClient = {};
-    databaseConfigs.forEach(
-      this._handleDBInit.bind(this, this.app.externalSystemClient)
-    );
-
-    (global as any).app = {
-      externalSystemClient: this.app.externalSystemClient as ExternalSystem,
-    };
-  };
+    externalServersCache.reset();
+    databaseConfigs.forEach(this._handleDBInit);
+  }
 
   /**
    * 执行 SQL 查询语句
@@ -172,9 +159,17 @@ export class DatabaseService {
   ): Promise<any> => {
     // 处理错误
     try {
-      const DBInstance = this.ctx.app.externalSystemClient[databaseId];
-      if (!DBInstance || !DBInstance.querying) {
-        this.ctx?.throw(500, "数据库实例不存在！");
+      let DBInstance = externalServersCache.get(databaseId);
+      console.log(DBInstance)
+      if (!DBInstance || !DBInstance?.querying) {
+        if (databaseId) {
+          const _dbConfigs = await this.getDatabaseById(databaseId)
+          const _dbInstance = this._handlePlugins(this._parseDatabseInput(_dbConfigs))
+          externalServersCache.set(databaseId,_dbInstance)
+          DBInstance = _dbInstance
+        } else {
+          this.ctx?.throw(500, "数据库实例不存在！");
+        }
       }
 
       const execSql = typeof sql === "object" ? sql[DBInstance.type] : sql;
@@ -216,7 +211,7 @@ export class DatabaseService {
 
     // queryIds.forEach(async (queryId) => {
     //   if (isCms) {
-    //     await this.ctx.app.clickhouseClient.querying<
+    //     await this.app.clickhouseClient.querying<
     //       any,
     //       IClickhouseResponseFactory<any[]>
     //     >(
@@ -225,7 +220,7 @@ export class DatabaseService {
     //         "*/%')"
     //     );
     //   } else {
-    //     await this.ctx.app.clickhouseClient.querying<
+    //     await this.app.clickhouseClient.querying<
     //       any,
     //       IClickhouseResponseFactory<any[]>
     //     >(
@@ -233,7 +228,7 @@ export class DatabaseService {
     //         base64Encode(queryId) +
     //         "*/%')"
     //     );
-    //     await this.ctx.app.chStatusClient.querying<
+    //     await this.app.chStatusClient.querying<
     //       any,
     //       IClickhouseResponseFactory<any[]>
     //     >(
