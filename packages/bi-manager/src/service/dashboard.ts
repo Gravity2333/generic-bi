@@ -251,6 +251,9 @@ export class DashboardService {
     const dashboardNameList = fs
       .readdirSync(defaultDashboardDirPath)
       .filter((name) => name !== ".DS_Store");
+      this.logger.error('init dashboard')
+      this.logger.error(defaultDashboardDirPath)
+      this.logger.error(dashboardNameList)
     for (const dashboardName of dashboardNameList) {
       const dashboardPath = `${path.join(
         defaultDashboardDirPath,

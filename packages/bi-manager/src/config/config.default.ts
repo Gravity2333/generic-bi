@@ -89,8 +89,8 @@ export default (appInfo: EggAppInfo) => {
   };
 
   config.init = {
-    dashboard: path.join(__dirname, "../init/dashboard"),
-    widget: path.join(__dirname, "../init/widget"),
+    dashboard: path.join(appInfo.baseDir, "./app/init/dashboard"),
+    widget: path.join(appInfo.baseDir, "./app/init/widget"),
   };
 
   config.dict = {
