@@ -62,14 +62,14 @@ export class LayoutController {
       });
       if (!success) {
         throw new Error(info);
-      } else {
-        /** 目标文件夹路径 */
-        const backgroundsPath = this.backgroundsPath;
-        fs.writeFileSync(
-          `${backgroundsPath}/${uuidv4()}.${ext}`,
-          Buffer.from(info)
-        );
       }
+
+      const backgroundsPath = this.backgroundsPath;
+      fs.writeFileSync(
+        `${backgroundsPath}/${uuidv4()}.${ext}`,
+        Buffer.from(info)
+      );
+
     } catch (error) {
       this.ctx?.throw(500, error);
     }
@@ -83,6 +83,7 @@ export class LayoutController {
     const fileList = fs.readdirSync(`${backgroundsPath}`)
     return fileList.map(url => prefix + `/resources/backgrounds/${url}`)
   }
+
 
   @Del("/background")
   async deletebackground(@Body(ALL) { path }: { path: string }) {

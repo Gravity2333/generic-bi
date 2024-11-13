@@ -11,27 +11,48 @@
 ## 创建数据库
 CREATE DATABASE bi;
 \c bi
+
 ## 创建用户
 超级管理员 postgre下：
 CREATE USER genericbiserver WITH PASSWORD 'genericbiserver@123';
-ALTER USER genericbiserver WITH PASSWORD 'genericbiserver@123';
+
 给权限
+```sql
 grant all on schema public to genericbiserver;
- GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO genericbiserver;
-  GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO genericbiserver;
+
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO genericbiserver;
+
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO genericbiserver;
+
 grant all on table_name to genericbiserver
+
+```
+
 
 ## 安装redis
 下载地址  https://redis.io/docs/latest/operate/oss_and_stack/install/install-redis
 
+## 安装依赖
 ```bash
-$ npm install lerna -g
-# Or
-$ cnpm install lerna -g
-# Or
-$ yarn global add lerna
+cd /packages/bi-common
+
+# 中途遇到错误的话 就执行一下 yarn build 再执行 yarn
+yarn 
+
 ```
 
+## 运行 
+
+```bash
+# 后台服务
+cd /packages/bi-manager
+yarn workspace @bi/manager run dev
+
+
+# web服务
+cd /packages/bi-manager-web
+yarn start
+```
 ---
 
 ## Yarn workspace 版本
@@ -148,9 +169,17 @@ docker-compose -f docker-compose.dev.yml stop
 docker-compose -f docker-compose.dev.yml up -d
 ```
 
+## Docker构建
+在根目录下 执行
+```bash
+docker build -t generic-bi-server .
+```
 
+一些可能有帮助的命令
+```bash
+docker: psql -h localhost -U genericbiserver -d genericbiserver -d bi
 
-# docker run --name iptables --privileged -it registry/iptables:v1 bash
+psql -h generic-bi-postgres -U genericbiserver -d genericbiserver -d bi -w genericbiserver@123
 
 psql -h postgres-container -U postgres -d postgres
 
@@ -159,3 +188,9 @@ postgres-container
 docker run -d -p 8080:41130 --name=my_generic_bi11 generic-bi /bin/sh -c "tail -f /dev/null"  
 
 docker run -d -p 8080:41130 --name=my_generic_bi22 --network my_network generic-bi /bin/sh -c "tail -f /dev/null"
+
+apk add postgresql-client
+```
+
+## 直接运行？
+见release分支，下载docker镜像即可

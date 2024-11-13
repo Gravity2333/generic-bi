@@ -11,41 +11,43 @@ import MOUNTAIN from "!!file-loader?name=static/[name].[ext]!./mountain.jpg"
 import TURBINES from "!!file-loader?name=static/[name].[ext]!./turbines.jpg"
 //@ts-ignore
 import CITY_SAMPLE from "!!file-loader?name=static/[name].[ext]!./city-sample.jpg"
+const isDev = process.env.NODE_ENV === 'development';
+
 
 export const __DEFAULT_BACKGROUNDS__   = [
     {
         name: '灯塔',
-        path: '/static/bridge.svg',
+        path: isDev?'/static/bridge.svg': '/bi/web-static/static/bridge.svg',
         cover: BRIDGE_SVG,
     },
     {
         name: '枫叶🍁',
-        path: '/static/yellowLeaves.jpg',
+        path: isDev?'/static/yellowLeaves.jpg':'/bi/web-static/static/yellowLeaves.jpg',
         cover: YELLOW_LEAF
     },
     {
         name: '森林🌳',
-        path: '/static/forest.jpg',
+        path: isDev?'/static/forest.jpg':'/bi/web-static/static/forest.jpg',
         cover: FOREST
     },
     {
         name: '松树林🌲',
-        path: '/static/pine-forest.jpg',
+        path: isDev?'/static/pine-forest.jpg':'/bi/web-static/static/pine-forest.jpg',
         cover: PINE_FOREST
     },
     {
         name: '山峰⛰️',
-        path: '/static/mountain.jpg',
+        path: isDev?'/static/mountain.jpg':'/bi/web-static/static/mountain.jpg',
         cover: MOUNTAIN
     },
     {
         name: '风车',
-        path: '/static/turbines.jpg',
+        path: isDev?'/static/turbines.jpg':'/bi/web-static/static/turbines.jpg',
         cover: TURBINES
     },
     {
         name: '城市简笔',
-        path: '/static/city-sample.jpg',
+        path: isDev?'/static/city-sample.jpg':'/bi/web-static/static/city-sample.jpg',
         cover: CITY_SAMPLE
     }
 ]

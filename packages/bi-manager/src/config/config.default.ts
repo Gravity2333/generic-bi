@@ -9,7 +9,7 @@ export default (appInfo: EggAppInfo) => {
     listen: {
       path: "",
       port: 41130,
-      hostname: "127.0.0.1",
+      hostname: "0.0.0.0",
     },
   };
 
@@ -35,9 +35,10 @@ export default (appInfo: EggAppInfo) => {
   config.sequelize = {
     options: {
       dialect: "postgres",
-      host: "127.0.0.1",
-      port: 5433,
+      host: "generic-bi-postgres",
+      port: 5432,
       database: "bi",
+      user: "genericbiserver",
       username: "genericbiserver",
       password: "genericbiserver@123",
       timezone: "+08:00",
@@ -62,7 +63,7 @@ export default (appInfo: EggAppInfo) => {
 
   config.redis = {
     client: {
-      host: "bi-redis", // default value
+      host: "generic-bi-redis", // default value
       port: 6379, // default value
       // password: "Machloop@123",
       db: 0,
@@ -81,7 +82,7 @@ export default (appInfo: EggAppInfo) => {
     },
   };
 
-  config.backgrounds = path.join(__dirname, "../resources/backgrounds")
+  config.backgrounds = path.join(appInfo.baseDir, "./app/public/static/resources/backgrounds")
 
   config.report = {
     pdf_dir: path.join(__dirname, "../resources/pdf"),
@@ -112,7 +113,7 @@ export default (appInfo: EggAppInfo) => {
 
   config.web_uri = "http://127.0.0.1:41130/bi";
 
-  config.asset_uri = "http://127.0.0.1:41130/public";
+  config.asset_uri = "http://127.0.0.1:41130/bi/web-static/static";
 
   config.jwt = {
     enabled: false,
@@ -138,11 +139,6 @@ export default (appInfo: EggAppInfo) => {
    *  主线 - MAIN
    */
   config.bi_mode = "main";
-
-  config.static = {
-    prefix: "/public/",
-    dir: path.join(appInfo.baseDir, "app")
-  };
 
   config.static = {
     prefix: "/bi/web-static/",
