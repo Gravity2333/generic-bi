@@ -423,8 +423,8 @@ export class WidgetService {
     /** 文件夹下文件名称列表 */
     const widgetNameList = fs
       .readdirSync(defaultWidgetDirPath)
-      .filter((name) => name !== ".DS_Store");
-
+      .filter((name) => name !== ".DS_Store")
+      .filter((name) => name !== "placeholder");
     for (const widgetName of widgetNameList) {
       const widgetPath = `${path.join(defaultWidgetDirPath, widgetName)}`;
       const widgetJson = fs.readFileSync(widgetPath, "utf-8");
