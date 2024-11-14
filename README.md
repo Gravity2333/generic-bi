@@ -1,5 +1,9 @@
 # Generic-bi-server
 一个通用的bi系统,目前支持Clickhouse Postgre Mysql的数据可视化
+
+DEMO: http://180.76.162.109/
+
+
 ![alt text](image.png)
 ## Getting Started
 
