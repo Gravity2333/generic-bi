@@ -5,14 +5,14 @@ import { request } from 'umi';
 import { downloadFile } from './downloadFile';
 
 /** 探索sql */
-export async function exploreSqlJson(sql: string, queryId: string) {
+export async function exploreSqlJson(sql: string, queryId: string,database: string) {
   return request<IAjaxResponseFactory<{
     success: boolean,
     message?: string,
     data?: IWidgetFormData[]
   }>>(`${API_PREFIX}/sql-json/explore`, {
     method: 'GET',
-    params: { sql, queryId },
+    params: { sql, queryId,database },
   });
 }
 

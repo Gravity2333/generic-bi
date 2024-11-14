@@ -1,16 +1,16 @@
 import storage from '@/utils/storage';
-import { useContext, useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 export const SEARCH_TREE_COLLAPSED_KEY = 'search-tree-collapsed';
 import styles from './index.less';
-import ProTable, { ActionType, ProColumns } from '@ant-design/pro-table';
+import ProTable, { ProColumns } from '@ant-design/pro-table';
 import { IClickhouseColumn } from '@bi/common';
 import { Affix, Button, Card, Select, Tooltip, message } from 'antd';
-import { GlobalContext, IGlobalContext } from '@/layouts/GlobalLayout';
-import { queryClichhouseTableColumns } from '@/services/dataset';
 import classNames from 'classnames';
 import { DoubleRightOutlined, LeftSquareOutlined } from '@ant-design/icons';
 import AutoHeightContainer from '@/components/AutoHeightContainer';
 import CopyToClipboard from 'react-copy-to-clipboard';
+import useSource from '@/hooks/useSource';
+import React from 'react';
 
 const datasourceColumns: ProColumns<IClickhouseColumn>[] = [
   {
@@ -57,13 +57,34 @@ const datasourceColumns: ProColumns<IClickhouseColumn>[] = [
   },
 ];
 
-const SideBar = ({ children,initTableName }: any) => {
+const SideBar = ({ children, initTableName }: any) => {
   const [collapsed, setCollapsed] = useState<boolean>(
     () => storage.get(SEARCH_TREE_COLLAPSED_KEY) === 'true',
   );
-  const { datasets: tables = [] } = useContext<IGlobalContext>(GlobalContext);
-  const [selectedTable, setSelectedTable] = useState<string>(initTableName||tables[0]?.name);
-  const actionRef = useRef<ActionType>();
+
+  const [selectedTable, setSelectedTable] = useState<string>('');
+  const [selectedDatabase, setSelectedDatabase] = useState<string>('');
+
+  const { databases, datasources, columns: currentColums, selectDB, selectTb } = useSource();
+
+  /** 数据源列表 */
+  const databaseList = useMemo(() => {
+    return (
+      databases.map((item: any) => ({
+        id: item.id,
+        title: item.name,
+      })) || []
+    );
+  }, [databases]);
+
+  const tables = useMemo(() => {
+    return (
+      datasources.map((item: any) => ({
+        id: item.name,
+        title: item.comment || item.name,
+      })) || []
+    );
+  }, [datasources]);
 
   const handleCollapsed = (nextCollapsed: boolean) => {
     setCollapsed(nextCollapsed);
@@ -71,15 +92,28 @@ const SideBar = ({ children,initTableName }: any) => {
   };
 
   useEffect(() => {
-    setSelectedTable(tables[0]?.name);
-    actionRef.current?.reload();
+    selectTb(selectedTable);
+  }, [selectedTable]);
+
+  useEffect(() => {
+    selectDB(selectedDatabase);
+  }, [selectedDatabase]);
+
+  useEffect(() => {
+    setSelectedTable(tables[0]?.id);
   }, [tables]);
 
-  useEffect(()=>{
-    if(initTableName){
-      setSelectedTable(initTableName)
+  useEffect(() => {
+    if (initTableName) {
+      setSelectedTable(initTableName);
     }
-  },[initTableName])
+  }, [initTableName]);
+
+  useEffect(()=>{
+    if(databases?.length > 0 ){
+      setSelectedDatabase(databases[0]?.id!)
+    }
+  },[databases])
 
   return (
     <div className={classNames([styles.layoutWrap, collapsed && styles.collapsed])}>
@@ -117,18 +151,36 @@ const SideBar = ({ children,initTableName }: any) => {
                 <AutoHeightContainer contentStyle={{ overflow: 'auto' }}>
                   <Select
                     style={{ width: '90%', margin: '15px 15px' }}
+                    showSearch
+                    value={selectedDatabase}
+                    optionFilterProp="label"
+                    placeholder="数据库"
+                    onChange={(value) => {
+                      setSelectedDatabase(value);
+                    }}
+                  >
+                    {databaseList.length &&
+                      databaseList.map((item: any) => (
+                        <Select.Option key={item.id} value={item.id} label={item.title}>
+                          {item.title}
+                        </Select.Option>
+                      ))}
+                  </Select>
+                  <Select
+                    style={{ width: '90%', margin: '15px 15px' }}
                     onChange={(value) => {
                       setSelectedTable(value);
-                      actionRef.current?.reload();
                     }}
+                    showSearch
+                    optionFilterProp="label"
                     placeholder="数据源"
                     value={selectedTable}
                   >
                     {tables.map((item) => {
-                      const value = item.name!;
+                      const value = item.id!;
                       return (
-                        <Select.Option key={value} value={value}>
-                          {item.comment! || value}
+                        <Select.Option key={value} value={value} label={item.title}>
+                          {item.title! || value}
                         </Select.Option>
                       );
                     })}
@@ -158,23 +210,10 @@ const SideBar = ({ children,initTableName }: any) => {
                     key={'1'}
                     size="small"
                     columns={datasourceColumns}
-                    request={async () => {
-                      if (tables.length <= 0 || !selectedTable) {
-                        return {
-                          data: [],
-                          success: false,
-                        };
-                      }
-                      const { success, data } = await queryClichhouseTableColumns(selectedTable);
-                      return {
-                        data: success ? [...data] : [],
-                        success,
-                      };
-                    }}
+                    dataSource={currentColums}
                     pagination={false}
                     search={false}
                     toolBarRender={false}
-                    actionRef={actionRef}
                   />
                 </AutoHeightContainer>
               </Card>
@@ -182,7 +221,9 @@ const SideBar = ({ children,initTableName }: any) => {
           </Affix>
         )}
       </div>
-      <div className={styles.contentWrap}>{children}</div>
+      <div className={styles.contentWrap}>
+        {React.Children.map(children, (child) => React.cloneElement(child, { databaseList }))}
+      </div>
     </div>
   );
 };

@@ -6,9 +6,15 @@ import { v4 as uuidv4 } from 'uuid';
 import { exploreSqlJson } from '@/services/sqllab';
 import React from 'react';
 import { cancelQueryWidgetData } from '@/services';
+import { MonitorOutlined } from '@ant-design/icons';
 
 function SQLPreview(
-  { sql, setLoading, initId }: { sql?: string; setLoading?: any; initId?: string },
+  {
+    sql,
+    setLoading,
+    initId,
+    database,
+  }: { sql?: string; setLoading?: any; initId?: string; database: string },
   ref: any,
 ) {
   const [tableData, setTableData] = useState<any[]>([]);
@@ -20,6 +26,7 @@ function SQLPreview(
     return initId || uuidv4();
   }, [initId]);
   const sqlRef = useRef<string>();
+  const isInit = useRef<any>(true);
   const exploreSql = async (sqlParam?: string) => {
     if (!(sqlParam || sql)) {
       return;
@@ -28,7 +35,7 @@ function SQLPreview(
     setExploreLoading(true);
     setLoading && setLoading(true);
     const { success, data, message } =
-      (await exploreSqlJson(sqlParam || sql || '', id))?.data || {};
+      (await exploreSqlJson(sqlParam || sql || '', id, database))?.data || {};
     setExploreSuccess(success);
     if (success) {
       if (data![0]) {
@@ -48,6 +55,9 @@ function SQLPreview(
         setTableColumns([]);
       }
       setTableData(data!);
+      if (!isInit.current) {
+        isInit.current = true;
+      }
     } else {
       setTableColumns([]);
       setTableData([]);
@@ -70,6 +80,17 @@ function SQLPreview(
       cancelQueryWidgetData(id);
     };
   }, []);
+
+  if (isInit.current) {
+    return (
+      <Result
+        status="info"
+        icon={<MonitorOutlined />}
+        title={' SQL LAB '}
+        extra={<span style={{color:'lightgray'}}>请在选择数据库后开始查询！</span>}
+      />
+    );
+  }
 
   return (
     <>

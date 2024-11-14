@@ -32,7 +32,7 @@ import { DatabaseService } from "../service/database";
 export class SqlLabController {
   @Inject()
   databaseService: DatabaseService;
-  
+
   @Inject()
   ctx: Context;
 
@@ -45,7 +45,15 @@ export class SqlLabController {
   @Get("/sql-json/explore")
   async sqlJsonExplore(
     @Query(ALL)
-    { queryId, sql }: { sql: string; queryId?: string }
+    {
+      queryId,
+      sql,
+      database,
+    }: {
+      sql: string;
+      queryId?: string;
+      database: string;
+    }
   ) {
     try {
       const securityQueryId = queryId ? `/*${base64Encode(queryId)}*/ ` : "";
@@ -54,10 +62,10 @@ export class SqlLabController {
         securityQueryId;
       let sqlData: any = null;
       try {
-        sqlData = await this.databaseService.executeSql(fullSql,'');
+        sqlData = await this.databaseService.executeSql(fullSql, database);
       } catch (e) {
         try {
-          sqlData = await this.databaseService.executeSql(fullSql,'');
+          sqlData = await this.databaseService.executeSql(fullSql, database);
         } catch (error) {
           throw new Error(error);
         }
@@ -131,10 +139,10 @@ export class SqlLabController {
     try {
       let dataList: Record<string, any>[] = null;
       try {
-        dataList = await this.databaseService.executeSql(sql,'');
+        dataList = await this.databaseService.executeSql(sql, "");
       } catch (e) {
         try {
-          dataList = await this.databaseService.executeSql(sql,'');
+          dataList = await this.databaseService.executeSql(sql, "");
         } catch (error) {
           this.ctx?.throw(500, error);
         }
@@ -148,7 +156,10 @@ export class SqlLabController {
           });
           const stream = Readable.from(csv);
           this.ctx.set(KEEP_RESPONSE_RAW, "1");
-          this.ctx.set("Content-Disposition", `attachment; filename=${encodeURIComponent(`${"untitled"}.csv`)}`);
+          this.ctx.set(
+            "Content-Disposition",
+            `attachment; filename=${encodeURIComponent(`${"untitled"}.csv`)}`
+          );
           this.ctx.set("Content-Type", "application/csv");
           this.ctx.body = stream;
           this.ctx.status = 200;
@@ -169,7 +180,10 @@ export class SqlLabController {
           ]);
           const stream = Readable.from(excel);
           this.ctx.set(KEEP_RESPONSE_RAW, "1");
-          this.ctx.set("Content-Disposition", `attachment; filename=${encodeURIComponent(`${"untitled"}.xlsx`)}`);
+          this.ctx.set(
+            "Content-Disposition",
+            `attachment; filename=${encodeURIComponent(`${"untitled"}.xlsx`)}`
+          );
           this.ctx.set("Content-Type", "application/xlsx");
           this.ctx.body = stream;
           this.ctx.status = 200;

@@ -1,6 +1,6 @@
 import { API_PREFIX, BI_AUTH_TOKEN_KEY } from '@/common';
 import { deleteBackground, getBackgroundUrls } from '@/services/layout';
-import { PlusOutlined, PlusSquareOutlined, UploadOutlined } from '@ant-design/icons';
+import { PlusSquareOutlined } from '@ant-design/icons';
 import { Button, Card, message, Upload } from 'antd';
 import Meta from 'antd/lib/card/Meta';
 import { useEffect, useState } from 'react';
@@ -28,7 +28,7 @@ export default function Theme() {
       <h2 style={{ width: '80%', margin: '20px auto' }}>选择背景图:</h2>
       <div className={styles['background-list']}>
         <Card
-          style={{ width: ' 350px', height: '350px' }}
+          style={{ width: ' 300px', height: '350px' }}
           hoverable
           bodyStyle={{
             height: '100%',
@@ -61,20 +61,18 @@ export default function Theme() {
                 }
               },
             }}
-            beforeUpload={
-              (file) => {
-                const { name } = file;
-                const allowTypes = /\.(jpg|jpeg|png|gif|svg|webp)$/i;
-                if (!allowTypes.test(name)) {
-                  message.destroy();
-                  message.error('只能上传 JPG 或 PNG 文件!');
-                  return false;
-                }
+            beforeUpload={(file) => {
+              const { name } = file;
+              const allowTypes = /\.(jpg|jpeg|png|gif|svg|webp)$/i;
+              if (!allowTypes.test(name)) {
                 message.destroy();
-                message.loading('上传中!');
-                return true;
+                message.error('只能上传 JPG 或 PNG 文件!');
+                return false;
               }
-            }
+              message.destroy();
+              message.loading('上传中!');
+              return true;
+            }}
           >
             <PlusSquareOutlined
               style={{
@@ -88,35 +86,66 @@ export default function Theme() {
           </Upload>
         </Card>
         {__DEFAULT_BACKGROUNDS__.map(({ name, path, cover }: any) => {
-          return <Card hoverable cover={<img width={350} height={250} alt="example" src={cover} />} >
-            <Meta
-              title={name}
-              description={
-                <>
-                  <Button size='small' type='link' onClick={() => {
-                    changeBackground(path)
-                  }}>设置为背景</Button>
-                </>
-              } />
-          </Card>;
+          return (
+            <Card hoverable cover={<img width={350} height={250} alt="example" src={cover} />}>
+              <Meta
+                title={name}
+                description={
+                  <>
+                    <Button
+                      size="small"
+                      type="link"
+                      onClick={() => {
+                        changeBackground(path);
+                      }}
+                    >
+                      设置为背景
+                    </Button>
+                  </>
+                }
+              />
+            </Card>
+          );
         })}
         {backgroundUrls.map((backgroundUrl) => {
-          return <Card hoverable cover={<img width={350} height={250} alt="example" src={backgroundUrl} />} >
-            <Meta
-              title={<Button size='small' type='link' onClick={() => {
-                changeBackground(backgroundUrl)
-              }}>设置为背景</Button>}
-              description={<Button size='small' type='link' danger
-                onClick={() => {
-                  (async () => {
-                    const { success } = await deleteBackground(backgroundUrl)
-                    if (success) {
-                      message.success('删除素材成功！')
-                      refreshUrls();
-                    }
-                  })()
-                }}>删除素材</Button>} />
-          </Card>;
+          return (
+            <Card
+              hoverable
+              cover={<img width={350} height={250} alt="example" src={backgroundUrl} />}
+            >
+              <Meta
+                title={
+                  <Button
+                    size="small"
+                    type="link"
+                    onClick={() => {
+                      changeBackground(backgroundUrl);
+                    }}
+                  >
+                    设置为背景
+                  </Button>
+                }
+                description={
+                  <Button
+                    size="small"
+                    type="link"
+                    danger
+                    onClick={() => {
+                      (async () => {
+                        const { success } = await deleteBackground(backgroundUrl);
+                        if (success) {
+                          message.success('删除素材成功！');
+                          refreshUrls();
+                        }
+                      })();
+                    }}
+                  >
+                    删除素材
+                  </Button>
+                }
+              />
+            </Card>
+          );
         })}
       </div>
     </>

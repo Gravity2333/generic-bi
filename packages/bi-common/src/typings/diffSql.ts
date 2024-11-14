@@ -28,9 +28,9 @@ export const DATA_SET_QUERY_MAP = {
     tableName: string
   ) => ({
     [EDatabaseType.POSTGRE]: `SELECT 
-      c.column_name,
-      c.data_type,
-      pg_catalog.col_description(t.oid, c.ordinal_position) AS column_comment
+      c.column_name as name,
+      c.data_type as type,
+      pg_catalog.col_description(t.oid, c.ordinal_position) AS comment
   FROM 
       information_schema.columns c
   JOIN 

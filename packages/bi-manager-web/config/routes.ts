@@ -184,7 +184,7 @@ const routes: IRouteProps[] = [
   {
     path: '/embed/sql-lab',
     name: 'SQL Lab',
-    icon: 'ConsoleSqlOutlined',
+    icon: 'MonitorOutlined',
     hideInMenu: true,
     layout: false,
     component: '../layouts/GlobalLayout',

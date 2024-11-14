@@ -11,6 +11,7 @@ import {
 import {
   ExportOutlined,
   FormatPainterOutlined,
+  QuestionCircleOutlined,
   RollbackOutlined,
   SearchOutlined,
   StopOutlined,
@@ -23,19 +24,20 @@ import {
   Form,
   Menu,
   Modal,
+  Popover,
   Result,
+  Select,
   Skeleton,
   Tabs,
   TabsProps,
   message,
 } from 'antd';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import SideBar from './components/SideBar';
 import { EVisualizationType, IWidgetFormData } from '@bi/common';
 import DraggableTabs from '../Dashboard/components/DraggableTabs';
 import EditableTitle from '@/components/EditableTitle';
 import TextArea from 'antd/lib/input/TextArea';
-import styles from './index.less';
 import { history } from 'umi';
 //@ts-ignore
 import { format } from 'sql-formatter';
@@ -44,57 +46,22 @@ import { useWatch } from 'antd/lib/form/Form';
 import { cancelQueryWidgetData } from '@/services';
 import useEmbed from '@/hooks/useEmbed';
 import CenteredCard from '@/components/CenteredCard';
-
-function extractTableNamesFromSQL(sqlQuery: string) {
-  const tableNames = [];
-  const regex = /FROM\s+([^\s,\)]+)/gi;
-  let match;
-
-  while ((match = regex.exec(sqlQuery))) {
-    tableNames.push(match[1]);
-  }
-
-  return tableNames[0];
-}
-
-/**
- * 删除当前url中指定参数
- * @param names 数组或字符串
- * @returns {string}
- */
-function urlDelParams(names: any) {
-  if (typeof names == 'string') {
-    names = [names];
-  }
-  var loca = window.location;
-  var obj = {} as any;
-  var arr = loca.search.substr(1).split('&') as any;
-  //获取参数转换为object
-  for (var i = 0; i < arr.length; i++) {
-    arr[i] = arr[i].split('=');
-    obj[arr[i][0]] = arr[i][1];
-  }
-  //删除指定参数
-  for (var i = 0; i < names.length; i++) {
-    delete obj[names[i]];
-  }
-  //重新拼接url
-  var url =
-    loca.origin +
-    loca.pathname +
-    '?' +
-    JSON.stringify(obj)
-      .replace(/[\"\{\}]/g, '')
-      .replace(/\:/g, '=')
-      .replace(/\,/g, '&');
-  window.history.replaceState(null, '', url);
-}
+import { flushSync } from 'react-dom';
 
 const BI_SQL_JSON_TAB_ID = 'BI_SQL_JSON_TAB_ID';
 
-export default function SqlLab() {
+const SQLLabEditContent = ({
+  databaseList = [],
+}: {
+  databaseList?: {
+    id: any;
+    title: any;
+  }[];
+}) => {
+  const [selectedDatabase, setSelectedDatabase] = useState<string>('');
   const [form] = Form.useForm();
   const [exploreLoading, setExploreLoading] = useState<boolean>(false);
+
   const id = useRef('');
   const [sqlJsonList, setSqlJsonList] = useState<IWidgetFormData[]>([]);
   const [selectedSqlJson, setSelectedSqlJson] = useState<IWidgetFormData>();
@@ -103,9 +70,8 @@ export default function SqlLab() {
   const sqlEmpty = !/\S/.test(sql);
   const banCreateTab = selectedSqlJson?.id === '' && sqlJsonList?.length !== 0;
   const banChangeTab = selectedSqlJson?.id === '';
-  const [embed, location] = useEmbed();
+  const [embed] = useEmbed();
   const [tabLoading, setTabLoading] = useState<boolean>(true);
-  const [initTableName, setInitTableName] = useState<string>();
   const sqlPreviewRef = useRef<{ reload: any }>();
 
   const fetchSqlJsonList = async () => {
@@ -127,6 +93,8 @@ export default function SqlLab() {
         viz_type: EVisualizationType.SQL,
         specification: sql,
         readonly: '0',
+        template: '0',
+        database: selectedDatabase,
       });
       if (success) {
         await fetchSqlJsonList();
@@ -143,6 +111,8 @@ export default function SqlLab() {
         viz_type: EVisualizationType.SQL,
         specification: sql,
         readonly: '0',
+        template: '',
+        database: selectedDatabase,
       });
       if (success) {
         await fetchSqlJsonList();
@@ -164,6 +134,8 @@ export default function SqlLab() {
           viz_type: EVisualizationType.SQL,
           specification: '',
           readonly: '0',
+          template: '0',
+          database: '',
         };
         id.current = '';
         setSqlJsonList([...sqlJsonList, newSqlJson]);
@@ -218,6 +190,7 @@ export default function SqlLab() {
       if (t !== undefined) {
         id.current = t.id!;
         setSelectedSqlJson(t);
+        setSelectedDatabase(t.database);
         localStorage.setItem(BI_SQL_JSON_TAB_ID, activeKey);
       }
     };
@@ -241,216 +214,232 @@ export default function SqlLab() {
 
   useEffect(() => {
     (async () => {
-      const createSql = location?.query?.createsql;
-      if (createSql) {
-        setInitTableName(extractTableNamesFromSQL(createSql));
-      }
       const data = await fetchSqlJsonList();
-
-      urlDelParams('createsql');
-      if (createSql) {
-        const newSqlJson = {
-          id: '',
-          name: 'untitled',
-          datasource: '',
-          viz_type: EVisualizationType.SQL,
-          specification: createSql,
-          readonly: '0',
-        };
-        setSqlJsonList([...data, newSqlJson]);
-        setSelectedSqlJson(newSqlJson);
-        sqlPreviewRef?.current?.reload(createSql);
-        return;
-      }
-
-      const urlId = location?.query?.id;
-      urlDelParams('id');
-      if (urlId) {
-        const t = data?.find((s) => s.id === urlId);
-        if (t !== undefined) {
-          id.current = t.id!;
-          setSelectedSqlJson(t);
-          localStorage.setItem(BI_SQL_JSON_TAB_ID, urlId);
-          location.query = {};
-          sqlPreviewRef?.current?.reload(t?.specification);
-          return;
-        }
-      }
-
       if (data[0]) {
-        setSelectedSqlJson(data[0]);
+        flushSync(() => {
+          setSelectedSqlJson(data[0]);
+          setSelectedDatabase(data[0].database);
+        });
         sqlPreviewRef?.current?.reload(data[0]?.specification);
       }
     })();
   }, []);
 
+  if (tabLoading) {
+    return <Skeleton />;
+  }
+
   return (
-    <CenteredCard>
-      <SideBar initTableName={initTableName}>
-        {(() => {
-          if (tabLoading) {
-            return <Skeleton />;
-          }
-
+    <>
+      <DraggableTabs
+        type="editable-card"
+        destroyInactiveTabPane
+        activeKey={selectedSqlJson?.id}
+        onEdit={handleEdit}
+        onChange={handleChange}
+        dragEnd={handleDragEnd}
+      >
+        {sqlJsonList.map((row) => {
           return (
-            <>
-              <DraggableTabs
-                type="editable-card"
-                destroyInactiveTabPane
-                activeKey={selectedSqlJson?.id}
-                onEdit={handleEdit}
-                onChange={handleChange}
-                dragEnd={handleDragEnd}
-              >
-                {sqlJsonList.map((row) => {
-                  return (
-                    <Tabs.TabPane
-                      tab={
-                        <EditableTitle
-                          title={row.name}
-                          canEdit={true}
-                          onSaveTitle={setCurrentSqlJsonName}
-                          showTooltip={false}
-                        />
-                      }
-                      key={row.id}
-                    ></Tabs.TabPane>
-                  );
-                })}
-              </DraggableTabs>
+            <Tabs.TabPane
+              tab={
+                <EditableTitle
+                  title={row.name}
+                  canEdit={true}
+                  onSaveTitle={setCurrentSqlJsonName}
+                  showTooltip={false}
+                />
+              }
+              key={row.id}
+            ></Tabs.TabPane>
+          );
+        })}
+      </DraggableTabs>
 
-              {sqlJsonList?.length > 0 ? (
-                <>
-                  <Form form={form}>
-                    <Card
-                      style={{
-                        width: '100%',
-                        height: '300px',
-                        margin: '10px',
-                        background: 'rgba(0, 0, 0, 0.05)',
-                      }}
-                      title={null}
-                      size={'small'}
-                      bodyStyle={{ width: '100%', height: '100%', padding: '10px' }}
-                      bordered
-                    >
-                      <Form.Item name="sql" noStyle>
-                        <TextArea style={{ height: 240, resize: 'none' }} />
-                      </Form.Item>
-                      <div
-                        style={{
-                          width: '100%',
-                          height: '50px',
-                          display: 'flex',
-                          alignItems: 'center',
+      {sqlJsonList?.length > 0 ? (
+        <>
+          <Form form={form}>
+            <Card
+              style={{
+                width: '100%',
+                height: '300px',
+                margin: '10px',
+                background: 'rgba(0, 0, 0, 0.05)',
+              }}
+              title={null}
+              size={'small'}
+              bodyStyle={{ width: '100%', height: '100%', padding: '10px' }}
+              bordered
+            >
+              <Form.Item name="sql" noStyle>
+                <TextArea style={{ height: 240, resize: 'none' }} />
+              </Form.Item>
+              <div
+                style={{
+                  width: '100%',
+                  height: '50px',
+                  display: 'flex',
+                  alignItems: 'center',
+                }}
+              >
+                <Select
+                  style={{ width: '200px', marginRight: '10px' }}
+                  showSearch
+                  value={selectedDatabase}
+                  optionFilterProp="label"
+                  placeholder="数据库"
+                  onChange={(value) => {
+                    setSelectedDatabase(value);
+                  }}
+                >
+                  {databaseList.length &&
+                    databaseList.map((item: any) => (
+                      <Select.Option key={item.id} value={item.id} label={item.title}>
+                        {item.title}
+                      </Select.Option>
+                    ))}
+                </Select>
+                {exploreLoading ? (
+                  <Button
+                    type="primary"
+                    danger
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      cancelQueryWidgetData(id.current);
+                      setExploreLoading(false);
+                    }}
+                    icon={<StopOutlined />}
+                    style={{ marginRight: '10px' }}
+                  >
+                    取消查询
+                  </Button>
+                ) : (
+                  <Button
+                    type="primary"
+                    icon={<SearchOutlined />}
+                    loading={exploreLoading}
+                    disabled={!selectedDatabase || sqlEmpty}
+                    onClick={() => {
+                      sqlPreviewRef?.current?.reload(sql);
+                    }}
+                  >
+                    查询
+                  </Button>
+                )}
+
+                <Button
+                  style={{ marginLeft: '10px' }}
+                  icon={<FormatPainterOutlined />}
+                  disabled={sqlEmpty}
+                  onClick={() => {
+                    form.setFieldValue('sql', format(sql));
+                  }}
+                >
+                  格式化
+                </Button>
+                <Button
+                  style={{ marginLeft: '10px' }}
+                  icon={<SearchOutlined />}
+                  disabled={sqlEmpty}
+                  onClick={() => {
+                    saveSqlJson();
+                  }}
+                >
+                  保存
+                </Button>
+                <Divider type="vertical" />
+                <Dropdown
+                  overlay={
+                    <Menu>
+                      <Menu.Item
+                        key={'csv'}
+                        onClick={() => {
+                          downloadSqlJsonCSV(sql);
                         }}
                       >
-                        {exploreLoading ? (
-                          <Button
-                            type="primary"
-                            danger
-                            onClick={(e) => {
-                              e.preventDefault();
-                              e.stopPropagation();
-                              cancelQueryWidgetData(id.current);
-                              setExploreLoading(false);
-                            }}
-                            icon={<StopOutlined />}
-                            style={{ marginRight: '10px' }}
-                          >
-                            取消查询
-                          </Button>
-                        ) : (
-                          <Button
-                            type="primary"
-                            icon={<SearchOutlined />}
-                            loading={exploreLoading}
-                            disabled={sqlEmpty}
-                            onClick={() => {
-                              sqlPreviewRef?.current?.reload(sql);
-                            }}
-                          >
-                            查询
-                          </Button>
-                        )}
+                        导出 CSV 文件
+                      </Menu.Item>
+                      <Menu.Item
+                        key={'excel'}
+                        onClick={() => {
+                          downloadSqlJsonExcel(sql);
+                        }}
+                      >
+                        导出 Excel 文件
+                      </Menu.Item>
+                    </Menu>
+                  }
+                  disabled={sqlEmpty}
+                  trigger={['click']}
+                >
+                  <Button disabled={sqlEmpty} type="primary" icon={<ExportOutlined />}>
+                    导出
+                  </Button>
+                </Dropdown>
+                <Button
+                  style={{ marginLeft: '10px' }}
+                  icon={<RollbackOutlined />}
+                  onClick={() => {
+                    if (embed) {
+                      history.push('/embed/widget');
+                    } else {
+                      history.push('/widget');
+                    }
+                  }}
+                >
+                  返回
+                </Button>
+                <Popover
+                  style={{ padding: '5px' }}
+                  placement="bottom"
+                  content={
+                    <div style={{ fontSize: '12px' }}>
+                      <ul style={{ margin: '0px', paddingLeft: '10px' }}>
+                        <li>BI SQL Lab 是一个集成 SQL 查询和分析功能的工具</li>
+                        <li>
+                          旨在为您提供一个易于使用的平台，以执行高效的数据查询、可视化分析和报告生成。
+                        </li>
+                        <li>您可以够直接对数据库执行 SQL 查询，分析数据，并实时查看结果。</li>
+                      </ul>
+                    </div>
+                  }
+                  trigger="hover"
+                >
+                  <QuestionCircleOutlined
+                    style={{
+                      color: 'var(--ant-primary-color)',
+                      cursor: 'help',
+                      fontSize: '20px',
+                      verticalAlign: '-2px',
+                      marginLeft: '10px',
+                    }}
+                  />
+                </Popover>
+              </div>
+            </Card>
+            <AutoHeightContainer contentStyle={{ overflowY: 'auto' }} autoHeight={true}>
+              <SQLPreview
+                database={selectedDatabase}
+                initId={id.current}
+                ref={sqlPreviewRef}
+                setLoading={setExploreLoading}
+              />
+            </AutoHeightContainer>
+          </Form>
+        </>
+      ) : (
+        <Result status="info" title="请创建SQL!" />
+      )}
+    </>
+  );
+};
 
-                        <Button
-                          style={{ marginLeft: '10px' }}
-                          icon={<FormatPainterOutlined />}
-                          disabled={sqlEmpty}
-                          onClick={() => {
-                            form.setFieldValue('sql', format(sql));
-                          }}
-                        >
-                          格式化
-                        </Button>
-                        <Button
-                          style={{ marginLeft: '10px' }}
-                          icon={<SearchOutlined />}
-                          disabled={sqlEmpty}
-                          onClick={saveSqlJson}
-                        >
-                          保存
-                        </Button>
-                        <Divider type="vertical" />
-                        <Dropdown
-                          overlay={
-                            <Menu>
-                              <Menu.Item
-                                key={'csv'}
-                                onClick={() => {
-                                  downloadSqlJsonCSV(sql);
-                                }}
-                              >
-                                导出 CSV 文件
-                              </Menu.Item>
-                              <Menu.Item
-                                key={'excel'}
-                                onClick={() => {
-                                  downloadSqlJsonExcel(sql);
-                                }}
-                              >
-                                导出 Excel 文件
-                              </Menu.Item>
-                            </Menu>
-                          }
-                          disabled={sqlEmpty}
-                          trigger={['click']}
-                        >
-                          <Button disabled={sqlEmpty} type="primary" icon={<ExportOutlined />}>
-                            导出
-                          </Button>
-                        </Dropdown>
-                        <Button
-                          style={{ marginLeft: '10px' }}
-                          icon={<RollbackOutlined />}
-                          onClick={() => {
-                            if (embed) {
-                              history.push('/embed/widget');
-                            } else {
-                              history.push('/widget');
-                            }
-                          }}
-                        >
-                          返回
-                        </Button>
-                      </div>
-                    </Card>
-                    <AutoHeightContainer contentStyle={{ overflowY: 'auto' }} autoHeight={true}>
-                      <SQLPreview
-                        initId={id.current}
-                        ref={sqlPreviewRef}
-                        setLoading={setExploreLoading}
-                      />
-                    </AutoHeightContainer>
-                  </Form>
-                </>
-              ) : (
-                <Result status="info" title="请创建SQL!" />
-              )}
-            </>
-          );
-        })()}
+export default function SqlLabLayout() {
+  return (
+    <CenteredCard>
+      <SideBar>
+        <SQLLabEditContent />
       </SideBar>
     </CenteredCard>
   );
