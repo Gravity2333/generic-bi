@@ -14,8 +14,8 @@ export default function Welcome() {
   // }, []);
   const { initialState } = useModel('@@initialState');
   return (
-    <>
-      {/* {!connect ? (
+    <div style={{ minWidth:'80%' ,position:'absolute', left:'50%',top:'50%',transform:'translate(-50%,-50%)'}}>
+        {/* {!connect ? (
         <Alert
           icon={<DisconnectOutlined />}
           type="error"
@@ -34,56 +34,56 @@ export default function Welcome() {
           }
         />
       ) : null} */}
-      <Result
-        icon={<ExperimentOutlined/>}
-        title={
-          <h4 style={{ color: 'var(--ant-info-color)' }}>
-            {'欢迎使用' + ((initialState as any)?.title || `Generic-BI`)}
-          </h4>
-        }
-      />
-      <div className={styles['show-bar']}>
-        <div
-          className={`${styles['show-bar__card']} ${styles['show-bar__card__db-cover']}`}
-          title={undefined}
-          onClick={() => {
-            history.push('/configuration/database');
-          }}
-        >
-          <h3>还没配置数据库？</h3>
-          <span>去配置</span>
-        </div>
-        <div
-          className={`${styles['show-bar__card']} ${styles['show-bar__card__widget-cover']}`}
-          title={undefined}
-          onClick={() => {
-            history.push('/widget/create');
-          }}
-        >
-          <h3>开始第一个图表！</h3>
-          <span>去创建</span>
-        </div>
-        <div
-          className={`${styles['show-bar__card']} ${styles['show-bar__card__dashboard-cover']}`}
-          title={undefined}
-          onClick={() => {
-            history.push('/dashboard/create');
-          }}
-        >
-          <h3>批量展示！</h3>
-          <span>去拖拽</span>
-        </div>
-        <div
-          className={`${styles['show-bar__card']} ${styles['show-bar__card__mail-cover']}`}
-          title={undefined}
-          onClick={() => {
-            history.push('/report/create');
-          }}
-        >
-          <h3>立刻通知！</h3>
-          <span>去发送</span>
+        <Result
+          icon={<ExperimentOutlined />}
+          title={
+            <h4 style={{ color: 'var(--ant-info-color)' }}>
+              {'欢迎使用' + ((initialState as any)?.title || `Generic-BI`)}
+            </h4>
+          }
+        />
+        <div className={styles['show-bar']}>
+          <div
+            className={`${styles['show-bar__card']} ${styles['show-bar__card__db-cover']}`}
+            title={undefined}
+            onClick={() => {
+              history.push('/configuration/database');
+            }}
+          >
+            <h3>还没配置数据库？</h3>
+            <span>去配置</span>
+          </div>
+          <div
+            className={`${styles['show-bar__card']} ${styles['show-bar__card__widget-cover']}`}
+            title={undefined}
+            onClick={() => {
+              history.push('/widget/create');
+            }}
+          >
+            <h3>开始第一个图表！</h3>
+            <span>去创建</span>
+          </div>
+          <div
+            className={`${styles['show-bar__card']} ${styles['show-bar__card__dashboard-cover']}`}
+            title={undefined}
+            onClick={() => {
+              history.push('/dashboard/create');
+            }}
+          >
+            <h3>批量展示！</h3>
+            <span>去拖拽</span>
+          </div>
+          <div
+            className={`${styles['show-bar__card']} ${styles['show-bar__card__mail-cover']}`}
+            title={undefined}
+            onClick={() => {
+              history.push('/report/create');
+            }}
+          >
+            <h3>立刻通知！</h3>
+            <span>去发送</span>
+          </div>
         </div>
       </div>
-    </>
   );
 }
