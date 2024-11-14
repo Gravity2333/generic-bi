@@ -14,6 +14,7 @@ import { history } from 'umi';
 import styles from './index.less';
 import { getTablePaginationDefaultSettings } from '@/utils/pagination';
 import useEmbed from '@/hooks/useEmbed';
+import CenteredCard from '@/components/CenteredCard';
 
 const biToken = window.localStorage.getItem(BI_AUTH_TOKEN_KEY);
 
@@ -209,12 +210,7 @@ export default function DashboardList() {
   };
 
   return (
-    <Card
-      title={undefined}
-      size="small"
-      className={styles['outer-card']}
-      bodyStyle={{ height: '100%' }}
-    >
+    <CenteredCard>
       <div className={styles['pro-table-auto-height']}>
         <ProTable
           rowKey="id"
@@ -306,6 +302,6 @@ export default function DashboardList() {
           toolBarRender={false}
         />
       </div>
-    </Card>
+    </CenteredCard>
   );
 }

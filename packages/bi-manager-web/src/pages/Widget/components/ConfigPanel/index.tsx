@@ -1046,7 +1046,7 @@ function ConfigPanel(props: Props, ref: any) {
             title={null}
             size={'small'}
             style={{
-              position: 'fixed',
+              position: 'absolute',
               width: '440px',
               left: 0,
               bottom: 0,

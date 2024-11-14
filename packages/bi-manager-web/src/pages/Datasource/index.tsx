@@ -14,6 +14,7 @@ import useVariable from 'use-variable-hook';
 import TagEditDrawer, { dictMapColumns, TagEditDrawerRef } from './components/TagEditDrawer';
 import useDatabases from '@/hooks/useDatabases';
 import useDatasources from '@/hooks/useDatasource';
+import CenteredCard from '@/components/CenteredCard';
 
 type DatasourceVariables = {
   selectedDatabase: string;
@@ -191,12 +192,7 @@ export default function Datasource() {
   ];
 
   return (
-    <Card
-      title={undefined}
-      size="small"
-      className={styles['outer-card']}
-      bodyStyle={{ height: '100%' }}
-    >
+    <CenteredCard>
       <div style={{ margin: '10px' }} className={styles['pro-table-auto-height']}>
         <ProTable<IClickhouseColumn>
           rowKey={(row) => `${variables.selectedTable}__${row.name}__${row.type}`}
@@ -280,6 +276,6 @@ export default function Datasource() {
           dicts={dicts}
         />
       </div>
-    </Card>
+    </CenteredCard>
   );
 }

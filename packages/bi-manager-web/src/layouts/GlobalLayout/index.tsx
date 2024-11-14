@@ -10,6 +10,7 @@ interface Props {
 export interface IGlobalContext {
   dicts?: INpmdDict[];
   dictsLoading?: boolean;
+  datasets?: []
 }
 
 export const GlobalContext = createContext<IGlobalContext>({});
@@ -35,6 +36,7 @@ const GlobalLayout = ({ children }: Props) => {
       value={{
         dicts,
         dictsLoading,
+        datasets: [],
       }}
     >
       {children}

@@ -21,6 +21,7 @@ import useAttachmentSourceMap from '../hooks/useAttachmentSourceMap';
 import ReportLogModal from '../components/ReportLogModal';
 import useEmbed from '@/hooks/useEmbed';
 import useVariable, { UseVariableParams } from 'use-variable-hook';
+import CenteredCard from '@/components/CenteredCard';
 
 const DEFAULT_PAGE_SIZE = 10;
 const DEFAULT_PAGE = 1;
@@ -225,12 +226,7 @@ export default function List() {
   ];
 
   return (
-    <Card
-      title={undefined}
-      size="small"
-      className={styles['outer-card']}
-      bodyStyle={{ height: '100%' }}
-    >
+    <CenteredCard>
       <div className={styles['pro-table-auto-height']}>
         {/* 邮箱配置提醒 */}
         <MailConfigAlert />
@@ -293,6 +289,6 @@ export default function List() {
           }}
         />
       </div>
-    </Card>
+    </CenteredCard>
   );
 }

@@ -7,7 +7,7 @@ import {
   IWidgetSpecification,
   parseObjJson,
 } from '@bi/common';
-import { Modal, Result, Spin, message } from 'antd';
+import { Card, Modal, Result, Spin, message } from 'antd';
 import React, { useEffect, useRef } from 'react';
 import { useContext, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
@@ -15,7 +15,7 @@ import ConfigPanel from '../components/ConfigPanel';
 import WidgetRender from '../components/Renderer';
 import styles from './index.less';
 import TemplateDrawer from '../components/TemplateDrawer';
-import { isDev } from '@/common';
+import CenteredCard from '@/components/CenteredCard';
 
 interface Props {
   widgetDetail?: IWidget;
@@ -67,19 +67,13 @@ function WidgetEditor(props: Props) {
   }, []);
 
   return (
+    <CenteredCard>
     <WidgetEditorContext.Provider
       value={{
         tableColumns,
         setTableColums,
       }}
     >
-      <style>
-        {`
-            :root{
-              --top: ${isDev ? '48px' : '0px'};
-            }
-          `}
-      </style>
       <div className={styles['widget-editor']}>
         <div className={styles['widget-editor__config']}>
           {operateType && (
@@ -202,7 +196,7 @@ function WidgetEditor(props: Props) {
           </div>
         </div>
       </div>
-    </WidgetEditorContext.Provider>
+    </WidgetEditorContext.Provider></CenteredCard>
   );
 }
 

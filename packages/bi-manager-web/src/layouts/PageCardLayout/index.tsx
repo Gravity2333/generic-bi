@@ -2,6 +2,7 @@ import { Card, Menu } from 'antd';
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { history } from 'umi';
 import styles from './index.less';
+import CenteredCard from '@/components/CenteredCard';
 
 export interface IRoute {
   exact: boolean;
@@ -72,13 +73,7 @@ const PageCardLayout: React.FC<IFlowLayout> = ({
   }, [findMatchedTag, menus, pathname]);
 
   return (
-    <Card
-      title={undefined}
-      size="small"
-      className={styles['outer-card']}
-      style={{ opacity: '0.9', height: '80vh', overflow: 'auto' }}
-      bodyStyle={{ height: '100%' }}
-    >
+    <CenteredCard>
       <div style={{ height: '100%', display: 'flex', flexFlow: 'column nowrap' }}>
         <Menu
           onClick={handlePageChange}
@@ -91,7 +86,7 @@ const PageCardLayout: React.FC<IFlowLayout> = ({
         />
         <div style={{ height: 'calc( 100% - 30px )', overflow: 'auto' }}>{children}</div>
       </div>
-    </Card>
+    </CenteredCard>
   );
 };
 

@@ -37,6 +37,7 @@ import { downloadSqlJsonCSV, downloadSqlJsonExcel } from '@/services/sqllab';
 import styles from './index.less';
 import { getTablePaginationDefaultSettings } from '@/utils/pagination';
 import useEmbed from '@/hooks/useEmbed';
+import CenteredCard from '@/components/CenteredCard';
 
 const DEFAULT_PAGE_SIZE = 10;
 const DEFAULT_PAGE = 1;
@@ -304,12 +305,7 @@ export default function WidgetList() {
   ];
 
   return (
-    <Card
-      title={undefined}
-      size="small"
-      className={styles['outer-card']}
-      bodyStyle={{ height: '100%' }}
-    >
+    <CenteredCard>
       <div className={styles['pro-table-auto-height']}>
         <ProTable
           rowKey="id"
@@ -569,6 +565,6 @@ export default function WidgetList() {
           })()}
         </Modal>
       </div>
-    </Card>
+    </CenteredCard>
   );
 }
