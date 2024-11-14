@@ -1,6 +1,7 @@
 import { EBACKGROUNDTYPE } from "@/pages/Dashboard/components/HorizontalBackground/typing";
 import { getDefaultBackground, setDefaultBackground } from "@/services/layout";
 import { message } from "antd";
+import { getThemeColor } from "./color";
 
 export const dynamicSetHeaderTitle = (title: string) => {
   const headerTitle = document.querySelector('#logo');
@@ -39,6 +40,11 @@ export async function changeBackground(path: string) {
   }
   const { success } = await setDefaultBackground(path)
   if (success) {
+    getThemeColor(path).then(vals=>{
+      console.log(vals)
+    }).catch(err=>{
+      console.log(err)
+    })
     message.success('背景修改成功！')
   }
 }
@@ -53,3 +59,5 @@ export async function updateBackground() {
   }
 
 }
+
+
