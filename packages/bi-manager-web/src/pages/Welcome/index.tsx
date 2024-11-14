@@ -1,5 +1,5 @@
 import { checkDabaseConnect } from '@/services/database';
-import { DisconnectOutlined, SmileOutlined } from '@ant-design/icons';
+import { DisconnectOutlined, ExperimentOutlined, SmileOutlined } from '@ant-design/icons';
 import { Alert, Button, Card, Result } from 'antd';
 import { useEffect, useState } from 'react';
 import { history, useModel } from 'umi';
@@ -35,8 +35,12 @@ export default function Welcome() {
         />
       ) : null} */}
       <Result
-        icon={<SmileOutlined style={{ color: 'rgba(84,154,220,0.9)' }} />}
-        title={<h4 style={{ color: 'rgba(84,154,220,0.9)' }}>{'欢迎使用' + ((initialState as any)?.title || `Generic-BI`)}</h4>}
+        icon={<ExperimentOutlined style={{ color: 'rgba(84,154,220,0.9)' }} />}
+        title={
+          <h4 style={{ color: 'rgba(84,154,220,0.9)' }}>
+            {'欢迎使用' + ((initialState as any)?.title || `Generic-BI`)}
+          </h4>
+        }
       />
       <div className={styles['show-bar']}>
         <div
