@@ -1,6 +1,4 @@
 import { API_PREFIX } from '@/common';
-import { IAjaxResponseFactory } from '@/interface';
-import { EDatabaseType } from '@bi/common';
 import { request } from 'umi';
 
 export async function register(params: {

@@ -28,6 +28,7 @@
     "ag-grid-react": "^28.2.1",
     "ahooks": "^3.7.1",
     "antd": "^4.19.3",
+    "color-thief-ts": "^1.1.1",
     "dom-to-image": "^2.6.0",
     "echarts": "^5.4.0",
     "echarts-for-react": "^3.0.2",

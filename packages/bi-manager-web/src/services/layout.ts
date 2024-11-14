@@ -44,3 +44,18 @@ export async function getDefaultBackground() {
     method: 'GET',
   });
 }
+
+export async function setThemeColor(color: string) {
+  return request(`${API_PREFIX}/default/theme-color`, {
+    method: 'POST',
+    data: {
+      color,
+    },
+  });
+}
+
+export async function getThemeColor() {
+  return request(`${API_PREFIX}/default/theme-color`, {
+    method: 'GET',
+  });
+}

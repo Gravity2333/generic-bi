@@ -35,9 +35,9 @@ export default function Welcome() {
         />
       ) : null} */}
       <Result
-        icon={<ExperimentOutlined style={{ color: 'rgba(84,154,220,0.9)' }} />}
+        icon={<ExperimentOutlined/>}
         title={
-          <h4 style={{ color: 'rgba(84,154,220,0.9)' }}>
+          <h4 style={{ color: 'var(--ant-info-color)' }}>
             {'欢迎使用' + ((initialState as any)?.title || `Generic-BI`)}
           </h4>
         }

@@ -1,5 +1,5 @@
 import { EBACKGROUNDTYPE } from "@/pages/Dashboard/components/HorizontalBackground/typing";
-import { getDefaultBackground, setDefaultBackground } from "@/services/layout";
+import { setThemeColor } from "@/services/layout";
 import { message } from "antd";
 import { getThemeColor } from "./color";
 
@@ -37,27 +37,22 @@ export async function changeBackground(path: string) {
   const root = document.querySelector('div.ant-layout')
   if (root) {
     root.setAttribute('style', `background-image: url("${path}") !important`)
-  }
-  const { success } = await setDefaultBackground(path)
+  } const primaryColorObj = await getThemeColor(path)
+  const { success } = await setThemeColor({
+    ...primaryColorObj,
+    background: path
+  })
   if (success) {
-    getThemeColor(path).then(vals=>{
-      console.log(vals)
-    }).catch(err=>{
-      console.log(err)
-    })
     message.success('背景修改成功！')
+    return
   }
 }
 
-export async function updateBackground() {
-  const { success, data } = await getDefaultBackground()
-  if (success && data) {
-    const root = document.querySelector('div.ant-layout')
-    if (root) {
-      root.setAttribute('style', `background-image: url("${data}") !important`)
-    }
+export async function updateBackground(path: string) {
+  const root = document.querySelector('div.ant-layout')
+  if (root) {
+    root.setAttribute('style', `background-image: url("${path}") !important`)
   }
-
 }
 
 
