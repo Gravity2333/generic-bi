@@ -26,7 +26,7 @@ function SQLPreview(
     return initId || uuidv4();
   }, [initId]);
   const sqlRef = useRef<string>();
-  const isInit = useRef<any>(true);
+  const [init,setInit] = useState<boolean>(true);
   const exploreSql = async (sqlParam?: string) => {
     if (!(sqlParam || sql)) {
       return;
@@ -55,8 +55,8 @@ function SQLPreview(
         setTableColumns([]);
       }
       setTableData(data!);
-      if (!isInit.current) {
-        isInit.current = true;
+      if (init) {
+        setInit(false)
       }
     } else {
       setTableColumns([]);
@@ -81,7 +81,7 @@ function SQLPreview(
     };
   }, []);
 
-  if (isInit.current) {
+  if (init) {
     return (
       <Result
         status="info"

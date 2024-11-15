@@ -1,6 +1,6 @@
 import { API_PREFIX, BI_AUTH_TOKEN_KEY } from '@/common';
 import { deleteBackground, getBackgroundUrls } from '@/services/layout';
-import { PlusSquareOutlined } from '@ant-design/icons';
+import { CloudUploadOutlined } from '@ant-design/icons';
 import { Button, Card, message, Upload } from 'antd';
 import Meta from 'antd/lib/card/Meta';
 import { useEffect, useState } from 'react';
@@ -26,7 +26,7 @@ export default function Theme() {
 
   return (
     <>
-      <h2 style={{ width: '80%', margin: '20px auto' }}>选择背景图:</h2>
+      {/* <h2 style={{ width: '80%', margin: '20px auto' }}>选择背景图:</h2> */}
       <div className={styles['background-list']}>
         <Card
           style={{ width: ' 300px', height: '350px' }}
@@ -75,7 +75,7 @@ export default function Theme() {
               return true;
             }}
           >
-            <PlusSquareOutlined
+            <CloudUploadOutlined 
               style={{
                 width: '100%',
                 height: '100%',

@@ -4,6 +4,7 @@ import { Result, Skeleton } from 'antd';
 import { useEffect, useState } from 'react';
 import { useParams } from 'umi';
 import DashboardEditor from '../Editor';
+import CenteredCard from '@/components/CenteredCard';
 
 export default function DashboardUpdate() {
   const { dashboardId } = useParams<any>();
@@ -27,5 +28,9 @@ export default function DashboardUpdate() {
     return <Result status="warning" title="没有找到相关的 Dashboard" />;
   }
 
-  return <DashboardEditor dashboard={dashboardDetail} />;
+  return (
+    <CenteredCard>
+      <DashboardEditor dashboard={dashboardDetail} />;
+    </CenteredCard>
+  );
 }

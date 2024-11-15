@@ -13,6 +13,7 @@ import { queryCurrentUserInfo } from './services/global';
 import { sendMsgToParent } from './utils/sendMsgToParent';
 import { getLayoutTitle } from './services/layout';
 import { dynamicSetHeaderTitle, updateBackground } from './utils/layout';
+import ProjectInfo from './components/ProjectInfo';
 
 export function getInitialState(): { theme: TTheme; settings?: Partial<LayoutSettings> } {
   const theme = (window.localStorage.getItem(THEME_KEY) as TTheme) || 'light';
@@ -34,10 +35,13 @@ function LayoutContent(children: JSX.Element) {
       setLoading(true);
       const { success, data } = await queryCurrentUserInfo();
       if (success) {
-        setInitialState(prev => ({
-          ...(prev || {}),
-          currentUserInfo: data,
-        }) as any);
+        setInitialState(
+          (prev) =>
+            ({
+              ...(prev || {}),
+              currentUserInfo: data,
+            } as any),
+        );
       } else {
         backToLogin();
       }
@@ -48,10 +52,13 @@ function LayoutContent(children: JSX.Element) {
       const { success, data } = await getLayoutTitle();
       if (success && data) {
         dynamicSetHeaderTitle(data);
-        setInitialState(prev => ({
-          ...(prev || {}),
-          title: data,
-        }) as any);
+        setInitialState(
+          (prev) =>
+            ({
+              ...(prev || {}),
+              title: data,
+            } as any),
+        );
       }
     })();
   }, []);
@@ -61,31 +68,32 @@ function LayoutContent(children: JSX.Element) {
   }
 
   const [themeColor, infoColor] = useMemo(() => {
-    const { palette = [],background } = (initialState as any)?.currentUserInfo?.themeColor || {}
-    updateBackground(background || './assets/backgrounds/bridge.svg')
-    return palette[1] ? [palette[2], palette[3]] : ['rgba(84,154,220,0.9)', 'rgba(84,154,220,0.9)']
-  }, [initialState])
+    const { palette = [], background } = (initialState as any)?.currentUserInfo?.themeColor || {};
+    updateBackground(background || './assets/backgrounds/bridge.svg');
 
-
+    return palette[1]
+      ? [palette[2], palette[3]]
+      : ['rgba(84,154,220,0.9)', 'rgba(84,154,220,0.9)'];
+  }, [initialState]);
 
   return (
     <>
       <style>
-        {
-          `
+        {`
           :root{
              --ant-primary-color: ${themeColor} !important;
              --ant-info-color: ${infoColor} !important;
           }
-        `
-        }
+        `}
       </style>
+      <ProjectInfo />
       <Skeleton active loading={loading}>
         {children}
       </Skeleton>
     </>
   );
 }
+
 const unAuthorizedNotification = throttle(() => {
   if (!location.href?.includes('/login')) {
     notification.error({
@@ -100,7 +108,7 @@ const unAuthorizedNotification = throttle(() => {
 // ProLayout 支持的api https://procomponents.ant.design/components/layout
 export const layout: RunTimeLayoutConfig = ({ initialState }) => {
   return {
-    logo: true,
+    logo: false,
     navTheme: initialState?.theme === 'dark' ? 'realDark' : 'light',
     layout: 'top',
     primaryColor: initialState?.theme === 'dark' ? DARK_COLOR : LIGHT_COLOR,
@@ -119,7 +127,7 @@ const REQUEST_TIME_OUT = 600000;
 export const request: RequestConfig = {
   headers: (() => {
     const biToken = window.localStorage.getItem(BI_AUTH_TOKEN_KEY);
-    return biToken ? { Authorization: `Bearer ${biToken}` } : {}
+    return biToken ? { Authorization: `Bearer ${biToken}` } : {};
   })() as any,
   timeout: REQUEST_TIME_OUT,
   errorHandler: (error: any) => {

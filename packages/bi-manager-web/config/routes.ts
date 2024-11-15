@@ -294,7 +294,7 @@ const routes: IRouteProps[] = [
   {
     path: '/sql-lab',
     name: 'SQL Lab',
-    icon: 'ConsoleSqlOutlined',
+    icon: 'MonitorOutlined',
     component: '../layouts/GlobalLayout',
     routes: [
       {
@@ -360,12 +360,12 @@ const routes: IRouteProps[] = [
         hideInMenu: true,
         component: './Configuration/Dashboard',
       },
-      {
-        path: '/configuration/dict',
-        name: '字典',
-        hideInMenu: true,
-        component: './Configuration/Dict',
-      },
+      // {
+      //   path: '/configuration/dict',
+      //   name: '字典',
+      //   hideInMenu: true,
+      //   component: './Configuration/Dict',
+      // },
       {
         path: '/configuration/mail',
         name: '邮件',

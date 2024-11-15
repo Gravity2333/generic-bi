@@ -1,10 +1,10 @@
 import { API_PREFIX, BI_AUTH_TOKEN_KEY } from '@/common';
 import { deleteDeafultDashboard, queryAllDefaultDashboards } from '@/services/dashboard';
 import { UploadOutlined } from '@ant-design/icons';
-import { EBIVERSION, IDashboardFormData, SYSTEM_DASHBOARD_ID } from '@bi/common';
+import { IDashboardFormData, SYSTEM_DASHBOARD_ID } from '@bi/common';
 import { Button, Form, List, Modal, Tag, Upload, message } from 'antd';
 import { useForm } from 'antd/lib/form/Form';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 const biToken = window.localStorage.getItem(BI_AUTH_TOKEN_KEY);
 
@@ -22,6 +22,10 @@ export default function DashboardConfig() {
     }
     setDefaltDashboardLoading(false);
   };
+
+  useEffect(() => {
+    fetchDefaultDashboard();
+  }, []);
 
   return (
     <>
@@ -60,9 +64,7 @@ export default function DashboardConfig() {
               accept: '.bi',
             }}
           >
-            <Button icon={<UploadOutlined />}>
-              导入
-            </Button>
+            <Button icon={<UploadOutlined />}>导入</Button>
           </Upload>
         </Form.Item>
         <Form.Item
