@@ -39,7 +39,7 @@ export default (appInfo: EggAppInfo) => {
     options: {
       dialect: "postgres",
       host: LOCAL_HOST,
-      port: 5433,
+      port: 5432,
       database: "bi",
       user: "genericbiserver",
       username: "genericbiserver",

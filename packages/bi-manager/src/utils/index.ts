@@ -42,6 +42,11 @@ export interface IDefaultBackgroundPathService {
   get: () => Promise<string>;
 }
 
+export interface IThemeColorService {
+  set: (userId: string, color: string) => void;
+  get: (userId: string) => Promise<string>;
+}
+
 /**
  * 编码成 Base64
  * @param str 字符串
@@ -58,6 +63,7 @@ const SQL_JSON_SEQ_MAP = Symbol("Utils#sqlJsonSeqMap");
 const JWT_TIMEOUT_MAP = Symbol("Utils#jwtTimeoutMap");
 const SYS_TITLE_MAP = Symbol("Utils#SysTitleMap");
 const DEFAULT_BACKGROUND_PATH_MAP = Symbol("Utils#DefaultBackgroundPathMap");
+const THEME_COLOR_MAP = Symbol("Utils#ThemeColorMap");
 @Provide()
 @Scope(ScopeEnum.Singleton)
 export class Utils {
@@ -148,19 +154,40 @@ export class Utils {
   }
 
   /** 背景 */
-get defaultBackgroundPathService(): IDefaultBackgroundPathService {
-  if (!this[DEFAULT_BACKGROUND_PATH_MAP]) {
-    this[DEFAULT_BACKGROUND_PATH_MAP] = {};
-    this[DEFAULT_BACKGROUND_PATH_MAP].set = (title) => {
-      this.redisService.set(DEFAULT_BACKGROUND_PATH_MAP as any, title);
-    };
-    this[DEFAULT_BACKGROUND_PATH_MAP].get = async () => {
-      return (await this.redisService.get(DEFAULT_BACKGROUND_PATH_MAP as any)) || "";
-    };
+  get defaultBackgroundPathService(): IDefaultBackgroundPathService {
+    if (!this[DEFAULT_BACKGROUND_PATH_MAP]) {
+      this[DEFAULT_BACKGROUND_PATH_MAP] = {};
+      this[DEFAULT_BACKGROUND_PATH_MAP].set = (title) => {
+        this.redisService.set(DEFAULT_BACKGROUND_PATH_MAP as any, title);
+      };
+      this[DEFAULT_BACKGROUND_PATH_MAP].get = async () => {
+        return (await this.redisService.get(DEFAULT_BACKGROUND_PATH_MAP as any)) || "";
+      };
+    }
+    return this[DEFAULT_BACKGROUND_PATH_MAP];
   }
-  return this[DEFAULT_BACKGROUND_PATH_MAP];
+
+  /** 主题色 */
+  get themeColorService(): IThemeColorService {
+    if (!this[THEME_COLOR_MAP]) {
+      this[THEME_COLOR_MAP] = {};
+      this[THEME_COLOR_MAP].set = async (userId: string,color: string) => {
+        const currentMapJson = (await this.redisService.get(THEME_COLOR_MAP as any)) || '{}'
+        const currentMap = JSON.parse(currentMapJson)
+        currentMap[userId] = color
+        this.redisService.set(THEME_COLOR_MAP as any, JSON.stringify(currentMap));
+      };
+      this[THEME_COLOR_MAP].get = async (username: string) => {
+        const currentMapJson = (await this.redisService.get(THEME_COLOR_MAP as any)) || '{}'
+        const currentMap = JSON.parse(currentMapJson)
+        return currentMap[username];
+      };
+    }
+    return this[THEME_COLOR_MAP];
+  }
+
 }
-}
+
 
 
 export const formatTime = function (fmt, date) {

@@ -8,7 +8,7 @@ import RightContent from './components/RightContent';
 import { TTheme } from './interface';
 import { backToLogin, isIframeEmbed, throttle } from './utils';
 import { DARK_COLOR, THEME_KEY } from './utils/theme';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { queryCurrentUserInfo } from './services/global';
 import { sendMsgToParent } from './utils/sendMsgToParent';
 import { getLayoutTitle } from './services/layout';
@@ -27,14 +27,14 @@ export function getInitialState(): { theme: TTheme; settings?: Partial<LayoutSet
 
 function LayoutContent(children: JSX.Element) {
   const [loading, setLoading] = useState<boolean>(true);
-  const { setInitialState } = useModel('@@initialState');
+  const { initialState, setInitialState } = useModel('@@initialState');
 
   useEffect(() => {
     (async () => {
       setLoading(true);
       const { success, data } = await queryCurrentUserInfo();
       if (success) {
-        setInitialState(prev=>({
+        setInitialState(prev => ({
           ...(prev || {}),
           currentUserInfo: data,
         }) as any);
@@ -46,23 +46,40 @@ function LayoutContent(children: JSX.Element) {
 
     (async () => {
       const { success, data } = await getLayoutTitle();
-      if (success&&data) {
+      if (success && data) {
         dynamicSetHeaderTitle(data);
-        setInitialState(prev=>({
+        setInitialState(prev => ({
           ...(prev || {}),
           title: data,
         }) as any);
       }
     })();
-
-    updateBackground()
   }, []);
 
   if (window.location.pathname.includes(SHARE_PAGE_PREFIX)) {
     return children;
   }
+
+  const [themeColor, infoColor] = useMemo(() => {
+    const { palette = [],background } = (initialState as any)?.currentUserInfo?.themeColor || {}
+    updateBackground(background || './assets/backgrounds/bridge.svg')
+    return palette[1] ? [palette[2], palette[3]] : ['rgba(84,154,220,0.9)', 'rgba(84,154,220,0.9)']
+  }, [initialState])
+
+
+
   return (
     <>
+      <style>
+        {
+          `
+          :root{
+             --ant-primary-color: ${themeColor} !important;
+             --ant-info-color: ${infoColor} !important;
+          }
+        `
+        }
+      </style>
       <Skeleton active loading={loading}>
         {children}
       </Skeleton>
@@ -100,7 +117,7 @@ export const layout: RunTimeLayoutConfig = ({ initialState }) => {
 const REQUEST_TIME_OUT = 600000;
 
 export const request: RequestConfig = {
-  headers: (()=>{
+  headers: (() => {
     const biToken = window.localStorage.getItem(BI_AUTH_TOKEN_KEY);
     return biToken ? { Authorization: `Bearer ${biToken}` } : {}
   })() as any,

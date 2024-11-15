@@ -105,4 +105,15 @@ export class LayoutController {
     return await this.utils.defaultBackgroundPathService
       .get();
   }
+
+  @Post("/default/theme-color")
+  async setThemeColor(@Body(ALL) { color }: { color: string }) {
+    return await this.utils.themeColorService.set(this.ctx.userInfo?.username, color);
+  }
+
+  @Get("/default/theme-color")
+  async getThemeColor() {
+    return await this.utils.themeColorService
+      .get(this.ctx.username);
+  }
 }

@@ -8,10 +8,11 @@ const biToken = window.localStorage.getItem(BI_AUTH_TOKEN_KEY);
 import styles from './index.less';
 import { changeBackground } from '@/utils/layout';
 import { __DEFAULT_BACKGROUNDS__ } from '@/assets/backgrounds/desc';
+import useCurrentUserInfo from '@/hooks/useCurrentInfo';
 
 export default function Theme() {
   const [backgroundUrls, setBackgroundUrls] = useState<string[]>([]);
-
+  const [,reload] = useCurrentUserInfo()
   const refreshUrls = async () => {
     const { success, data } = await getBackgroundUrls();
     if (success) {
@@ -95,8 +96,9 @@ export default function Theme() {
                     <Button
                       size="small"
                       type="link"
-                      onClick={() => {
-                        changeBackground(path);
+                      onClick={async() => {
+                        await changeBackground(path);
+                        reload()
                       }}
                     >
                       设置为背景

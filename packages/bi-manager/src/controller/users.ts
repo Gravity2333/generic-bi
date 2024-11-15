@@ -68,9 +68,11 @@ export class UsersController {
       return this.ctx?.throw(500, "未授权用户！");
     }
     const info = await this.usersService.getUserInfoByUsername(username);
+    const themeColor = await this.utils.themeColorService.get(username);
     return {
       ...ctxInfo,
       ...info,
+      themeColor
     };
   }
 
