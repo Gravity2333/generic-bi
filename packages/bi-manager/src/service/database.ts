@@ -39,7 +39,16 @@ export class DatabaseService {
 
   async getDatabases(): Promise<DatabaseModel[]> {
     const { rows } = await DatabaseModel.findAndCountAll();
-    return rows;
+
+    return (await Promise.all(
+      rows.map(async (row) => {
+        const state = await this.checkConnect(row.type, row.id);
+        return {
+          ...row.dataValues,
+          state,
+        };
+      })
+    )) as any[];
   }
 
   async getDatabaseById(id): Promise<DatabaseModel> {
@@ -78,7 +87,6 @@ export class DatabaseService {
 
   private _handleDBInit = (databaseConfig: ParsedDBConfig) => {
     const { id } = databaseConfig;
-    console.log(this._handlePlugins(databaseConfig))
     externalServersCache.set(id, this._handlePlugins(databaseConfig));
   };
 
@@ -140,7 +148,6 @@ export class DatabaseService {
 
   /** 初始化数据库中已经有的配置 */
   async initDatabaseInstance() {
-    console.log("init db");
     // 初始化 外部系统 客户端
     // =======================
     const databaseConfigs = await this._getParsedInfos();
@@ -160,13 +167,14 @@ export class DatabaseService {
     // 处理错误
     try {
       let DBInstance = externalServersCache.get(databaseId);
-      console.log(DBInstance)
       if (!DBInstance || !DBInstance?.querying) {
         if (databaseId) {
-          const _dbConfigs = await this.getDatabaseById(databaseId)
-          const _dbInstance = this._handlePlugins(this._parseDatabseInput(_dbConfigs))
-          externalServersCache.set(databaseId,_dbInstance)
-          DBInstance = _dbInstance
+          const _dbConfigs = await this.getDatabaseById(databaseId);
+          const _dbInstance = this._handlePlugins(
+            this._parseDatabseInput(_dbConfigs)
+          );
+          externalServersCache.set(databaseId, _dbInstance);
+          DBInstance = _dbInstance;
         } else {
           this.ctx?.throw(500, "数据库实例不存在！");
         }
@@ -245,28 +253,35 @@ export class DatabaseService {
     );
   }
 
-  checkConnect = async () => {
-    // if (!this.type) return false;
-    // switch (this.type) {
-    //   case EDatabaseType.CLICKHOUSE:
-    //     try {
-    //       // await this.executeSql("SHOW TABLES LIKE 'system%';");
-    //       return true;
-    //     } catch (e) {
-    //       return false;
-    //     }
-    //   case EDatabaseType.POSTGRE:
-    //     try {
-    //       // await this.executeSql(
-    //       //   "SELECT tablename as name FROM pg_catalog.pg_tables limit 1"
-    //       // );
-    //       return true;
-    //     } catch (e) {
-    //       return false;
-    //     }
-    //   default:
-    //     return false;
-    // }
+  checkConnect = async (type, database) => {
+    switch (type) {
+      case EDatabaseType.CLICKHOUSE:
+        try {
+          await this.executeSql("SHOW TABLES LIKE 'system%';", database);
+          return true;
+        } catch (e) {
+          return false;
+        }
+      case EDatabaseType.POSTGRE:
+        try {
+          await this.executeSql(
+            "SELECT tablename as name FROM pg_catalog.pg_tables limit 1;",
+            database
+          );
+          return true;
+        } catch (e) {
+          return false;
+        }
+      case EDatabaseType.MYSQL:
+        try {
+          await this.executeSql("show databases;", database);
+          return true;
+        } catch (e) {
+          return false;
+        }
+      default:
+        return false;
+    }
   };
 
   initDefaultDatabse = async () => {

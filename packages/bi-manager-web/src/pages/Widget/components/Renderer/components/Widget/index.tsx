@@ -149,7 +149,6 @@ export default function Widget({
           },
         };
       });
-      console.log(columns,tableProps)
       return (
         <div
           style={{

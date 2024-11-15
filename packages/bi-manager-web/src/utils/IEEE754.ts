@@ -37,7 +37,6 @@ export default class IEEENumber implements IEEENumberType {
   static DecimalismToBinary(DecimalismCode: number, exact: number = 16) {
     const interger = Math.floor(DecimalismCode);
     const decimal = DecimalismCode % 1;
-    console.log(interger, decimal);
     // handle interger
     const integerBinBuf = [];
     let _divideVal = interger;
@@ -60,7 +59,6 @@ export default class IEEENumber implements IEEENumberType {
         decimalBuf.push(0);
       }
     }
-    console.log(integerBinBuf, decimalBuf);
   }
 
   public binaryBuffer = [];

@@ -1,25 +1,35 @@
-import { checkDabaseConnect } from '@/services/database';
-import { DisconnectOutlined, ExperimentOutlined, SmileOutlined } from '@ant-design/icons';
-import { Alert, Button, Card, Result } from 'antd';
+import { queryDatabases } from '@/services/database';
+import { DisconnectOutlined, ExperimentOutlined } from '@ant-design/icons';
+import { Alert, Button, Result } from 'antd';
 import { useEffect, useState } from 'react';
 import { history, useModel } from 'umi';
 import styles from './index.less';
 
 export default function Welcome() {
-  // const [connect, setConnect] = useState<boolean>(true);
-  // useEffect(() => {
-  //   (async () => {
-  //     setConnect((await checkDabaseConnect()) || false);
-  //   })();
-  // }, []);
+  const [errConnect, setErrConnect] = useState<string[]>([]);
+
+  useEffect(() => {
+    (async () => {
+      const { success, data } = await queryDatabases();
+      if (success) {
+        const list: string[] = [];
+        for (let db of data) {
+          if (!(db as any).state) {
+            list.push(db.name);
+          }
+        }
+        setErrConnect(list);
+      }
+    })();
+  }, []);
   const { initialState } = useModel('@@initialState');
   return (
-    <div style={{ minWidth:'80%' ,position:'absolute', left:'50%',top:'50%',transform:'translate(-50%,-50%)'}}>
-        {/* {!connect ? (
+    <>
+      {errConnect?.length > 0 ? (
         <Alert
           icon={<DisconnectOutlined />}
           type="error"
-          message="数据库连接失败，请检查配置！"
+          message={`数据库: ${errConnect?.join(',')} 连接失败，请检查配置！`}
           style={{ margin: '20px', borderRadius: '10px' }}
           action={
             <Button
@@ -33,7 +43,16 @@ export default function Welcome() {
             </Button>
           }
         />
-      ) : null} */}
+      ) : null}
+      <div
+        style={{
+          minWidth: '80%',
+          position: 'absolute',
+          left: '50%',
+          top: '50%',
+          transform: 'translate(-50%,-50%)',
+        }}
+      >
         <Result
           icon={<ExperimentOutlined />}
           title={
@@ -85,5 +104,6 @@ export default function Welcome() {
           </div>
         </div>
       </div>
+    </>
   );
 }

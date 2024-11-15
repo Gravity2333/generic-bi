@@ -1,5 +1,5 @@
 import { DataBaseParsedType } from '@bi/common';
-import { Button, Descriptions, message, Popconfirm, Popover } from 'antd';
+import { Badge, Button, Descriptions, message, Popconfirm, Popover } from 'antd';
 import { useEffect, useRef, useState } from 'react';
 import { Table } from 'antd';
 import { deleteDatabase, queryDatabases } from '@/services/database';
@@ -16,31 +16,33 @@ const renderDesc = (obj: Record<string, any>) => {
           column={2}
           style={{ maxHeight: '300px', marginTop: '10px', maxWidth: '600px' }}
         >
-          {Object.keys(obj || {}).filter(k=>typeof (obj || {})[k] !== 'object').map((k) => {
-            if (typeof (obj || {})[k] === 'object') {
-              return <></>
-            }
-            return (
-              <Descriptions.Item
-                style={{
-                  textOverflow: 'ellipsis',
-                  overflow: 'hidden',
-                }}
-                label={k}
-              >
-                <div
+          {Object.keys(obj || {})
+            .filter((k) => typeof (obj || {})[k] !== 'object')
+            .map((k) => {
+              if (typeof (obj || {})[k] === 'object') {
+                return <></>;
+              }
+              return (
+                <Descriptions.Item
                   style={{
-                    maxWidth: '150px',
-                    maxHeight: '100px',
                     textOverflow: 'ellipsis',
-                    overflow: 'auto',
+                    overflow: 'hidden',
                   }}
+                  label={k}
                 >
-                  {(obj || {})[k]}
-                </div>
-              </Descriptions.Item>
-            );
-          })}
+                  <div
+                    style={{
+                      maxWidth: '150px',
+                      maxHeight: '100px',
+                      textOverflow: 'ellipsis',
+                      overflow: 'auto',
+                    }}
+                  >
+                    {(obj || {})[k]}
+                  </div>
+                </Descriptions.Item>
+              );
+            })}
         </Descriptions>
       }
       trigger="click"
@@ -56,12 +58,6 @@ export default function WidgetList() {
 
   const columns: ColumnType<DataBaseParsedType>[] = [
     {
-      title: 'ID',
-      dataIndex: 'id',
-      width: 350,
-      align: 'center',
-    },
-    {
       title: '名称',
       dataIndex: 'name',
       align: 'center',
@@ -72,12 +68,49 @@ export default function WidgetList() {
       align: 'center',
     },
     {
+      title: 'HOST地址',
+      dataIndex: 'host',
+      align: 'center',
+      render: (_, record) => {
+        return (record.option as any)?.host;
+      },
+    },
+    {
+      title: '端口',
+      dataIndex: 'port',
+      align: 'center',
+      render: (_, record) => {
+        return (record.option as any)?.port;
+      },
+    },
+    {
+      title: '数据库',
+      dataIndex: 'database',
+      align: 'center',
+      render: (_, record) => {
+        return (record.option as any)?.database;
+      },
+    },
+    {
       title: '配置详情',
       dataIndex: 'option',
       width: 150,
       align: 'center',
       render: (_, record) => {
-        return (renderDesc(record.option));
+        return renderDesc(record.option);
+      },
+    },
+    {
+      title: '连接状态',
+      dataIndex: 'state',
+      width: 150,
+      align: 'center',
+      render: (state) => {
+        return state ? (
+          <Badge status="success" text="连接成功" />
+        ) : (
+          <Badge status="error" text="连接失败" />
+        );
       },
     },
     {

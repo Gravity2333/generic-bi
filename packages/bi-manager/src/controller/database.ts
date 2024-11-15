@@ -31,11 +31,6 @@ export class DatabseAPIController {
     return this.databaseService.getDatabases();
   }
 
-  @Get("/database/:id/check")
-  async checkDatabasConnect() {
-    return this.databaseService.checkConnect();
-  }
-
   @Get("/database/:id")
   @Validate()
   async queryDatabaseInfobyId(@Param() id: string) {
