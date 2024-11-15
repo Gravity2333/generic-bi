@@ -92,7 +92,7 @@ export default function Login() {
         className={styles['outer-card']}
       >
         <div className={styles['outer-card__title']}>
-          {isRegister ? '注册账号' : '登录到 Generic BI'}
+          {isRegister ? '注册账号' : window?.productInfo?.loginTitle || '登录到 Generic BI'}
         </div>
         <Form form={form} layout="vertical" onFinish={handleLogin}>
           {isRegister ? (

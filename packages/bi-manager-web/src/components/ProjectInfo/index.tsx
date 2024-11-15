@@ -1,9 +1,4 @@
-import Icon, {
-  GithubOutlined,
-  InfoCircleOutlined,
-  LikeOutlined,
-  UserOutlined,
-} from '@ant-design/icons';
+import { GithubOutlined, InfoCircleOutlined, UserOutlined } from '@ant-design/icons';
 import styles from './index.less';
 import { useState } from 'react';
 import LOGO from '@/assets/icons/logo.png';
@@ -13,12 +8,14 @@ export default function ProjectInfo() {
   const [visiable, setVisiable] = useState<boolean>(false);
   return (
     <>
-      <InfoCircleOutlined
-        className={styles['info_btn']}
-        onClick={() => {
-          setVisiable(true);
-        }}
-      />
+      {window?.productInfo?.projectInfo?.show ? (
+        <InfoCircleOutlined
+          className={styles['info_btn']}
+          onClick={() => {
+            setVisiable(true);
+          }}
+        />
+      ) : null}
       <Modal
         destroyOnClose
         width="500px"
@@ -39,14 +36,22 @@ export default function ProjectInfo() {
           <img src={LOGO}></img>
         </div>
 
-        <header className={styles['project-info-card__title']}>感谢使用Generic-BI</header>
-        <div className={styles['project-info-card__subTitle']}>你的版本: 展示版</div>
+        <header className={styles['project-info-card__title']}>
+          {window?.productInfo?.projectInfo?.title}
+        </header>
+        <div className={styles['project-info-card__subTitle']}>
+          {window?.productInfo?.projectInfo?.mode}
+        </div>
         <footer className={styles['project-info-card__footer']}>
           <div>
-            <div>此版本为展示版</div>
-            <div>请下载源码编译打包，或使用release的docker镜像</div>
+            {(window?.productInfo?.projectInfo?.description || []).map((d) => {
+              return <div>{d}</div>;
+            })}
             <div
-              style={{ marginTop: '10px' }}
+              style={{
+                marginTop: '10px',
+                visibility: window?.productInfo?.projectInfo?.showSource ? 'visible' : 'hidden',
+              }}
               onClick={() => {
                 window.open('https://github.com/Gravity2333/generic-bi');
               }}
@@ -56,6 +61,9 @@ export default function ProjectInfo() {
               <span> 项目源码</span>
             </div>
             <div
+              style={{
+                visibility: window?.productInfo?.projectInfo?.showAuthor ? 'visible' : 'hidden',
+              }}
               onClick={() => {
                 window.open('https://github.com/Gravity2333');
               }}

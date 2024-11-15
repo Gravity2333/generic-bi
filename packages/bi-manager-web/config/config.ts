@@ -1,4 +1,4 @@
-import { defineConfig } from "umi";
+import { defineConfig } from 'umi';
 
 export default defineConfig({
   base: '/',
@@ -7,4 +7,5 @@ export default defineConfig({
   },
   favicon: '/favicon.ico',
   layout: {},
+  scripts: [{ src: `/bi/web-static/config/config.js` }],
 });
