@@ -1,7 +1,7 @@
 services:
   generic-bi:
     container_name: generic-bi-server
-    image: generic-bi-server:latest
+    image: generic-bi-x86:latest
     environment:
       USER: root
       TZ: "Asia/Shanghai"
