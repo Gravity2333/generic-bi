@@ -1,18 +1,24 @@
 import { API_PREFIX, BI_AUTH_TOKEN_KEY } from '@/common';
 import { deleteBackground, getBackgroundUrls } from '@/services/layout';
 import { CloudUploadOutlined } from '@ant-design/icons';
-import { Button, Card, message, Upload } from 'antd';
+import { Button, Card, message, Progress, Upload } from 'antd';
 import Meta from 'antd/lib/card/Meta';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 const biToken = window.localStorage.getItem(BI_AUTH_TOKEN_KEY);
 import styles from './index.less';
 import { changeBackground } from '@/utils/layout';
 import { __DEFAULT_BACKGROUNDS__ } from '@/assets/backgrounds/desc';
 import useCurrentUserInfo from '@/hooks/useCurrentInfo';
+import { uploadFile } from '@/services/transfer';
+import GlobalAlert from '@/components/GlobalAlert';
+import { flushSync } from 'react-dom';
 
 export default function Theme() {
+  const alertRef = useRef<any>()
+  const abortRef = useRef<any>()
   const [backgroundUrls, setBackgroundUrls] = useState<string[]>([]);
-  const [,reload] = useCurrentUserInfo()
+  const [uploadProgress, setUploadProgress] = useState<number>(0)
+  const [, reload] = useCurrentUserInfo()
   const refreshUrls = async () => {
     const { success, data } = await getBackgroundUrls();
     if (success) {
@@ -24,67 +30,96 @@ export default function Theme() {
     refreshUrls();
   }, []);
 
+  const startProcess = () => {
+    flushSync(() => {
+      setUploadProgress(0)
+    })
+    alertRef.current.on()
+  }
+
+  const [msg, setMsg] = useState<any>('')
+
+  const changeProcess = (p: number) => {
+    setUploadProgress(+(p * 100).toFixed(0))
+  }
+
+  const endProcess = () => {
+    setUploadProgress(100)
+    setMsg('上传成功！')
+    setTimeout(() => {
+      alertRef.current.off()
+      setTimeout(() => {
+        setMsg('')
+      }, 1000);
+    }, 2000);
+  }
+
+  const errProcess = () => {
+    setUploadProgress(100)
+    setMsg('上传失败！')
+    setTimeout(() => {
+      alertRef.current.off()
+      setTimeout(() => {
+        setMsg('')
+      }, 1000);
+    }, 2000);
+  }
+
   return (
     <>
-      {/* <h2 style={{ width: '80%', margin: '20px auto' }}>选择背景图:</h2> */}
+      <GlobalAlert onClose={() => {
+        abortRef.current?.()
+      }} ref={alertRef} ><div style={{ fontSize: '12px', lineHeight: '30px', textAlign: 'center' }}>
+          {
+            !msg ? <> <span style={{ marginRight: '10px' }}>上传进度</span>
+              <Progress percent={uploadProgress} steps={10} /></> : <span>{msg}</span>
+          }
+        </div></GlobalAlert>
       <div className={styles['background-list']}>
         <Card
-          style={{ width: ' 300px', height: '350px' }}
+          style={{ width: ' 300px', height: '350px', cursor: 'pointer' }}
           hoverable
           bodyStyle={{
             height: '100%',
             textAlign: 'center',
             padding: '0px',
             display: 'flex',
+            flexFlow: 'column nowrap',
             justifyContent: 'center',
             alignItems: 'center',
+            cursor: 'pointer'
           }}
         >
-          <Upload
-            style={{ width: '100%', height: '100%', backgroundColor: 'red', display: 'block' }}
-            {...{
-              name: 'file',
-              headers: {
-                ...(biToken ? { Authorization: `Bearer ${biToken}` } : {}),
-              },
-              method: 'post',
-              action: `${API_PREFIX}/background/as-import`,
-              showUploadList: false,
-              withCredentials: true,
-              onChange(info) {
-                if (info.file.status === 'done') {
-                  message.destroy();
-                  message.success(`上传完成!`);
-                  refreshUrls();
-                } else if (info.file.status === 'error') {
-                  message.destroy();
-                  message.error(`上传失败!`);
-                }
-              },
-            }}
-            beforeUpload={(file) => {
-              const { name } = file;
-              const allowTypes = /\.(jpg|jpeg|png|gif|svg|webp)$/i;
-              if (!allowTypes.test(name)) {
-                message.destroy();
-                message.error('只能上传 JPG 或 PNG 文件!');
-                return false;
+          <input className={styles['upload']} type='file' accept=".jpg, .jpeg, .png, .gif .svg .webp" onChange={async (e) => {
+            if (e.target.files?.[0]) {
+              const [uploadPromise, abort] = uploadFile({
+                file: e.target.files[0]!,
+                url: `${API_PREFIX}/background/as-import`,
+                onLoadStart: startProcess,
+                onProgress: changeProcess,
+                onLoadEnd: endProcess,
+                onError: errProcess,
+              })
+
+              abortRef.current = abort
+              const { success } = await uploadPromise
+
+              if (success) {
+                endProcess()
+
+              } else {
+                errProcess()
               }
-              message.destroy();
-              message.loading('上传中!');
-              return true;
+            }
+          }} />
+          <CloudUploadOutlined
+            style={{
+              textAlign: 'center',
+              fontSize: '70px',
+              display: 'block',
             }}
-          >
-            <CloudUploadOutlined 
-              style={{
-                width: '100%',
-                height: '100%',
-                textAlign: 'center',
-                fontSize: '70px',
-                display: 'block',
-              }}
-            />
-          </Upload>
+          />
+          <div>背景上传</div>
         </Card>
         {__DEFAULT_BACKGROUNDS__.map(({ name, path, cover }: any) => {
           return (
@@ -96,7 +131,7 @@ export default function Theme() {
                     <Button
                       size="small"
                       type="link"
-                      onClick={async() => {
+                      onClick={async () => {
                         await changeBackground(path);
                         reload()
                       }}

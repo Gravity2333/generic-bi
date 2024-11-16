@@ -1,0 +1,49 @@
+.alert-content{
+    width: 350px;
+    position: fixed;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 120;
+    border-radius: 5px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.8);
+    background-color: white;
+
+    &__close{
+        position: absolute;
+        right: 5px;
+        top: 22%;
+        border-radius: 50%;
+
+        color: black;
+        width: 16px;
+        height: 16px;
+        text-align: center;
+        line-height: 18px;
+        font-size: 10px;
+        font-weight: bold;
+        vertical-align: 2px;
+    }
+
+    &__close:hover{
+        color: red;
+        transition-duration: 0.5s;
+    }
+
+    &__message{
+        text-align: center;
+        line-height: 30px;
+    }
+}
+
+:global{
+    .alert-content__visiable{
+        transition-duration: 0.6s;
+        top: 10px;
+    }
+
+    .alert-content__close{
+        transition-duration: 0.6s;
+        top: -100px;
+    }
+}
