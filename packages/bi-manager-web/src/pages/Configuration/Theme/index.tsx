@@ -106,7 +106,7 @@ export default function Theme() {
 
               if (success) {
                 endProcess()
-
+                refreshUrls()
               } else {
                 errProcess()
               }
