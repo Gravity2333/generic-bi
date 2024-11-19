@@ -11,6 +11,7 @@ export * from './datasets'
 export * from './database'
 export * from './diffSql'
 export * from './default'
+export * from './perfixs'
 
 export interface IPageFactory<T> {
   rows: T[];
@@ -20,3 +21,4 @@ export interface IPageFactory<T> {
   pageNumber?: number;
   pageSize?: number;
 }
+

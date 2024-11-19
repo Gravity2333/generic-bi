@@ -127,7 +127,7 @@ export async function batchDeleteDashboard(ids: string) {
  * @returns
  */
 export async function downloadPdf(id: string) {
-  downloadFile(`${API_PREFIX}/dashboards/${id}/export`);
+  downloadFile(`/dashboards/${id}/export`);
 }
 
 /** 导出仪表盘 */
@@ -139,6 +139,6 @@ export async function exportDashboard({
   exportWidgets?: boolean;
 }) {
   downloadFile(
-    `${API_PREFIX}/dashboards/as-export?ids=${ids}&exportWidgets=${exportWidgets ? '1' : '0'}`,
+    `/dashboards/as-export?ids=${ids}&exportWidgets=${exportWidgets ? '1' : '0'}`,
   );
 }

@@ -63,7 +63,7 @@ export async function deleteSqlJson(id: string) {
  * @returns
  */
 export async function downloadSqlJsonExcel(sql: string) {
-  downloadFile(`${API_PREFIX}/sql-json/export?type=excel&sql=${sql}`);
+  downloadFile(`/sql-json/export?type=excel&sql=${sql}`);
 }
 
 /**
@@ -72,7 +72,7 @@ export async function downloadSqlJsonExcel(sql: string) {
  * @returns
  */
 export async function  downloadSqlJsonCSV(sql: string) {
-  downloadFile(`${API_PREFIX}/sql-json/export?type=csv&sql=${sql}`);
+  downloadFile(`/sql-json/export?type=csv&sql=${sql}`);
 }
 
 /** 同步tab顺序 */

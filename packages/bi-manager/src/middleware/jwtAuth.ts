@@ -3,6 +3,7 @@ import { Context, IMidwayWebNext, IWebMiddleware } from "@midwayjs/web";
 import { GlobalService } from "../service/global";
 import { IMidwayLogger } from "@midwayjs/logger";
 import { JwtService } from "../service/jwt";
+import { API_DOWNLOAD, AUTH_USER_COOKIE } from "@bi/common";
 
 @Provide("jwtAuthMiddleware")
 export class jwtAuthMiddleware implements IWebMiddleware {
@@ -34,6 +35,20 @@ export class jwtAuthMiddleware implements IWebMiddleware {
       if (ctx.path.includes("/login") || ctx.path.includes("/register")) {
         await next();
         return;
+      }
+
+      if(ctx.path.includes(API_DOWNLOAD)){
+        const authUserCookie = ctx.cookies.get(AUTH_USER_COOKIE, {
+          signed: true,  // 如果 Cookie 是签名的，需要启用签名验证
+        });
+
+        if(authUserCookie){
+          ctx.request.path=ctx.request.path.replace(API_DOWNLOAD,'')
+          await next();
+          return;
+        }else{
+          ctx?.throw(401, "授权失败");
+        }
       }
 
       try {
