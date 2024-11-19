@@ -92,6 +92,7 @@ COPY --from=generic-bi-x86 /build/bi-manager-prod/node_modules/ /usr/src/app/nod
 # Copy Web production
 COPY --from=generic-bi-x86 /build/packages/bi-manager-web/dist/index.html /usr/src/app/view/
 COPY --from=generic-bi-x86 /build/packages/bi-manager-web/dist/favicon.ico /usr/src/app/view/
+COPY --from=generic-bi-x86 /build/packages/bi-manager-web/dist/config /usr/src/app/view/
 COPY --from=generic-bi-x86 /build/packages/bi-manager-web/dist/ /usr/src/app/dist/app/public/
 
 # 拷贝初始化仪表盘文件

@@ -143,6 +143,10 @@ export default (appInfo: EggAppInfo) => {
   config.static = {
     prefix: "/bi/web-static/",
   };
-  
+
+  config.siteFile = {
+    '/favicon.ico': '/bi/web-static/favicon.ico',
+  };
+
   return config;
 };
