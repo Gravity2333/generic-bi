@@ -199,5 +199,5 @@ apk add postgresql-client
 ## 直接运行？
 见release分支，下载docker镜像即可
 
-x86_64 打包 docker build --platform linux/arm64 . -t generic-bi-x86 .  
+x86_64 打包 docker build --platform linux/arm64  -t generic-bi-x86 .  
 docker buildx build --platform linux/amd64 -t generic-bi-x86 .
