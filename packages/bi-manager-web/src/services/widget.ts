@@ -169,7 +169,7 @@ export async function widgetExplore(params: IWidgetExploreParams) {
 
 /** 导出widget */
 export async function widgetExport(ids: string) {
-  downloadFile(`${API_PREFIX}/widgets/as-export?ids=${ids}`);
+  downloadFile(`/widgets/as-export?ids=${ids}`);
 }
 
 /**
@@ -178,7 +178,7 @@ export async function widgetExport(ids: string) {
  * @returns
  */
 export async function downloadWidgetExcel(id: string) {
-  downloadFile(`${API_PREFIX}/widgets/${id}/export?type=excel`);
+  downloadFile(`/widgets/${id}/export?type=excel`);
 }
 
 /**
@@ -187,5 +187,5 @@ export async function downloadWidgetExcel(id: string) {
  * @returns
  */
 export async function downloadWidgetCSV(id: string) {
-  downloadFile(`${API_PREFIX}/widgets/${id}/export?type=csv`);
+  downloadFile(`/widgets/${id}/export?type=csv`);
 }

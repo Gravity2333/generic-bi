@@ -34,7 +34,7 @@ export async function queryReportLogs({ reportId, ...params }: IReportLogParams)
  * @returns
  */
 export async function downloadLog(reportId: string, logId: string) {
-  downloadFile(`${API_PREFIX}/reports/${reportId}/job-logs/${logId}/file-download`);
+  downloadFile(`/reports/${reportId}/job-logs/${logId}/file-download`);
 }
 
 /**
@@ -43,7 +43,7 @@ export async function downloadLog(reportId: string, logId: string) {
  * @returns
  */
 export async function queryReportDetail(id: string) {
-  return request<IAjaxResponseFactory<IReportFormData>>(`${API_PREFIX}/reports/${id}`, {
+  return request<IAjaxResponseFactory<IReportFormData>>(`/reports/${id}`, {
     method: 'GET',
   });
 }

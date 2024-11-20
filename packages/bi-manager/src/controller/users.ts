@@ -14,6 +14,7 @@ import { UsersService } from "../service/users";
 import { Utils } from "../utils";
 const formidable = require("formidable");
 import * as fs from "fs";
+import { AUTH_USER_COOKIE } from "@bi/common";
 
 @Provide()
 @Controller("/web-api/v1")
@@ -109,5 +110,23 @@ export class UsersController {
     } catch (error) {
       this.ctx?.throw(500, error);
     }
+  }
+
+  @Get(`/auth-cookie`)
+  async authCookie() {
+    const ctxInfo = await this.ctx.userInfo;
+    const { username } = ctxInfo;
+    if (!username) {
+      return this.ctx?.throw(500, "未授权用户！");
+    }
+    // 生成短cookie max-age 1分钟
+    this.ctx.cookies.set(AUTH_USER_COOKIE, username, {
+      maxAge: 60000, //  1分钟有效期
+      secure: this.ctx.request.secure,  // 如果是 HTTPS，启用 Secure
+      sameSite: 'Lax',             // 设置 SameSite 属性
+      path: '/',
+      httpOnly: false,
+    });
+    return true
   }
 }
