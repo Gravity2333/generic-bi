@@ -33,7 +33,7 @@ RUN cd /build/packages/bi-common/ && npm install numeral sqlstring uuid -g && np
 COPY packages/bi-common ./packages/bi-common/
 RUN cd /build/packages/bi-common/ && npm run build
 
-# # 构建 manager-web 
+# 构建 manager-web 
 RUN cd /build/packages/bi-manager-web/ && npm install /build/packages/bi-common && npm install 
 COPY packages/bi-manager-web ./packages/bi-manager-web/
 RUN cd /build/packages/bi-manager-web/ && npm run build --timeout=100000 || true
