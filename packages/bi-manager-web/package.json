@@ -4,6 +4,7 @@
   "scripts": {
     "start": "cross-env NODE_OPTIONS=--openssl-legacy-provider WEBPACK_FS_CACHE=none umi dev",
     "build:test": "cross-env NODE_OPTIONS=--openssl-legacy-provider WEBPACK_FS_CACHE=none umi build ",
+    "build:analyze": "cross-env NODE_OPTIONS=--openssl-legacy-provider ANALYZE=1 WEBPACK_FS_CACHE=none umi build ",
     "build": "cross-env WEBPACK_FS_CACHE=none umi build ",
     "postinstall": "umi generate tmp",
     "prettier": "prettier --write '**/*.{js,jsx,tsx,ts,less,md,json}'",
@@ -52,6 +53,7 @@
     "sql-formatter": "^2.3.4",
     "styled-components": "^5.3.1",
     "umi": "^3.5.19",
+    "umi-webpack-bundle-analyzer": "^4.4.2",
     "use-polling-hook": "^1.1.1",
     "use-variable-hook": "^3.0.13",
     "uuid": "^8.3.2",
