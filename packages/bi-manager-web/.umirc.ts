@@ -6,7 +6,7 @@ import buildConfig from './config/build.config';
 
 export const isDev = process.env.NODE_ENV === 'development';
 const MomentLocatesWebpackPlugin = require('moment-locales-webpack-plugin');
-const CompressionWebpackPlugin = require('compression-webpack-plugin');
+// const CompressionWebpackPlugin = require('compression-webpack-plugin');
 export default defineConfig({
   nodeModulesTransform: {
     type: 'none',
@@ -71,12 +71,12 @@ export default defineConfig({
       localesToKeep: ['es-us'],
     }),)
 
-    /** 开启gzip压缩 */
-    config.plugin('compress').use( 
-      new CompressionWebpackPlugin({
-        test: /\.(js|css)$/,
-        algorithm: 'gzip', //压缩算法
-        minRatio: 0.7, // 压缩倍率
-      }))
+    // /** 开启gzip压缩 */
+    // config.plugin('compress').use( 
+    //   new CompressionWebpackPlugin({
+    //     test: /\.(js|css)$/,
+    //     algorithm: 'gzip', //压缩算法
+    //     minRatio: 0.7, // 压缩倍率
+    //   }))
   },
 });
