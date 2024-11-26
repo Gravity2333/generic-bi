@@ -33,14 +33,14 @@ const buildConifg = {
         //   priority: 20,
         //   reuseExistingChunk: true,
         // },
-        // react: {
-        //   name: 'react',
-        //   test: /[\\/]node_modules[\\/](react|react-dom|react-router-dom|react-redux|redux)[\\/]/,
-        //   chunks: 'all',
-        //   // 要比node_modules高一点
-        //   priority: 20,
-        //   reuseExistingChunk: true,
-        // },
+        react: {
+          name: 'react',
+          test: /[\\/]node_modules[\\/](react|react-dom|react-router-dom|react-redux|redux)[\\/]/,
+          chunks: 'all',
+          // 要比node_modules高一点
+          priority: 20,
+          reuseExistingChunk: true,
+        },
         echarts: {
           name: 'echarts',
           test: /[\\/]node_modules[\\/]echarts/,
@@ -61,9 +61,15 @@ const buildConifg = {
           chunks: 'all',
           priority: 20,
         },
+        pages: {
+          name: 'pages', // 分组名称
+          test: /[\\/]src[\\/](pages)/, // 匹配工具库
+          chunks: 'async',
+          priority: 20,
+        },
         // utils: {
         //   name: 'utils', // 分组名称
-        //   test: /[\\/]node_modules[\\/](lodash|moment|dayjs)/, // 匹配工具库
+        //   test: /[\\/]node_modules[\\/](moment)/, // 匹配工具库
         //   chunks: 'all',
         //   priority: 20,
         // },

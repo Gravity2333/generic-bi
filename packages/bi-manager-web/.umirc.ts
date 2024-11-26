@@ -44,7 +44,7 @@ export default defineConfig({
   },
   mountElementId: 'bi-web-root',
   chunks: (() => {
-    const _chunks = ['default','umi'];
+    const _chunks = ['react','default','umi'];
     // if (process.env.NODE_ENV === 'production') {
     //   /** 根据分包自动设置_chunks */
     //   const cacheGroups = buildConfig?.optimization?.splitChunks?.cacheGroups || {};
