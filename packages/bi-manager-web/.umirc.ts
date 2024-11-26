@@ -5,8 +5,8 @@ import moment from 'moment';
 import buildConfig from './config/build.config';
 
 export const isDev = process.env.NODE_ENV === 'development';
-const { BundleAnalyzerPlugin } = require('umi-webpack-bundle-analyzer');
-
+const MomentLocatesWebpackPlugin = require('moment-locales-webpack-plugin');
+const CompressionWebpackPlugin = require('compression-webpack-plugin');
 export default defineConfig({
   nodeModulesTransform: {
     type: 'none',
@@ -44,7 +44,7 @@ export default defineConfig({
   },
   mountElementId: 'bi-web-root',
   chunks: (() => {
-    const _chunks = ['react','default','umi'];
+    const _chunks = ['umi'];
     // if (process.env.NODE_ENV === 'production') {
     //   /** 根据分包自动设置_chunks */
     //   const cacheGroups = buildConfig?.optimization?.splitChunks?.cacheGroups || {};
@@ -62,20 +62,21 @@ export default defineConfig({
       .test(/\.m?js$/)
       .resolve.set('fullySpecified', false);
 
-    // 分析模式下打开分析插件
-    if (process.env.ANALYZE === '1') {
-      config.plugin('umi-webpack-bundle-analyzer').use(
-        new BundleAnalyzerPlugin({
-          analyzerMode: 'server', // 启用分析模式
-          analyzerPort: 9765, // 设置端口号为 9765,
-          openAnalyzer: true, // 自动打开分析页面
-        }),
-      );
-    }
-
     // 合并生产环境优化
     if (process.env.NODE_ENV === 'production') {
       config.merge(buildConfig);
     }
+    /** 减少momentjs体积 去除没必要的locate */
+    config.plugin('moment-locates').use(new MomentLocatesWebpackPlugin({
+      localesToKeep: ['es-us'],
+    }),)
+
+    /** 开启gzip压缩 */
+    config.plugin('compress').use( 
+      new CompressionWebpackPlugin({
+        test: /\.(js|css)$/,
+        algorithm: 'gzip', //压缩算法
+        minRatio: 0.7, // 压缩倍率
+      }))
   },
 });

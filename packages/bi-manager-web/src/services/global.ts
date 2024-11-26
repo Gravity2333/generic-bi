@@ -103,6 +103,14 @@ export async function queryCurrentUserInfo() {
   });
 }
 
+/**
+ * 查询详细用户信息
+ */
+export async function queryCurrentUserInfoDetails() {
+  return request<IAjaxResponseFactory<IUserInfo>>(`${API_PREFIX}/current-user-details`, {
+    method: 'GET',
+  });
+}
 
 /**
  * 查询os信息

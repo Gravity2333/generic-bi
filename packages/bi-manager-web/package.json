@@ -2,7 +2,7 @@
   "name": "@bi/manager-web",
   "version": "1.0.0",
   "scripts": {
-    "start": "cross-env NODE_ENV=development NODE_OPTIONS=--openssl-legacy-provider  WEBPACK_FS_CACHE=none umi dev",
+    "start": "cross-env NODE_ENV=development NODE_OPTIONS=--openssl-legacy-provider WEBPACK_FS_CACHE=none umi dev",
     "analyze": "cross-env NODE_ENV=production NODE_OPTIONS=--openssl-legacy-provider ANALYZE=1 WEBPACK_FS_CACHE=none umi build ",
     "build": "cross-env  NODE_ENV=production WEBPACK_FS_CACHE=none umi build ",
     "build:test": "cross-env NODE_ENV=production TEST=1 NODE_OPTIONS=--openssl-legacy-provider  WEBPACK_FS_CACHE=none umi build ",

@@ -68,6 +68,18 @@ export class UsersController {
     if (!username) {
       return this.ctx?.throw(500, "未授权用户！");
     }
+    return {
+      ...ctxInfo,
+    };
+  }
+
+  @Get("/current-user-details")
+  async querCurrentUserInfoDetails() {
+    const ctxInfo = await this.ctx.userInfo;
+    const { username } = ctxInfo;
+    if (!username) {
+      return this.ctx?.throw(500, "未授权用户！");
+    }
     const info = await this.usersService.getUserInfoByUsername(username);
     const themeColor = await this.utils.themeColorService.get(username);
     return {

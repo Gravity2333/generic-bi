@@ -2,7 +2,6 @@ import { API_PREFIX, BI_AUTH_TOKEN_KEY } from '@/common';
 import {
   CloseOutlined,
   EditOutlined,
-  EllipsisOutlined,
   LogoutOutlined,
   SettingOutlined,
   UserOutlined,
@@ -15,7 +14,7 @@ import Meta from 'antd/lib/card/Meta';
 import { forwardRef, useImperativeHandle, useRef, useState } from 'react';
 import ChangePassword from '../ChangePassword';
 import { backToLogin } from '@/utils';
-import { queryCurrentUserInfo } from '@/services/global';
+import {  queryCurrentUserInfoDetails } from '@/services/global';
 import EditableTitle from '../EditableTitle';
 import { changeNickname } from '@/services/users';
 import { history } from 'umi';
@@ -55,7 +54,7 @@ const UserInfoModal = forwardRef(function (
   const { setInitialState } = useModel('@@initialState');
 
   const fetchCurrentUserInfo = async () => {
-    const { success, data } = await queryCurrentUserInfo();
+    const { success, data } = await queryCurrentUserInfoDetails();
     if (success) {
       setInitialState(
         (prev) =>

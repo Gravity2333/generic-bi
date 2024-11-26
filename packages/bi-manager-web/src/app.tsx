@@ -9,7 +9,7 @@ import { TTheme } from './interface';
 import { backToLogin, isIframeEmbed, throttle } from './utils';
 import { DARK_COLOR, THEME_KEY } from './utils/theme';
 import { useEffect, useMemo, useState } from 'react';
-import { queryCurrentUserInfo } from './services/global';
+import { queryCurrentUserInfo, queryCurrentUserInfoDetails } from './services/global';
 import { sendMsgToParent } from './utils/sendMsgToParent';
 import { getLayoutTitle } from './services/layout';
 import { dynamicSetHeaderTitle, updateBackground } from './utils/layout';
@@ -33,19 +33,24 @@ function LayoutContent(children: JSX.Element) {
   useEffect(() => {
     (async () => {
       setLoading(true);
-      const { success, data } = await queryCurrentUserInfo();
-      if (success) {
-        setInitialState(
-          (prev) =>
-            ({
-              ...(prev || {}),
-              currentUserInfo: data,
-            } as any),
-        );
-      } else {
+      const { success } = await queryCurrentUserInfo();
+      if (!success) {
         backToLogin();
       }
       setLoading(false);
+    })();
+
+    (async () => {
+      const { success, data } = await queryCurrentUserInfoDetails();
+      if (success) {
+        setInitialState(
+          (prev) =>
+          ({
+            ...(prev || {}),
+            currentUserInfo: data,
+          } as any),
+        );
+      }
     })();
 
     (async () => {
@@ -54,10 +59,10 @@ function LayoutContent(children: JSX.Element) {
         dynamicSetHeaderTitle(data);
         setInitialState(
           (prev) =>
-            ({
-              ...(prev || {}),
-              title: data,
-            } as any),
+          ({
+            ...(prev || {}),
+            title: data,
+          } as any),
         );
       }
     })();
