@@ -201,3 +201,8 @@ apk add postgresql-client
 
 x86_64 打包 docker build --platform linux/arm64  -t generic-bi-x86 .  
 docker buildx build --platform linux/amd64 -t generic-bi-x86 .
+
+
+### 打包调试模式
+/dist使用liveserver
+live-server --entry-file=index.html

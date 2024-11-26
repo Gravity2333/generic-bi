@@ -2,6 +2,7 @@ import proxy from './config/proxy';
 import routes from './config/routes';
 import { defineConfig } from 'umi';
 import moment from 'moment';
+import buildConfig from './config/build.config';
 
 export const isDev = process.env.NODE_ENV === 'development';
 const { BundleAnalyzerPlugin } = require('umi-webpack-bundle-analyzer');
@@ -10,8 +11,19 @@ export default defineConfig({
   nodeModulesTransform: {
     type: 'none',
   },
-  base: '/bi/',
-  publicPath: '/bi/web-static/',
+  ...(() => {
+    /** TEST模式下，修改publicPath 和 base */
+    if (process.env.TEST === '1') {
+      return {
+        base: '/',
+        publicPath: '/',
+      };
+    }
+    return {
+      base: '/bi/',
+      publicPath: '/bi/web-static/',
+    };
+  })(),
   antd: {},
   layout: {},
   hash: true,
@@ -31,12 +43,26 @@ export default defineConfig({
     'root-entry-name': 'variable',
   },
   mountElementId: 'bi-web-root',
+  chunks: (() => {
+    const _chunks = ['default','umi'];
+    // if (process.env.NODE_ENV === 'production') {
+    //   /** 根据分包自动设置_chunks */
+    //   const cacheGroups = buildConfig?.optimization?.splitChunks?.cacheGroups || {};
+    //   _chunks.push(
+    //     ...Object.keys(cacheGroups).filter(chunk => chunk!=='src').map((chunk) => {
+    //       return (cacheGroups as any)[chunk].name;
+    //     }),
+    //   );
+    // }
+    return _chunks;
+  })(),
   chainWebpack: (config) => {
     config.module
       .rule('mjs-rule')
       .test(/\.m?js$/)
       .resolve.set('fullySpecified', false);
 
+    // 分析模式下打开分析插件
     if (process.env.ANALYZE === '1') {
       config.plugin('umi-webpack-bundle-analyzer').use(
         new BundleAnalyzerPlugin({
@@ -47,59 +73,9 @@ export default defineConfig({
       );
     }
 
-    config.optimization.splitChunks({
-      chunks: 'all',
-      cacheGroups: {
-        vendor: {
-          name: 'vendor',
-          test: /[\\/]node_modules[\\/]/,
-          chunks: 'all',
-          priority: 10,
-          reuseExistingChunk: true,
-          enforce: true,
-        },
-        react: {
-          name: 'react',
-          test: /[\\/]node_modules[\\/](react|react-dom|react-router-dom|react-redux|redux)[\\/]/,
-          chunks: 'all',
-          // 要比node_modules高一点
-          priority: 20,
-          reuseExistingChunk: true,
-          enforce: true,
-        },
-        ecahrts: {
-          name: 'ecahrts',
-          test: /[\\/]node_modules[\\/]echarts/,
-          chunks: 'all',
-          // 要比node_modules高一点
-          priority: 20,
-          reuseExistingChunk: true,
-          enforce: true,
-        },
-        'ag-grid': {
-          name: 'ag-grid', // 分组名称
-          test: /[\\/]node_modules[\\/]ag-grid-community/, // 匹配工具库
-          chunks: 'all',
-          priority: 20,
-          maxSize: 1024*1024,
-          enforce: true,
-        },
-        'wangEditor': {
-          name: 'wangEditor', // 分组名称
-          test: /[\\/]node_modules[\\/]wangeditor/, // 匹配工具库
-          chunks: 'all',
-          priority: 20,
-          enforce: true,
-        },
-        utils: {
-          name: 'utils', // 分组名称
-          test: /[\\/]node_modules[\\/](lodash|moment|dayjs)/, // 匹配工具库
-          chunks: 'all',
-          priority: 10,
-          enforce: true,
-        },
-      },
-    });
-    config.optimization.set('emitOnErrors', false); // 替代 noEmitOnErrors
+    // 合并生产环境优化
+    if (process.env.NODE_ENV === 'production') {
+      config.merge(buildConfig);
+    }
   },
 });
